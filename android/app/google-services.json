@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "401992673899",
+    "project_id": "programacao-adacb",
+    "storage_bucket": "programacao-adacb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401992673899:android:eeaf830f6559b8d8095f2e",
+        "android_client_info": {
+          "package_name": "com.programacao.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwP_JOblY4InCo_LfoiaW-I6RQtArM-fg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
