@@ -1,5 +1,5 @@
-import 'package:programacao/app/core/components/loading.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/components/loading.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class IconLoadingButton extends StatefulWidget {

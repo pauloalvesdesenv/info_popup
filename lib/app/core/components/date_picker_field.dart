@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/components/app_field.dart';
-import 'package:programacao/app/core/extensions/date_ext.dart';
+import 'package:aco_plus/app/core/components/app_field.dart';
+import 'package:aco_plus/app/core/extensions/date_ext.dart';
 
 class DatePickerField extends StatelessWidget {
   final String label;
   final DateTime? item;
   final Function(DateTime) onChanged;
   const DatePickerField(
-      {required this.label,
-      required this.item,
-      required this.onChanged,
-      super.key});
+      {required this.label, required this.item, required this.onChanged, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +17,7 @@ class DatePickerField extends StatelessWidget {
         final first = now;
         final lats = now.add(const Duration(days: 365));
         FocusManager.instance.primaryFocus?.unfocus();
-        final result = await showDatePicker(
-            context: context, firstDate: first, lastDate: lats);
+        final result = await showDatePicker(context: context, firstDate: first, lastDate: lats);
         if (result == null) return;
         onChanged.call(result);
       },

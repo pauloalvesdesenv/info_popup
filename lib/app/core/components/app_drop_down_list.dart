@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/components/app_container.dart';
-import 'package:programacao/app/core/components/h.dart';
-import 'package:programacao/app/core/components/w.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/components/app_container.dart';
+import 'package:aco_plus/app/core/components/h.dart';
+import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 
 class AppDropDownList<T> extends StatefulWidget {
   final String label;
@@ -80,8 +80,7 @@ class _AppDropDownList<T> extends State<AppDropDownList<T>> {
                     },
                     child: Container(
                       height: 30,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.neutralLight),
                         borderRadius: BorderRadius.circular(4),
@@ -108,8 +107,7 @@ class _AppDropDownList<T> extends State<AppDropDownList<T>> {
                                     children: [
                                       Text(
                                         widget.itemLabel.call(e),
-                                        style:
-                                            TextStyle(color: AppColors.white),
+                                        style: TextStyle(color: AppColors.white),
                                       ),
                                       const W(4),
                                       InkWell(

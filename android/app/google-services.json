@@ -1,21 +1,40 @@
 {
   "project_info": {
-    "project_number": "401992673899",
-    "project_id": "programacao-adacb",
-    "storage_bucket": "programacao-adacb.appspot.com"
+    "project_number": "210867609065",
+    "project_id": "aco-plus-fa455",
+    "storage_bucket": "aco-plus-fa455.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:401992673899:android:eeaf830f6559b8d8095f2e",
+        "mobilesdk_app_id": "1:210867609065:android:31b0ec1b0b3f0693bc3f78",
         "android_client_info": {
-          "package_name": "com.programacao.app"
+          "package_name": "com.aco_plus.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCwP_JOblY4InCo_LfoiaW-I6RQtArM-fg"
+          "current_key": "AIzaSyCU47wXoaBO8eabFmKUiXIhPe-Xo7sbhaw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:210867609065:android:91662436a9e9a893bc3f78",
+        "android_client_info": {
+          "package_name": "com.m2.acoplus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCU47wXoaBO8eabFmKUiXIhPe-Xo7sbhaw"
         }
       ],
       "services": {

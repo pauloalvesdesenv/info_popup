@@ -1,6 +1,6 @@
-import 'package:programacao/app/core/components/w.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -26,10 +26,7 @@ class NotificationWidget extends StatelessWidget {
         color: Colors.transparent,
         child: Container(
             margin: EdgeInsets.only(
-                top: MediaQuery.of(context).viewPadding.top + 16,
-                right: 24,
-                left: 24,
-                bottom: 36),
+                top: MediaQuery.of(context).viewPadding.top + 16, right: 24, left: 24, bottom: 36),
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -41,8 +38,7 @@ class NotificationWidget extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                      color: color, borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
                   child: Icon(
                     icon,
                     color: Colors.white,
@@ -54,12 +50,10 @@ class NotificationWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title,
-                          style: AppCss.smallBold.setColor(AppColors.black)),
+                      Text(title, style: AppCss.smallBold.setColor(AppColors.black)),
                       Text(
                         subtitle,
-                        style: AppCss.minimumRegular
-                            .setColor(AppColors.neutralDark),
+                        style: AppCss.minimumRegular.setColor(AppColors.neutralDark),
                       ),
                     ],
                   ),

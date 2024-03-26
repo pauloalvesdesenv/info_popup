@@ -1,5 +1,5 @@
+import 'package:aco_plus/app/core/models/service_model.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:programacao/app/core/models/service_model.dart';
 
 class DateService implements Service {
   @override

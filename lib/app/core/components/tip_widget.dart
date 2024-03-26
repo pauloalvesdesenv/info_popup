@@ -1,5 +1,5 @@
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
 
 class TipWidget extends StatelessWidget {
@@ -24,15 +24,12 @@ class TipWidget extends StatelessWidget {
           decoration: BoxDecoration(
               color: isSelected ? AppColors.primaryDark : null,
               borderRadius: AppCss.radius16,
-              border: Border.all(
-                  color: isSelected
-                      ? AppColors.primaryDark
-                      : AppColors.neutralMedium)),
+              border:
+                  Border.all(color: isSelected ? AppColors.primaryDark : AppColors.neutralMedium)),
           child: Center(
             child: Text(
               label,
-              style: AppCss.smallRegular
-                  .setColor(isSelected ? AppColors.white : AppColors.black),
+              style: AppCss.smallRegular.setColor(isSelected ? AppColors.white : AppColors.black),
             ),
           ),
         ),

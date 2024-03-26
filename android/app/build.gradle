@@ -20,7 +20,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.programacao.app"
+    namespace "com.m2.acoplus"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -38,7 +38,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.programacao.app"
+        applicationId "com.m2.acoplus"
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode 119

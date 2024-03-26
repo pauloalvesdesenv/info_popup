@@ -1,7 +1,7 @@
+import 'package:aco_plus/app/core/components/h.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/components/h.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
 
 class AppDropDown<T> extends StatefulWidget {
   final String label;
@@ -44,9 +44,7 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.neutralMedium),
               borderRadius: AppCss.radius8,
-              color: widget.disable
-                  ? AppColors.neutralMedium.withOpacity(0.4)
-                  : null,
+              color: widget.disable ? AppColors.neutralMedium.withOpacity(0.4) : null,
             ),
             child: DropdownButton<T>(
               padding: const EdgeInsets.only(left: 8),
@@ -67,9 +65,7 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(10),
-                          child: Icon(widget.item != null
-                              ? Icons.close
-                              : Icons.arrow_drop_down),
+                          child: Icon(widget.item != null ? Icons.close : Icons.arrow_drop_down),
                         ),
                       ),
                     ),
@@ -86,6 +82,5 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
     );
   }
 
-  String label(_) =>
-      (_ != null ? (_.label as String) : 'all').replaceAll('\n', ' ');
+  String label(_) => (_ != null ? (_.label as String) : 'all').replaceAll('\n', ' ');
 }

@@ -1,12 +1,12 @@
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/usuario_model.dart';
+import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_theme.dart';
+import 'package:aco_plus/app/modules/base/base_page.dart';
+import 'package:aco_plus/app/modules/sign/ui/sign_up_page.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:programacao/app/core/client/firestore/models/usuario_main_model.dart';
-import 'package:programacao/app/core/components/stream_out.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_theme.dart';
-import 'package:programacao/app/modules/base/base_page.dart';
-import 'package:programacao/app/modules/sign/ui/sign_up_page.dart';
-import 'package:programacao/app/modules/usuario/usuario_controller.dart';
 
 import 'app_controller.dart';
 
@@ -34,11 +34,10 @@ class _AppState extends State<App> {
             theme: AppTheme.theme,
             debugShowCheckedModeBanner: false,
             navigatorKey: _appController.key,
-            title: 'Programação',
-            home: StreamOutNull<UsuarioMainModel?>(
+            title: 'AÇO+',
+            home: StreamOutNull<UsuarioModel?>(
               stream: usuarioCtrl.usuarioStream.listen,
-              child: (_, data) =>
-                  data == null ? const SignUpPage() : const BasePage(),
+              child: (_, data) => data == null ? const SignUpPage() : const BasePage(),
             )));
   }
 }

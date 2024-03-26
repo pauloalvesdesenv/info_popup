@@ -1,17 +1,16 @@
 import 'dart:convert';
 
+import 'package:aco_plus/app/core/client/http/viacep/viacep_model.dart';
+import 'package:aco_plus/app/core/extensions/text_controller_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
-import 'package:programacao/app/core/client/http/viacep/viacep_model.dart';
-import 'package:programacao/app/core/enums/country_states.dart';
-import 'package:programacao/app/core/extensions/text_controller_ext.dart';
 
 class EnderecoModel {
   String cep = '';
   String logradouro = '';
   String bairro = '';
   String localidade = '';
-  late CountryState estado;
+  String estado = '';
   String numero = '';
   String complemento = '';
   double lat = 0.0;
@@ -28,15 +27,14 @@ class EnderecoModel {
     required this.lon,
   });
 
-  String get name =>
-      '$logradouro, $numero - $bairro. $localidade-${estado.name.toUpperCase()}';
+  String get name => '$logradouro, $numero - $bairro. $localidade-${estado.toUpperCase()}';
 
   EnderecoModel.fromViacep(ViacepEndereco viacep) {
     cep = viacep.cep;
     logradouro = viacep.logradouro;
     bairro = viacep.bairro;
     localidade = viacep.localidade;
-    estado = CountryState.values.firstWhere((e) => e.name == viacep.uf);
+    estado = viacep.uf;
     complemento = viacep.complemento;
   }
 
@@ -46,7 +44,7 @@ class EnderecoModel {
       'logradouro': logradouro,
       'bairro': bairro,
       'localidade': localidade,
-      'estado': estado.index,
+      'estado': estado,
       'numero': numero,
       'complemento': complemento,
       'lat': lat,
@@ -60,7 +58,7 @@ class EnderecoModel {
       logradouro: map['logradouro'] ?? '',
       bairro: map['bairro'] ?? '',
       localidade: map['localidade'] ?? '',
-      estado: CountryState.values[map['estado']],
+      estado: map['estado'] ?? '',
       numero: map['numero'] ?? '',
       complemento: map['complemento'] ?? '',
       lat: map['lat'] != null ? double.parse(map['lat'].toString()) : 0.0,
@@ -70,12 +68,11 @@ class EnderecoModel {
 
   String toJson() => json.encode(toMap());
 
-  factory EnderecoModel.fromJson(String source) =>
-      EnderecoModel.fromMap(json.decode(source));
+  factory EnderecoModel.fromJson(String source) => EnderecoModel.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'Endereco(cep: $cep, logradouro: $logradouro, bairro: $bairro, localidade: $localidade, uf: ${estado.label}, numero: $numero, complemento: $complemento, lat: $lat, lon: $lon)';
+    return 'Endereco(cep: $cep, logradouro: $logradouro, bairro: $bairro, localidade: $localidade, uf: $estado, numero: $numero, complemento: $complemento, lat: $lat, lon: $lon)';
   }
 }
 
@@ -84,7 +81,7 @@ class EnderecoCreateModel {
   final TextEditingController logradouro = TextEditingController();
   final TextEditingController bairro = TextEditingController();
   final TextEditingController localidade = TextEditingController();
-  CountryState? estado;
+  final TextEditingController estado = TextEditingController();
   final TextEditingController numero = TextEditingController();
   final TextEditingController complemento = TextEditingController();
   final TextEditingController lat = TextEditingController();
@@ -98,8 +95,7 @@ class EnderecoCreateModel {
     logradouro.text = viacep.logradouro;
     bairro.text = viacep.bairro;
     localidade.text = viacep.localidade;
-    estado = states
-        .singleWhere((e) => e.name.toLowerCase() == viacep.uf.toLowerCase());
+    estado.text = viacep.uf;
   }
 
   EnderecoCreateModel.edit(EnderecoModel endereco) {
@@ -108,7 +104,7 @@ class EnderecoCreateModel {
     logradouro.text = endereco.logradouro;
     bairro.text = endereco.bairro;
     localidade.text = endereco.localidade;
-    estado = endereco.estado;
+    estado.text = endereco.estado;
     numero.text = endereco.numero;
     complemento.text = endereco.complemento;
     lat.text = endereco.lat.toString();
@@ -120,7 +116,7 @@ class EnderecoCreateModel {
         logradouro: logradouro.text,
         bairro: bairro.text,
         localidade: localidade.text,
-        estado: estado!,
+        estado: estado.text,
         numero: numero.text,
         complemento: complemento.text,
         lat: lat.doubleValue,

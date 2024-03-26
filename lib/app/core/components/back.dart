@@ -1,4 +1,4 @@
-import 'package:programacao/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class Back extends StatelessWidget {
@@ -25,8 +25,7 @@ class Back extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               style: ButtonStyle(
                   backgroundColor: MaterialStatePropertyAll(AppColors.white),
-                  foregroundColor:
-                      MaterialStatePropertyAll(AppColors.primaryMain),
+                  foregroundColor: MaterialStatePropertyAll(AppColors.primaryMain),
                   fixedSize: const MaterialStatePropertyAll(Size(80, 50)),
                   padding: const MaterialStatePropertyAll(
                       EdgeInsets.symmetric(horizontal: 1, vertical: 0))),

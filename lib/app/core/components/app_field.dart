@@ -1,6 +1,6 @@
-import 'package:programacao/app/core/components/h.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/components/h.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -105,8 +105,7 @@ class _AppFieldState extends State<AppField> {
                       onTap: widget.onSuffix,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20, right: 10),
-                        child: Icon(widget.suffixIcon,
-                            weight: 800, color: AppColors.neutralMedium),
+                        child: Icon(widget.suffixIcon, weight: 800, color: AppColors.neutralMedium),
                       ),
                     )
                   : null,

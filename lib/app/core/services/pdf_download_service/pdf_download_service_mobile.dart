@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:programacao/app/core/services/firebase_service.dart';
-import 'package:programacao/app/core/services/pdf_download_service/pdf_download_service_platform.dart';
+import 'package:aco_plus/app/core/services/firebase_service.dart';
+import 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_platform.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class PdfDownloadServiceMobile extends PdfDownloadServicePlatform {

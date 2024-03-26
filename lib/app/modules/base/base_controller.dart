@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/enums/app_module.dart';
-import 'package:programacao/app/core/enums/usuario_role.dart';
-import 'package:programacao/app/core/models/app_stream.dart';
-import 'package:programacao/app/modules/usuario/usuario_controller.dart';
+import 'package:aco_plus/app/core/enums/app_module.dart';
+import 'package:aco_plus/app/core/models/app_stream.dart';
 
 final baseCtrl = BaseController();
 
@@ -18,6 +16,6 @@ class BaseController {
   final AppStream<AppModule> moduleStream = AppStream<AppModule>();
 
   void onInit() {
-    moduleStream.add(usuario.role.modules.first);
+    moduleStream.add(AppModule.values.first);
   }
 }

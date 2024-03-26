@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/components/w.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 
 class AppCheckbox extends StatelessWidget {
   final String label;

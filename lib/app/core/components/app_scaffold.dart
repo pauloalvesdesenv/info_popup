@@ -1,4 +1,4 @@
-import 'package:programacao/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -45,8 +45,7 @@ class _AppScaffoldState extends State<AppScaffold> {
             (widget.bottomColor ?? backgroundColor).computeLuminance() > 0.5
                 ? Brightness.dark
                 : Brightness.light,
-        systemNavigationBarDividerColor:
-            (widget.bottomColor ?? backgroundColor),
+        systemNavigationBarDividerColor: (widget.bottomColor ?? backgroundColor),
         systemNavigationBarContrastEnforced: true,
       ),
       child: Container(

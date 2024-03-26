@@ -1,4 +1,4 @@
-import 'package:programacao/app/core/client/http/viacep/viacep_model.dart';
+import 'package:aco_plus/app/core/client/http/viacep/viacep_model.dart';
 import 'package:dio/dio.dart';
 
 class ViacepProvider {

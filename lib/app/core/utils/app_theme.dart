@@ -1,5 +1,5 @@
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
@@ -30,10 +30,9 @@ class AppTheme {
                 const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)
                     .setColor(AppColors.neutralLightest)),
             foregroundColor: MaterialStatePropertyAll(AppColors.white),
-            padding: const MaterialStatePropertyAll(
-                EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
-            shape: MaterialStatePropertyAll(
-                RoundedRectangleBorder(borderRadius: AppCss.radius8))),
+            padding:
+                const MaterialStatePropertyAll(EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
+            shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: AppCss.radius8))),
       ),
       iconButtonTheme: IconButtonThemeData(
         style: ButtonStyle(
@@ -42,8 +41,7 @@ class AppTheme {
           ),
           foregroundColor: MaterialStatePropertyAll(AppColors.white),
           iconSize: const MaterialStatePropertyAll(24),
-          shape: MaterialStatePropertyAll(
-              RoundedRectangleBorder(borderRadius: AppCss.radius8)),
+          shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: AppCss.radius8)),
           padding: const MaterialStatePropertyAll(EdgeInsets.all(12)),
         ),
       ),
@@ -57,10 +55,8 @@ class AppTheme {
             borderSide: BorderSide(color: AppColors.primaryMain, width: 2),
             borderRadius: AppCss.radius8,
           ),
-          hintStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: AppColors.neutralMedium)),
+          hintStyle:
+              TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: AppColors.neutralMedium)),
       appBarTheme: AppBarTheme(
           backgroundColor: AppColors.primaryMain,
           elevation: 0,

@@ -1,4 +1,4 @@
-import 'package:programacao/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -6,8 +6,7 @@ class AppShimmer extends StatelessWidget {
   final Widget child;
   final bool enable;
 
-  const AppShimmer({Key? key, required this.child, this.enable = true})
-      : super(key: key);
+  const AppShimmer({Key? key, required this.child, this.enable = true}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

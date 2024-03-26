@@ -1,9 +1,8 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:programacao/app/core/client/firestore/collections/usuario/usuario_model.dart';
-import 'package:programacao/app/core/client/firestore/models/usuario_main_model.dart';
-import 'package:programacao/app/core/models/app_stream.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/usuario_model.dart';
+import 'package:aco_plus/app/core/models/app_stream.dart';
 
 class UsuarioCollection {
   static final UsuarioCollection _instance = UsuarioCollection._();
@@ -30,8 +29,7 @@ class UsuarioCollection {
     if (_isStarted && lock) return;
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
-    final countries =
-        data.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
+    final countries = data.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
     countries.sort((a, b) => a.nome.compareTo(b.nome));
     dataStream.add(countries);
   }
@@ -71,14 +69,13 @@ class UsuarioCollection {
             : collection)
         .snapshots()
         .listen((e) {
-      final countries =
-          e.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
+      final countries = e.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
       countries.sort((a, b) => a.nome.compareTo(b.nome));
       dataStream.add(countries);
     });
   }
 
-  UsuarioMainModel getById(String id) => data.singleWhere((e) => e.id == id);
+  UsuarioModel getById(String id) => data.singleWhere((e) => e.id == id);
 
   Future<UsuarioModel?> add(UsuarioModel model) async {
     try {

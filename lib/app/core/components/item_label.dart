@@ -1,6 +1,6 @@
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
 
 class ItemLabel extends StatelessWidget {
   final String label;
@@ -28,11 +28,10 @@ class ItemLabel extends StatelessWidget {
                 )),
         Text(
           value,
-          style:
-              AppCss.mediumRegular.setColor(color ?? AppColors.black).copyWith(
-                    decoration: isDisable ? TextDecoration.lineThrough : null,
-                    color: isDisable ? AppColors.black.withOpacity(0.3) : null,
-                  ),
+          style: AppCss.mediumRegular.setColor(color ?? AppColors.black).copyWith(
+                decoration: isDisable ? TextDecoration.lineThrough : null,
+                color: isDisable ? AppColors.black.withOpacity(0.3) : null,
+              ),
         ),
       ],
     );

@@ -45,16 +45,16 @@ class AppColorsSystem {
 
   factory AppColorsSystem.lightFactory() {
     return AppColorsSystem(
-      primary: MaterialColor(
-        0xFF0682f9,
+      primary: const MaterialColor(
+        0xFFDA251C,
         <int, Color>{
-          50: const Color(0xFFccf0ff).withOpacity(0.5),
-          100: const Color(0xFFccf0ff),
-          200: const Color(0xFF99dcff),
-          300: const Color(0xFF3faaff),
-          500: const Color(0xFF0682f9),
-          700: const Color(0xFF0682f9),
-          900: const Color(0xFF00257a),
+          50: Color(0xFFE09B97),
+          100: Color(0xFFE48E86),
+          200: Color(0xFFE68175),
+          300: Color(0xFFE97464),
+          500: Color(0xFFDA251C),
+          700: Color(0xFFC62219),
+          900: Color(0xFFAF1F16),
         },
       ),
       secondary: const MaterialColor(
@@ -84,18 +84,15 @@ class AppColorsSystem {
 
   factory AppColorsSystem.darkFactory() {
     return AppColorsSystem(
-      primary: MaterialColor(
-        0xFF0682f9,
-        <int, Color>{
-          50: const Color(0xFFccf0ff).withOpacity(0.5),
-          100: const Color(0xFFccf0ff),
-          200: const Color(0xFF99dcff),
-          300: const Color(0xFF3faaff),
-          500: const Color(0xFF0682f9),
-          700: const Color(0xFF0682f9),
-          900: const Color(0xFF00257a),
-        },
-      ),
+      primary: const MaterialColor(0xFFDA251C, <int, Color>{
+        50: Color(0xFFE09B97),
+        100: Color(0xFFE48E86),
+        200: Color(0xFFE68175),
+        300: Color(0xFFE97464),
+        500: Color(0xFFDA251C),
+        700: Color(0xFFC62219),
+        900: Color(0xFFAF1F16),
+      }),
       secondary: const MaterialColor(
         0xFFf98209,
         <int, Color>{

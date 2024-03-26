@@ -1,6 +1,6 @@
 {
-    "name": "com.programacao.app",
-    "short_name": "com.programacao.app",
+    "name": "com.m2.acoplus",
+    "short_name": "com.m2.acoplus",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FFFFFF",

@@ -1,5 +1,5 @@
-import 'package:programacao/app/core/components/stream_out.dart';
-import 'package:programacao/app/core/services/keyboard_visible_service.dart';
+import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/services/keyboard_visible_service.dart';
 import 'package:flutter/material.dart';
 
 double? _heightScreen;

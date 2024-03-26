@@ -15,7 +15,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>programacao</string>
+		<string>aco_plus</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -31,9 +31,9 @@
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>NSPhotoLibraryAddUsageDescription</key>
-		<string>To add photos to your programacao</string>
+		<string>To add photos to your aco_plus</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>To add photos to your programacao</string>
+		<string>To add photos to your aco_plus</string>
 		<key>NSUserTrackingUsageDescription</key>
 		<string>This identifier will be used to deliver personalized ads to you</string>
 		<key>SKAdNetworkItems</key>

@@ -1,5 +1,5 @@
-import 'package:programacao/app/core/components/notification_widget.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/components/notification_widget.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -17,17 +17,16 @@ class NotificationService {
           position: position,
           duration: const Duration(seconds: 4));
 
-  static void showPending(String title, String subtitle) =>
-      showOverlayNotification(
-          (context) => NotificationWidget(
-                title: title,
-                subtitle: subtitle,
-                color: AppColors.pending,
-                colorOpacity: AppColors.pending.withOpacity(0.13),
-                icon: Icons.warning_rounded,
-              ),
-          position: NotificationPosition.top,
-          duration: const Duration(seconds: 4));
+  static void showPending(String title, String subtitle) => showOverlayNotification(
+      (context) => NotificationWidget(
+            title: title,
+            subtitle: subtitle,
+            color: AppColors.pending,
+            colorOpacity: AppColors.pending.withOpacity(0.13),
+            icon: Icons.warning_rounded,
+          ),
+      position: NotificationPosition.top,
+      duration: const Duration(seconds: 4));
 
   static void showNegative(String title, String subtitle,
           {NotificationPosition position = NotificationPosition.top}) =>

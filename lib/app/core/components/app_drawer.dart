@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/components/stream_out.dart';
-import 'package:programacao/app/core/components/w.dart';
-import 'package:programacao/app/core/enums/app_module.dart';
-import 'package:programacao/app/core/enums/usuario_role.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/global_resource.dart';
-import 'package:programacao/app/modules/base/base_controller.dart';
-import 'package:programacao/app/modules/usuario/usuario_controller.dart';
+import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/enums/app_module.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/base/base_controller.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -25,6 +23,7 @@ class AppDrawer extends StatelessWidget {
                     alignment: Alignment.topRight,
                     children: [
                       UserAccountsDrawerHeader(
+                        accountEmail: const SizedBox(),
                         currentAccountPicture: const CircleAvatar(
                           radius: 10,
                           backgroundImage: AssetImage('assets/images/logo.png'),
@@ -37,25 +36,6 @@ class AppDrawer extends StatelessWidget {
                             usuario.nome,
                           ),
                         ),
-                        accountEmail: Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.manage_accounts_outlined,
-                                color: Colors.white,
-                                size: 22,
-                              ),
-                              const W(8),
-                              Text(
-                                usuario.role.label,
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    decoration: TextDecoration.underline),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(16),
@@ -65,33 +45,28 @@ class AppDrawer extends StatelessWidget {
                           children: [
                             Text(
                               'v',
-                              style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
-                                  fontSize: 10),
+                              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 10),
                             ),
                             Text(
                               '1.0.0',
-                              style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8)),
+                              style: TextStyle(color: Colors.white.withOpacity(0.8)),
                             ),
                           ],
                         ),
                       )
                     ],
                   ),
-                  for (var item in usuario.role.modules)
+                  for (var item in AppModule.values)
                     ListTile(
                       onTap: () {
                         pop(context);
                         baseCtrl.moduleStream.add(item);
                       },
-                      leading: Icon(item.icon,
-                          color: item == module ? AppColors.primaryMain : null),
+                      leading:
+                          Icon(item.icon, color: item == module ? AppColors.primaryMain : null),
                       title: Text(
                         item.label,
-                        style: TextStyle(
-                            color:
-                                item == module ? AppColors.primaryMain : null),
+                        style: TextStyle(color: item == module ? AppColors.primaryMain : null),
                       ),
                     )
                 ],

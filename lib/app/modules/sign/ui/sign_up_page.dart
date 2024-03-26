@@ -1,12 +1,10 @@
+import 'package:aco_plus/app/core/components/app_field.dart';
+import 'package:aco_plus/app/core/components/app_scaffold.dart';
+import 'package:aco_plus/app/core/components/app_text_button.dart';
+import 'package:aco_plus/app/core/components/h.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/modules/sign/sign_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/components/app_field.dart';
-import 'package:programacao/app/core/components/app_scaffold.dart';
-import 'package:programacao/app/core/components/app_text_button.dart';
-import 'package:programacao/app/core/components/h.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
-import 'package:programacao/app/core/utils/global_resource.dart';
-import 'package:programacao/app/modules/sign/sign_controller.dart';
-import 'package:programacao/app/modules/sign/ui/sign_in_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -34,7 +32,9 @@ class SignUpPageState extends State<SignUpPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const H(20),
-              Text('Programação', style: AppCss.largeBold),
+              Image.asset('assets/images/logo.png', width: 100),
+              const H(20),
+              Text('AÇO+', style: AppCss.largeBold.setSize(16)),
               const H(20),
               AppField(
                 controller: email,
@@ -53,12 +53,6 @@ class SignUpPageState extends State<SignUpPage> {
                 label: 'Entrar',
                 onPressed: () => signCtrl.onClickLogin(email.text, senha.text),
               ),
-              const H(8),
-              AppTextButton(
-                label: 'Registre-se',
-                onPressed: () => push(
-                    context, const SignInPage()),
-              )
             ],
           ),
         ),

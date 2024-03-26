@@ -1,5 +1,5 @@
+import 'package:aco_plus/app/app_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:programacao/app/app_controller.dart';
 
 const String empty = '';
 
@@ -22,8 +22,8 @@ dynamic push([a, b]) async {
   } else {
     context = b;
   }
-  var result = await Navigator.push(context ?? contextGlobal,
-      MaterialPageRoute(builder: (_) => widget ?? Container()));
+  var result = await Navigator.push(
+      context ?? contextGlobal, MaterialPageRoute(builder: (_) => widget ?? Container()));
   return result;
 }
 

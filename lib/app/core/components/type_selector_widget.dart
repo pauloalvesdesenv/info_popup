@@ -1,8 +1,8 @@
+import 'package:aco_plus/app/core/components/h.dart';
+import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/components/h.dart';
-import 'package:programacao/app/core/components/w.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
 
 class TypeSelectorWidget<T> extends StatefulWidget {
   final String label;
@@ -55,8 +55,7 @@ class _TypeSelectorWidgetState<T> extends State<TypeSelectorWidget<T>> {
                   scrollDirection: Axis.horizontal,
                   itemCount: widget.values.length,
                   separatorBuilder: (_, __) => const W(8),
-                  itemBuilder: (_, i) =>
-                      _goalFilterType(widget.value, widget.values[i])),
+                  itemBuilder: (_, i) => _goalFilterType(widget.value, widget.values[i])),
             ),
           ),
         ),

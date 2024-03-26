@@ -1,6 +1,5 @@
-
-import 'package:programacao/app/core/services/firebase_service.dart';
-import 'package:programacao/app/core/services/keyboard_visible_service.dart';
+import 'package:aco_plus/app/core/services/firebase_service.dart';
+import 'package:aco_plus/app/core/services/keyboard_visible_service.dart';
 
 abstract class Service {
   Future<void> initialize();

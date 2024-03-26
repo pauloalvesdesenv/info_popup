@@ -1,7 +1,7 @@
-import 'package:programacao/app/core/components/app_shimmer.dart';
-import 'package:programacao/app/core/enums/fill.dart';
-import 'package:programacao/app/core/utils/app_colors.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/components/app_shimmer.dart';
+import 'package:aco_plus/app/core/enums/fill.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
 
 class AppTextButton extends StatefulWidget {
@@ -77,17 +77,14 @@ class _AppTextButtonState extends State<AppTextButton> {
 
   ButtonStyle get style {
     if (widget.style != null) {
-      return widget.style!.copyWith(
-          fixedSize:
-              const MaterialStatePropertyAll(Size(double.maxFinite, 43)));
+      return widget.style!
+          .copyWith(fixedSize: const MaterialStatePropertyAll(Size(double.maxFinite, 43)));
     }
     final outlined = Fill.outlined == widget.fill;
     return ButtonStyle(
       fixedSize: const MaterialStatePropertyAll(Size(double.maxFinite, 43)),
-      foregroundColor:
-          outlined ? MaterialStatePropertyAll(AppColors.primaryMain) : null,
-      backgroundColor:
-          outlined ? MaterialStatePropertyAll(AppColors.white) : null,
+      foregroundColor: outlined ? MaterialStatePropertyAll(AppColors.primaryMain) : null,
+      backgroundColor: outlined ? MaterialStatePropertyAll(AppColors.white) : null,
       shape: outlined
           ? MaterialStatePropertyAll(RoundedRectangleBorder(
               borderRadius: AppCss.radius8,

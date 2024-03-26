@@ -1,6 +1,6 @@
+import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:aco_plus/app/core/models/service_model.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:programacao/app/core/models/app_stream.dart';
-import 'package:programacao/app/core/models/service_model.dart';
 
 class KeyboardVisibleService implements Service {
   static AppStream<bool> isVisible = AppStream<bool>();

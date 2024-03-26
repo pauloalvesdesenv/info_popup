@@ -1,5 +1,5 @@
+import 'package:aco_plus/app/core/components/item_label.dart';
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/components/item_label.dart';
 
 class RowItensLabel extends StatelessWidget {
   final List<ItemLabel> itens;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:programacao/app/core/utils/app_css.dart';
-import 'package:programacao/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/utils/global_resource.dart';
 
 class AppMultipleRegisters<T> extends StatelessWidget {
   final IconData icon;

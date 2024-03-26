@@ -1,4 +1,4 @@
-name: programacao
+name: aco_plus
 description: A new Flutter project.
 
 publish_to: "none"
@@ -68,6 +68,8 @@ flutter_launcher_icons:
   ios: true
   remove_alpha_ios: true
   image_path: "assets/launcher/launcher.png"
+  adaptive_icon_background: "assets/launcher/background.png"
+  adaptive_icon_foreground: "assets/launcher/foreground.png"
   web:
     generate: true
     image_path: "assets/images/logo.png"
