@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/extensions/double_ext.dart';
 
-class   PedidoModel {
+class PedidoModel {
   final String id;
   final DateTime createdAt;
   final ClienteModel cliente;
@@ -24,6 +25,35 @@ class   PedidoModel {
       statusess.add(element.statusess.last.status);
     }
     return statusess.toSet().toList();
+  }
+
+  double getQtdeTotal() {
+    return produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
+  }
+
+  double getQtdeAguardandoProducao() {
+    return produtos
+        .where((e) => e.statusess.last.status == PedidoProdutoStatus.aguardandoProducao)
+        .fold(0, (previousValue, element) => previousValue + element.qtde);
+  }
+
+  double getQtdeProduzindo() {
+    return produtos
+        .where((e) => e.statusess.last.status == PedidoProdutoStatus.produzindo)
+        .fold(0, (previousValue, element) => previousValue + element.qtde);
+  }
+
+  double getQtdePronto() {
+    return produtos
+        .where((e) => e.statusess.last.status == PedidoProdutoStatus.pronto)
+        .fold(0, (previousValue, element) => previousValue + element.qtde);
+  }
+
+  double getPrcntgPronto() {
+    final pronto = getQtdePronto();
+    final total = getQtdeTotal();
+    if (total == 0) return 0;
+    return pronto / total;
   }
 
   Map<String, dynamic> toMap() {

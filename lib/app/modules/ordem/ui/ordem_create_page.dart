@@ -1,9 +1,11 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
+import 'package:aco_plus/app/core/components/app_text_button.dart';
 import 'package:aco_plus/app/core/components/done_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
@@ -57,8 +59,8 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
         AppDropDown<ProdutoModel?>(
           label: 'Produto',
           item: form.produto,
-          disable: form.cliente == null,
           itens: FirestoreClient.produtos.data,
+          disable: form.produtos.isNotEmpty,
           itemLabel: (e) => e!.descricao,
           onSelect: (e) {
             form.produto = e;
@@ -69,6 +71,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
         AppDropDown<ClienteModel?>(
           label: 'Cliente',
           item: form.cliente,
+          disable: form.produto == null,
           itens: ordemCtrl.getClientesByProduto(form.produto),
           itemLabel: (e) => e!.nome,
           onSelect: (e) {
@@ -89,36 +92,53 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
           },
         ),
         const H(16),
-        AppDropDown<ObraModel?>(
-          label: 'Protudo',
-          item: form.obra,
-          disable: form.cliente == null,
-          itens: form.cliente?.obras ?? [],
-          itemLabel: (e) => e!.descricao,
+        AppDropDown<PedidoProdutoModel?>(
+          label: 'Pedido',
+          item: form.produtoPedido,
+          disable: form.obra == null,
+          itens: ordemCtrl.getProduto(form.cliente, form.obra, form.produto),
+          itemLabel: (e) => '${'${e!.produto.nome} ${e.produto.descricao}'} - ${e.qtde}Kg',
           onSelect: (e) {
-            form.obra = e;
+            form.produtoPedido = e;
             ordemCtrl.formStream.update();
           },
         ),
-        // for (OrdemProdutoCreateModel produto in form.produtos)
-        //   ListTile(
-        //     leading:
-        //         Text((form.produtos.indexOf(produto) + 1).toString(), style: AppCss.mediumBold),
-        //     minLeadingWidth: 14,
-        //     contentPadding: const EdgeInsets.only(left: 16),
-        //     title: Text(produto.produtoModel?.descricao ?? ''),
-        //     subtitle: Text('Quantidade: ${produto.qtde.text}'),
-        //     trailing: IconButton(
-        //       onPressed: () {
-        //         form.produtos.remove(produto);
-        //         ordemCtrl.formStream.update();
-        //       },
-        //       icon: const Icon(
-        //         Icons.delete,
-        //         color: Colors.red,
-        //       ),
-        //     ),
-        //   )
+        const H(16),
+        AppTextButton(
+          isEnable: form.produtoPedido != null,
+          label: 'Adicionar',
+          onPressed: () {
+            form.produtos.add(form.produtoPedido!);
+            form.cliente = null;
+            form.obra = null;
+            form.produtoPedido = null;
+            ordemCtrl.formStream.update();
+          },
+        ),
+        for (PedidoProdutoModel pedidoProduto in form.produtos)
+          Builder(builder: (_) {
+            final cliente = FirestoreClient.clientes.getById(pedidoProduto.clienteId);
+            return ListTile(
+              leading: Text((form.produtos.indexOf(pedidoProduto) + 1).toString(),
+                  style: AppCss.mediumBold),
+              minLeadingWidth: 14,
+              contentPadding: const EdgeInsets.only(left: 16),
+              title: Text(
+                  '${'${pedidoProduto.produto.nome} ${pedidoProduto.produto.descricao}'} - ${pedidoProduto.qtde}Kg'),
+              subtitle: Text(
+                  '${cliente.nome} - ${cliente.obras.firstWhere((e) => e.id == pedidoProduto.obraId).descricao}'),
+              trailing: IconButton(
+                onPressed: () {
+                  form.produtos.remove(pedidoProduto);
+                  ordemCtrl.formStream.update();
+                },
+                icon: const Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                ),
+              ),
+            );
+          }),
       ],
     );
   }

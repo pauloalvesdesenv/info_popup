@@ -1,12 +1,15 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/ordem/ui/ordem_produto_status_bottom.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -72,9 +75,20 @@ class OrdemController {
   }
 
   void onValid() {
-    // if (form.nome.text.length < 2) {
-    //   throw Exception('Nome deve conter no mínimo 3 caracteres');
-    // }
+    if (form.produtos.isEmpty) {
+      if (form.produto == null) {
+        throw Exception('Selecione o produto');
+      }
+      if (form.cliente == null) {
+        throw Exception('Selecione o cliente');
+      }
+      if (form.obra == null) {
+        throw Exception('Selecione a obra');
+      }
+    }
+    if (form.produtos.isEmpty) {
+      throw Exception('Selecione ao menos um produto do pedido');
+    }
   }
 
   //PEDIDO
@@ -90,8 +104,9 @@ class OrdemController {
     return FirestoreClient.pedidos.data
         .where((e) => e.produtos.map((e) => e.produto.id).contains(produto.id))
         .toList()
-        .map((e) => e.cliente)
+        .map((e) => e.cliente.id)
         .toSet()
+        .map((e) => FirestoreClient.clientes.data.firstWhere((f) => f.id == e))
         .toList();
   }
 
@@ -101,25 +116,43 @@ class OrdemController {
         .where((e) =>
             e.cliente.id == cliente.id && e.produtos.map((e) => e.produto.id).contains(produto.id))
         .toList()
-        .map((e) => e.obra)
+        .map((e) => e.obra.id)
         .toSet()
+        .map((e) => cliente.obras.firstWhere((f) => f.id == e))
         .toList();
   }
 
   List<PedidoProdutoModel> getProduto(
       ClienteModel? cliente, ObraModel? obra, ProdutoModel? produto) {
     if (cliente == null || obra == null || produto == null) return [];
-    final pedidos = FirestoreClient.pedidos.data.where((e) =>
-        e.cliente.id == cliente.id &&
-        e.obra.id == obra.id &&
-        e.produtos.map((e) => e.produto.id).contains(produto.id));
+    final pedidos = FirestoreClient.pedidos.data
+        .where((e) =>
+            e.cliente.id == cliente.id &&
+            e.obra.id == obra.id &&
+            e.produtos.map((e) => e.produto.id).contains(produto.id))
+        .toList();
     if (pedidos.isEmpty) return [];
     List<PedidoProdutoModel> pedidoProdutos = [];
     for (final pedido in pedidos) {
       pedidoProdutos.add(pedido.produtos.firstWhere((e) => e.produto.id == produto.id));
     }
     return pedidoProdutos
-        .where((e) => form.produtos.map((e) => e.produto.id).contains(e.produto.id))
+        // .where((e) => !form.produtos.map((e) => e.produto.id).contains(e.produto.id))
         .toList();
+  }
+
+  void onChangeProdutoStatus(PedidoProdutoModel produto) async {
+    final produtoStatus = produto.statusess.last.status;
+    final status = await showOrdemProdutoStatusBottom(produtoStatus);
+    if (produtoStatus == status) return;
+    final statusModel =
+        PedidoProdutoStatusModel(id: HashService.get, status: status!, createdAt: DateTime.now());
+    produto.statusess.add(statusModel);
+    final pedido = FirestoreClient.pedidos.data.singleWhere((e) => e.id == produto.pedidoId);
+    pedido.produtos[pedido.produtos.indexWhere((e) => e.id == produto.id)].statusess
+        .add(statusModel);
+    ordemStream.update();
+    await FirestoreClient.ordens.update(ordem);
+    await FirestoreClient.pedidos.update(pedido);
   }
 }

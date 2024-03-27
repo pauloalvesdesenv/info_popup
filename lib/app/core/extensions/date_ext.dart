@@ -7,8 +7,7 @@ extension DateExt on DateTime {
   bool isSameDay(DateTime date) =>
       DateTime(date.year, date.month, date.day) == DateTime(year, month, day);
 
-  DateTime onlyDate({bool preserveDay = true}) =>
-      DateTime(year, month, preserveDay ? day : 1);
+  DateTime onlyDate({bool preserveDay = true}) => DateTime(year, month, preserveDay ? day : 1);
 
   int get lastDay {
     switch (month) {
@@ -26,9 +25,7 @@ extension DateExt on DateTime {
       case 11:
         return 30;
       case 2:
-        return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
-            ? 29
-            : 28;
+        return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
       default:
         throw ArgumentError();
     }
@@ -37,8 +34,7 @@ extension DateExt on DateTime {
   DateTime get previousMonth =>
       month == 1 ? DateTime(year - 1, 12, 1) : DateTime(year, month - 1, 1);
 
-  DateTime get nextMonth =>
-      month == 12 ? DateTime(year + 1, 1, 1) : DateTime(year, (month + 1));
+  DateTime get nextMonth => month == 12 ? DateTime(year + 1, 1, 1) : DateTime(year, (month + 1));
 
   DateTime addMonths(int lenght) {
     DateTime now = this;
@@ -60,7 +56,7 @@ extension DateExt on DateTime {
 }
 
 extension DateNullExt on DateTime? {
-  TextEditingController textEC() =>
-      TextEditingController(text: text());
+  TextEditingController textEC() => TextEditingController(text: text());
   String text() => this?.ddMMyyyy() ?? '';
+  String textHour() => this != null ? DateFormat("dd/MM/yyyy 'ás' HH:mm").format(this!) : '-';
 }

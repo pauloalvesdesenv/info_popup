@@ -115,6 +115,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                 onPressed: !form.produto.isEnable
                     ? null
                     : () {
+                        FocusScope.of(context).unfocus();
                         form.produtos.add(form.produto);
                         form.produto = PedidoProdutoCreateModel();
                         pedidoCtrl.formStream.update();

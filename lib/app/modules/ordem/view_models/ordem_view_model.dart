@@ -14,12 +14,13 @@ class OrdemCreateModel {
   ProdutoModel? produto;
   ClienteModel? cliente;
   ObraModel? obra;
+  PedidoProdutoModel? produtoPedido;
   List<PedidoProdutoModel> produtos = [];
 
   late bool isEdit;
 
   OrdemCreateModel()
-      : id = (FirestoreClient.pedidos.data.length + 1).toString(),
+      : id = (FirestoreClient.ordens.data.length + 1).toString(),
         isEdit = false;
 
   OrdemCreateModel.edit(OrdemModel pedido)

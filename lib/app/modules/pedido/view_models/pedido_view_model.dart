@@ -31,6 +31,6 @@ class PedidoCreateModel {
         createdAt: DateTime.now(),
         cliente: cliente!,
         obra: obra!,
-        produtos: produtos.map((e) => e.toPedidoProdutoModel(cliente!).copyWith()).toList(),
+        produtos: produtos.map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith()).toList(),
       );
 }

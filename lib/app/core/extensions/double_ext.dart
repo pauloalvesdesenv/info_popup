@@ -12,6 +12,8 @@ extension DoubleExt on double {
 
   String get percent {
     String stringValue = toString();
+    return toStringAsFixed(0);
+
     if (stringValue.endsWith(".0")) {
       return stringValue.substring(0, stringValue.length - 2);
     } else {
@@ -23,6 +25,5 @@ extension DoubleExt on double {
     return toStringAsFixed(0);
   }
 
-  String toMoney() =>
-      MoneyMaskedTextController(leftSymbol: 'R\$ ', initialValue: this).text;
+  String toMoney() => MoneyMaskedTextController(leftSymbol: 'R\$ ', initialValue: this).text;
 }

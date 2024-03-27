@@ -6,7 +6,9 @@ import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/empty_data.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
+import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -82,34 +84,67 @@ class _PedidosPageState extends State<PedidosPage> {
     );
   }
 
-  ListTile _itemPedidoWidget(PedidoModel pedido) {
-    return ListTile(
+  Widget _itemPedidoWidget(PedidoModel pedido) {
+    return InkWell(
       onTap: () => push(PedidoPage(pedido)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: Text(
-        'Pedido ${pedido.id}',
-        style: AppCss.mediumBold,
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${pedido.cliente.nome} - ${pedido.obra.descricao}',
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: AppColors.neutralLight,
+            ),
           ),
-          Text(
-            pedido.produtos.map((e) => '${'${e.produto.descricao} - ${e.qtde}'}Kg').join(', '),
-            style: AppCss.minimumRegular.setSize(11).setColor(AppColors.black),
-          ),
-          Text(
-            'Criada dia ${pedido.createdAt.text()}',
-            style: AppCss.minimumRegular.setSize(11).setColor(AppColors.neutralMedium),
-          ),
-        ],
-      ),
-      trailing: Icon(
-        Icons.arrow_forward_ios,
-        size: 14,
-        color: AppColors.neutralMedium,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Pedido ${pedido.id}',
+                    style: AppCss.mediumBold,
+                  ),
+                  Text(
+                    '${pedido.cliente.nome} - ${pedido.obra.descricao}',
+                  ),
+                  Text(
+                    pedido.produtos
+                        .map((e) => '${'${e.produto.descricao} - ${e.qtde}'}Kg')
+                        .join(', '),
+                    style: AppCss.minimumRegular.setSize(11).setColor(AppColors.black),
+                  ),
+                  Text(
+                    'Criada dia ${pedido.createdAt.text()}',
+                    style: AppCss.minimumRegular.setSize(11).setColor(AppColors.neutralMedium),
+                  ),
+                ],
+              ),
+            ),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: pedido.getPrcntgPronto(),
+                  backgroundColor: AppColors.primaryMain.withOpacity(0.2),
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(AppColors.primaryMain),
+                ),
+                Text(
+                  '${(pedido.getPrcntgPronto() * 100).percent}%',
+                  style: AppCss.minimumBold.setSize(11),
+                )
+              ],
+            ),
+            const W(24),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: AppColors.neutralMedium,
+            ),
+          ],
+        ),
       ),
     );
   }

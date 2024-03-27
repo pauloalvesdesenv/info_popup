@@ -56,7 +56,7 @@ class _PedidoPageState extends State<PedidoPage> {
               ExpansionTile(
                 title: Row(
                   children: [
-                    Text(produto.produto.nome),
+                    Text('${produto.produto.nome} - ${produto.produto.descricao}'),
                     const W(16),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -75,23 +75,31 @@ class _PedidoPageState extends State<PedidoPage> {
                 ),
                 children: [
                   for (final status in produto.statusess)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                                color: status.status.color.withOpacity(0.4),
-                                borderRadius: BorderRadius.circular(4)),
-                            child:
-                                Text(status.status.label, style: AppCss.mediumRegular.setSize(14)),
-                          ),
-                          Text(status.createdAt.text(), style: AppCss.minimumRegular),
-                        ],
-                      ),
-                    )
+                    Builder(builder: (context) {
+                      final isLast = status == produto.statusess.last;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: status.status.color.withOpacity(isLast ? 0.4 : 0.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(status.status.label,
+                                  style: AppCss.mediumRegular
+                                      .setSize(14)
+                                      .setColor(AppColors.black.withOpacity(isLast ? 1 : 0.4))),
+                            ),
+                            Text(status.createdAt.textHour(),
+                                style: AppCss.minimumRegular
+                                    .setColor(AppColors.black.withOpacity(isLast ? 1 : 0.4))),
+                          ],
+                        ),
+                      );
+                    })
                 ],
               ),
               const Divisor(),

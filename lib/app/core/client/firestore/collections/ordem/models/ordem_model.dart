@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 
 class OrdemModel {
@@ -9,6 +10,56 @@ class OrdemModel {
   final DateTime createdAt;
   DateTime? endAt;
   final List<PedidoProdutoModel> produtos;
+
+  double quantideTotal() {
+    return produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
+  }
+
+  double qtdeAguardando() {
+    return produtos
+        .where((e) => e.statusess.last.status == PedidoProdutoStatus.aguardandoProducao)
+        .fold(0, (previousValue, element) => previousValue + element.qtde);
+  }
+
+  double qtdeProduzindo() {
+    return produtos
+        .where((e) => e.statusess.last.status == PedidoProdutoStatus.produzindo)
+        .fold(0, (previousValue, element) => previousValue + element.qtde);
+  }
+
+  double qtdePronto() {
+    return produtos
+        .where((e) => e.statusess.last.status == PedidoProdutoStatus.pronto)
+        .fold(0, (previousValue, element) => previousValue + element.qtde);
+  }
+
+  //  double getPrcntgPronto() {
+  //   final pronto = getQtdePronto();
+  //   final total = getQtdeTotal();
+  //   if (total == 0) return 0;
+  //   return pronto / total;
+  // }
+
+  double getPrcntgAguardando() {
+    final aguardando = qtdeAguardando();
+    final total = quantideTotal();
+    if (total == 0) return 0;
+    return aguardando / total;
+  }
+
+  double getPrcntgProduzindo() {
+    final produzindo = qtdeProduzindo();
+    final total = quantideTotal();
+    if (total == 0) return 0;
+    return produzindo / total;
+  }
+
+  double getPrcntgPronto() {
+    final pronto = qtdePronto();
+    final total = quantideTotal();
+    if (total == 0) return 0;
+    return pronto / total;
+  }
 
   OrdemModel({
     required this.id,
@@ -23,6 +74,7 @@ class OrdemModel {
       'id': id,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'endAt': endAt?.millisecondsSinceEpoch,
+      'produto': produto.toMap(),
       'produtos': produtos.map((x) => x.toMap()).toList(),
     };
   }
@@ -32,7 +84,7 @@ class OrdemModel {
       id: map['id'] ?? '',
       produto: ProdutoModel.fromMap(map['produto']),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      endAt: DateTime.fromMillisecondsSinceEpoch(map['endAt']),
+      endAt: map['endAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['endAt']) : null,
       produtos:
           List<PedidoProdutoModel>.from(map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
     );
