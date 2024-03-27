@@ -16,6 +16,7 @@ class PedidoProdutoModel {
 
   ClienteModel get cliente => FirestoreClient.clientes.getById(clienteId);
   ObraModel get obra => cliente.obras.firstWhere((e) => e.id == obraId);
+  PedidoProdutoStatusModel get status => statusess.last;
 
   PedidoProdutoModel({
     required this.id,
@@ -48,7 +49,7 @@ class PedidoProdutoModel {
       produto: ProdutoModel.fromMap(map['produto']),
       statusess: List<PedidoProdutoStatusModel>.from(
           map['statusess']?.map((x) => PedidoProdutoStatusModel.fromMap(x))),
-      qtde: map['qtde'] ?? 0.0,
+      qtde: map['qtde'] != null ? double.parse(map['qtde'].toString()) : 0.0,
     );
   }
 

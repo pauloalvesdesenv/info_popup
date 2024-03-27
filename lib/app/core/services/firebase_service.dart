@@ -21,7 +21,8 @@ class FirebaseService implements Service {
     }
   }
 
-  static Future<String?> onUploadPortariaPDF(String name, Uint8List bytes) async {
+  static Future<String?> onUploadPortariaPDF(
+      String name, Uint8List bytes) async {
     try {
       final folderRef = FirebaseStorage.instance.ref().child('recording');
       final Reference fileRef = folderRef.child(name);

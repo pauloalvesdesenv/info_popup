@@ -18,17 +18,21 @@ class PedidoController {
 
   factory PedidoController() => _instance;
 
-  final AppStream<PedidoUtils> utilsStream = AppStream<PedidoUtils>.seed(PedidoUtils());
+  final AppStream<PedidoUtils> utilsStream =
+      AppStream<PedidoUtils>.seed(PedidoUtils());
   PedidoUtils get utils => utilsStream.value;
 
-  final AppStream<PedidoCreateModel> formStream = AppStream<PedidoCreateModel>();
+  final AppStream<PedidoCreateModel> formStream =
+      AppStream<PedidoCreateModel>();
   PedidoCreateModel get form => formStream.value;
 
   void onInitCreatePage(PedidoModel? pedido) {
-    formStream.add(pedido != null ? PedidoCreateModel.edit(pedido) : PedidoCreateModel());
+    formStream.add(
+        pedido != null ? PedidoCreateModel.edit(pedido) : PedidoCreateModel());
   }
 
-  List<PedidoModel> getPedidoesFiltered(String search, List<PedidoModel> pedidos) {
+  List<PedidoModel> getPedidoesFiltered(
+      String search, List<PedidoModel> pedidos) {
     if (search.length < 3) return pedidos;
     List<PedidoModel> filtered = [];
     for (final pedido in pedidos) {
@@ -54,17 +58,20 @@ class PedidoController {
         pop(_);
       }
       NotificationService.showPositive(
-          'Pedido ${form.isEdit ? 'Editada' : 'Adicionada'}', 'Operação realizada com sucesso',
+          'Pedido ${form.isEdit ? 'Editada' : 'Adicionada'}',
+          'Operação realizada com sucesso',
           position: NotificationPosition.bottom);
     } catch (e) {
-      NotificationService.showNegative('Erro', e.toString(), position: NotificationPosition.bottom);
+      NotificationService.showNegative('Erro', e.toString(),
+          position: NotificationPosition.bottom);
     }
   }
 
   Future<void> onDelete(_, PedidoModel pedido) async {
     await FirestoreClient.pedidos.delete(pedido);
     pop(_);
-    NotificationService.showPositive('Pedido Excluida', 'Operação realizada com sucesso',
+    NotificationService.showPositive(
+        'Pedido Excluida', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
   }
 

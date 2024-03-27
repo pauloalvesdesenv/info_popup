@@ -19,9 +19,9 @@ extension PedidoProdutoStatusExt on PedidoProdutoStatus {
   Color get color {
     switch (this) {
       case PedidoProdutoStatus.aguardandoProducao:
-        return Colors.grey;
+        return Colors.red;
       case PedidoProdutoStatus.produzindo:
-        return Colors.orange;
+        return Colors.yellow;
       case PedidoProdutoStatus.pronto:
         return Colors.green;
     }

@@ -34,11 +34,13 @@ class _OrdemPageState extends State<OrdemPage> {
     return AppScaffold(
         resizeAvoid: true,
         appBar: AppBar(
-          title:
-              Text('Ordem ${widget.ordem.id}', style: AppCss.largeBold.setColor(AppColors.white)),
+          title: Text('Ordem ${widget.ordem.id}',
+              style: AppCss.largeBold.setColor(AppColors.white)),
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(stream: ordemCtrl.ordemStream.listen, child: (_, form) => body(form)));
+        body: StreamOut(
+            stream: ordemCtrl.ordemStream.listen,
+            child: (_, form) => body(form)));
   }
 
   Widget body(OrdemModel form) {
@@ -47,7 +49,8 @@ class _OrdemPageState extends State<OrdemPage> {
         Padding(
           padding: const EdgeInsets.all(16),
           child: RowItensLabel([
-            ItemLabel('Produto', '${form.produto.nome} - ${form.produto.descricao}'),
+            ItemLabel(
+                'Produto', '${form.produto.nome} - ${form.produto.descricao}'),
             ItemLabel('Iniciada', form.createdAt.text()),
             if (form.endAt != null) ItemLabel('Finalizada', form.endAt.text()),
           ]),
@@ -64,7 +67,9 @@ class _OrdemPageState extends State<OrdemPage> {
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Text('Aguardando Produção', style: AppCss.mediumRegular)),
+                      Expanded(
+                          child: Text('Aguardando Produção',
+                              style: AppCss.mediumRegular)),
                       Text(
                         '${ordem.qtdeAguardando().formatted}Kg (${(ordem.getPrcntgAguardando() * 100).percent}%)',
                       )
@@ -73,9 +78,11 @@ class _OrdemPageState extends State<OrdemPage> {
                   const H(8),
                   LinearProgressIndicator(
                     value: ordem.getPrcntgAguardando(),
-                    backgroundColor: PedidoProdutoStatus.aguardandoProducao.color.withOpacity(0.3),
-                    valueColor:
-                        AlwaysStoppedAnimation(PedidoProdutoStatus.aguardandoProducao.color),
+                    backgroundColor: PedidoProdutoStatus
+                        .aguardandoProducao.color
+                        .withOpacity(0.3),
+                    valueColor: AlwaysStoppedAnimation(
+                        PedidoProdutoStatus.aguardandoProducao.color),
                   ),
                 ],
               ),
@@ -84,7 +91,9 @@ class _OrdemPageState extends State<OrdemPage> {
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Text('Produzindo', style: AppCss.mediumRegular)),
+                      Expanded(
+                          child:
+                              Text('Produzindo', style: AppCss.mediumRegular)),
                       Text(
                         '${ordem.qtdeProduzindo().formatted}Kg (${(ordem.getPrcntgProduzindo() * 100).percent}%)',
                       )
@@ -93,8 +102,10 @@ class _OrdemPageState extends State<OrdemPage> {
                   const H(8),
                   LinearProgressIndicator(
                     value: ordem.getPrcntgProduzindo(),
-                    backgroundColor: PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation(PedidoProdutoStatus.produzindo.color),
+                    backgroundColor:
+                        PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
+                    valueColor: AlwaysStoppedAnimation(
+                        PedidoProdutoStatus.produzindo.color),
                   ),
                 ],
               ),
@@ -103,7 +114,8 @@ class _OrdemPageState extends State<OrdemPage> {
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Text('Pronto', style: AppCss.mediumRegular)),
+                      Expanded(
+                          child: Text('Pronto', style: AppCss.mediumRegular)),
                       Text(
                         '${ordem.qtdePronto().formatted}Kg (${(ordem.getPrcntgPronto() * 100).percent}%)',
                       )
@@ -112,8 +124,10 @@ class _OrdemPageState extends State<OrdemPage> {
                   const H(8),
                   LinearProgressIndicator(
                     value: ordem.getPrcntgPronto(),
-                    backgroundColor: PedidoProdutoStatus.pronto.color.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation(PedidoProdutoStatus.pronto.color),
+                    backgroundColor:
+                        PedidoProdutoStatus.pronto.color.withOpacity(0.3),
+                    valueColor: AlwaysStoppedAnimation(
+                        PedidoProdutoStatus.pronto.color),
                   ),
                 ],
               ),
@@ -130,8 +144,10 @@ class _OrdemPageState extends State<OrdemPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const H(2),
-                Text(produto.cliente.nome, style: AppCss.minimumRegular.setSize(12)),
-                Text(produto.obra.descricao, style: AppCss.minimumRegular.setSize(12)),
+                Text(produto.cliente.nome,
+                    style: AppCss.minimumRegular.setSize(12)),
+                Text(produto.obra.descricao,
+                    style: AppCss.minimumRegular.setSize(12)),
               ],
             ),
             trailing: InkWell(

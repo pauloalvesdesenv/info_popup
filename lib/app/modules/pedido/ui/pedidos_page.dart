@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
@@ -39,7 +40,8 @@ class _PedidosPageState extends State<PedidosPage> {
             color: AppColors.white,
           ),
         ),
-        title: Text('Pedidos', style: AppCss.largeBold.setColor(AppColors.white)),
+        title:
+            Text('Pedidos', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
           IconButton(
               onPressed: () => push(context, const PedidoCreatePage()),
@@ -55,7 +57,8 @@ class _PedidosPageState extends State<PedidosPage> {
         child: (_, __) => StreamOut<PedidoUtils>(
           stream: pedidoCtrl.utilsStream.listen,
           child: (_, utils) {
-            final pedidos = pedidoCtrl.getPedidoesFiltered(utils.search.text, __).toList();
+            final pedidos =
+                pedidoCtrl.getPedidoesFiltered(utils.search.text, __).toList();
             return Column(
               children: [
                 Padding(
@@ -113,31 +116,29 @@ class _PedidosPageState extends State<PedidosPage> {
                     pedido.produtos
                         .map((e) => '${'${e.produto.descricao} - ${e.qtde}'}Kg')
                         .join(', '),
-                    style: AppCss.minimumRegular.setSize(11).setColor(AppColors.black),
+                    style: AppCss.minimumRegular
+                        .setSize(11)
+                        .setColor(AppColors.black),
                   ),
                   Text(
                     'Criada dia ${pedido.createdAt.text()}',
-                    style: AppCss.minimumRegular.setSize(11).setColor(AppColors.neutralMedium),
+                    style: AppCss.minimumRegular
+                        .setSize(11)
+                        .setColor(AppColors.neutralMedium),
                   ),
                 ],
               ),
             ),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: pedido.getPrcntgPronto(),
-                  backgroundColor: AppColors.primaryMain.withOpacity(0.2),
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation(AppColors.primaryMain),
-                ),
-                Text(
-                  '${(pedido.getPrcntgPronto() * 100).percent}%',
-                  style: AppCss.minimumBold.setSize(11),
-                )
-              ],
-            ),
-            const W(24),
+            const W(8),
+            _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
+                pedido.getPrcntgAguardandoProducao()),
+            const W(16),
+            _progressChartWidget(
+                PedidoProdutoStatus.produzindo, pedido.getPrcntgProduzindo()),
+            const W(16),
+            _progressChartWidget(
+                PedidoProdutoStatus.pronto, pedido.getPrcntgPronto()),
+            const W(16),
             Icon(
               Icons.arrow_forward_ios,
               size: 14,
@@ -146,6 +147,24 @@ class _PedidosPageState extends State<PedidosPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _progressChartWidget(PedidoProdutoStatus status, double porcentagem) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        CircularProgressIndicator(
+          value: porcentagem,
+          backgroundColor: status.color.withOpacity(0.2),
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation(status.color),
+        ),
+        Text(
+          '${(porcentagem * 100).percent}%',
+          style: AppCss.minimumBold.setSize(10),
+        )
+      ],
     );
   }
 }

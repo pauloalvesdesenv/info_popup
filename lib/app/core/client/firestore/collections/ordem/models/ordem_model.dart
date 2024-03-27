@@ -12,12 +12,14 @@ class OrdemModel {
   final List<PedidoProdutoModel> produtos;
 
   double quantideTotal() {
-    return produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
+    return produtos.fold(
+        0, (previousValue, element) => previousValue + element.qtde);
   }
 
   double qtdeAguardando() {
     return produtos
-        .where((e) => e.statusess.last.status == PedidoProdutoStatus.aguardandoProducao)
+        .where((e) =>
+            e.statusess.last.status == PedidoProdutoStatus.aguardandoProducao)
         .fold(0, (previousValue, element) => previousValue + element.qtde);
   }
 
@@ -84,13 +86,16 @@ class OrdemModel {
       id: map['id'] ?? '',
       produto: ProdutoModel.fromMap(map['produto']),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      endAt: map['endAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['endAt']) : null,
-      produtos:
-          List<PedidoProdutoModel>.from(map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
+      endAt: map['endAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['endAt'])
+          : null,
+      produtos: List<PedidoProdutoModel>.from(
+          map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory OrdemModel.fromJson(String source) => OrdemModel.fromMap(json.decode(source));
+  factory OrdemModel.fromJson(String source) =>
+      OrdemModel.fromMap(json.decode(source));
 }

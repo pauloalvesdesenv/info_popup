@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
@@ -6,7 +7,9 @@ import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/empty_data.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
+import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -37,7 +40,8 @@ class _OrdensPageState extends State<OrdensPage> {
             color: AppColors.white,
           ),
         ),
-        title: Text('Ordens', style: AppCss.largeBold.setColor(AppColors.white)),
+        title:
+            Text('Ordens', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
           IconButton(
               onPressed: () => push(context, const OrdemCreatePage()),
@@ -53,7 +57,8 @@ class _OrdensPageState extends State<OrdensPage> {
         child: (_, __) => StreamOut<OrdemUtils>(
           stream: ordemCtrl.utilsStream.listen,
           child: (_, utils) {
-            final ordens = ordemCtrl.getOrdemesFiltered(utils.search.text, __).toList();
+            final ordens =
+                ordemCtrl.getOrdemesFiltered(utils.search.text, __).toList();
             return Column(
               children: [
                 Padding(
@@ -82,32 +87,72 @@ class _OrdensPageState extends State<OrdensPage> {
     );
   }
 
-  ListTile _itemOrdemWidget(OrdemModel ordem) {
-    return ListTile(
+  Widget _itemOrdemWidget(OrdemModel ordem) {
+    return InkWell(
       onTap: () => push(OrdemPage(ordem)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: Text(
-        'Ordem ${ordem.id}',
-        style: AppCss.mediumBold,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ordem ${ordem.id}',
+                    style: AppCss.mediumBold,
+                  ),
+                  Text(
+                    '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.map((e) => e.qtde)}Kg',
+                    style: AppCss.minimumRegular
+                        .setSize(11)
+                        .setColor(AppColors.black),
+                  ),
+                  Text(
+                    'Criada dia ${ordem.createdAt.text()}',
+                    style: AppCss.minimumRegular
+                        .setSize(11)
+                        .setColor(AppColors.neutralMedium),
+                  ),
+                ],
+              ),
+            ),
+            const W(8),
+            _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
+                ordem.getPrcntgAguardando()),
+            const W(16),
+            _progressChartWidget(
+                PedidoProdutoStatus.produzindo, ordem.getPrcntgProduzindo()),
+            const W(16),
+            _progressChartWidget(
+                PedidoProdutoStatus.pronto, ordem.getPrcntgPronto()),
+            const W(16),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: AppColors.neutralMedium,
+            ),
+          ],
+        ),
       ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.map((e) => e.qtde)}Kg',
-            style: AppCss.minimumRegular.setSize(11).setColor(AppColors.black),
-          ),
-          Text(
-            'Criada dia ${ordem.createdAt.text()}',
-            style: AppCss.minimumRegular.setSize(11).setColor(AppColors.neutralMedium),
-          ),
-        ],
-      ),
-      trailing: Icon(
-        Icons.arrow_forward_ios,
-        size: 14,
-        color: AppColors.neutralMedium,
-      ),
+    );
+  }
+
+  Widget _progressChartWidget(PedidoProdutoStatus status, double porcentagem) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        CircularProgressIndicator(
+          value: porcentagem,
+          backgroundColor: status.color.withOpacity(0.2),
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation(status.color),
+        ),
+        Text(
+          '${(porcentagem * 100).percent}%',
+          style: AppCss.minimumBold.setSize(10),
+        )
+      ],
     );
   }
 }

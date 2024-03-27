@@ -34,6 +34,20 @@ class OrdemController {
     formStream.add(ordem != null ? OrdemCreateModel.edit(ordem) : OrdemCreateModel());
   }
 
+   List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto) {
+    List<PedidoProdutoModel> pedidos = [];
+    for (var pedido in FirestoreClient.pedidos.data) {
+      for (var pedidoProduto in pedido.produtos
+          .where((e) =>
+              e.status.status == PedidoProdutoStatus.aguardandoProducao &&
+              e.produto.id == produto.id)
+          .toList()) {
+        pedidos.add(pedidoProduto);
+      }
+    }
+    return pedidos;
+  }
+
   List<OrdemModel> getOrdemesFiltered(String search, List<OrdemModel> ordens) {
     if (search.length < 3) return ordens;
     List<OrdemModel> filtered = [];

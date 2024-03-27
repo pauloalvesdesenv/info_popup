@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
-import 'package:aco_plus/app/core/extensions/double_ext.dart';
 
 class PedidoModel {
   final String id;
@@ -28,12 +27,14 @@ class PedidoModel {
   }
 
   double getQtdeTotal() {
-    return produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
+    return produtos.fold(
+        0, (previousValue, element) => previousValue + element.qtde);
   }
 
   double getQtdeAguardandoProducao() {
     return produtos
-        .where((e) => e.statusess.last.status == PedidoProdutoStatus.aguardandoProducao)
+        .where((e) =>
+            e.statusess.last.status == PedidoProdutoStatus.aguardandoProducao)
         .fold(0, (previousValue, element) => previousValue + element.qtde);
   }
 
@@ -47,6 +48,20 @@ class PedidoModel {
     return produtos
         .where((e) => e.statusess.last.status == PedidoProdutoStatus.pronto)
         .fold(0, (previousValue, element) => previousValue + element.qtde);
+  }
+
+  double getPrcntgAguardandoProducao() {
+    final aguardandoProducao = getQtdeAguardandoProducao();
+    final total = getQtdeTotal();
+    if (total == 0) return 0;
+    return aguardandoProducao / total;
+  }
+
+  double getPrcntgProduzindo() {
+    final produzindo = getQtdeProduzindo();
+    final total = getQtdeTotal();
+    if (total == 0) return 0;
+    return produzindo / total;
   }
 
   double getPrcntgPronto() {
@@ -72,12 +87,13 @@ class PedidoModel {
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
       cliente: ClienteModel.fromMap(map['cliente']),
       obra: ObraModel.fromMap(map['obra']),
-      produtos:
-          List<PedidoProdutoModel>.from(map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
+      produtos: List<PedidoProdutoModel>.from(
+          map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory PedidoModel.fromJson(String source) => PedidoModel.fromMap(json.decode(source));
+  factory PedidoModel.fromJson(String source) =>
+      PedidoModel.fromMap(json.decode(source));
 }
