@@ -1,10 +1,10 @@
 import 'dart:developer';
 import 'dart:typed_data';
+
 import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseService {
-  static Future<String?> onUploadPortariaPDF(
-      String name, Uint8List bytes) async {
+  static Future<String?> onUploadPortariaPDF(String name, Uint8List bytes) async {
     try {
       final folderRef = FirebaseStorage.instance.ref().child('portarias');
       final list = (await folderRef.list()).items;
@@ -19,8 +19,7 @@ class FirebaseService {
         }
       }
       final Reference fileRef = folderRef.child(name);
-      await fileRef.putData(
-          bytes, SettableMetadata(contentType: 'application/pdf'));
+      await fileRef.putData(bytes, SettableMetadata(contentType: 'application/pdf'));
       return await fileRef.getDownloadURL();
     } catch (e) {
       return null;

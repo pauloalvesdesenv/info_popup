@@ -1,27 +1,25 @@
-import 'package:aco_plus/app/core/utils/app_colors.dart';
-import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/modules/cliente/ui/clientes_page.dart';
+import 'package:aco_plus/app/modules/pedido/ui/pedidos_page.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
-enum AppModule { cliente }
+enum AppModule { cliente, pedidos }
 
 extension AppModuleExt on AppModule {
   Widget get widget {
     switch (this) {
       case AppModule.cliente:
-        return Center(
-          child: Text(
-            '🔨 Em contrução',
-            style: AppCss.mediumRegular.setColor(AppColors.primaryMain),
-          ),
-        );
+        return const ClientesPage();
+      case AppModule.pedidos:
+        return const PedidosPage();
     }
   }
 
   IconData get icon {
     switch (this) {
       case AppModule.cliente:
-        return Symbols.person_outline;
+        return Icons.group_outlined;
+      case AppModule.pedidos:
+        return Icons.shopping_cart_outlined;
     }
   }
 
@@ -29,6 +27,8 @@ extension AppModuleExt on AppModule {
     switch (this) {
       case AppModule.cliente:
         return 'Clientes';
+      case AppModule.pedidos:
+        return 'Pedidos';
     }
   }
 }

@@ -1,0 +1,147 @@
+import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
+import 'package:aco_plus/app/core/components/app_field.dart';
+import 'package:aco_plus/app/core/components/app_multiple_registers.dart';
+import 'package:aco_plus/app/core/components/app_scaffold.dart';
+import 'package:aco_plus/app/core/components/done_button.dart';
+import 'package:aco_plus/app/core/components/h.dart';
+import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/enums/obra_status.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/cliente/cliente_controller.dart';
+import 'package:aco_plus/app/modules/cliente/cliente_view_model.dart';
+import 'package:aco_plus/app/modules/endereco/endereco_create_page.dart';
+import 'package:aco_plus/app/modules/obra/ui/obra_create_page.dart';
+import 'package:flutter/material.dart';
+
+class ClienteCreatePage extends StatefulWidget {
+  final ClienteModel? cliente;
+  final bool isFromOrder;
+  const ClienteCreatePage({this.cliente, this.isFromOrder = false, super.key});
+
+  @override
+  State<ClienteCreatePage> createState() => _ClienteCreatePageState();
+}
+
+class _ClienteCreatePageState extends State<ClienteCreatePage> {
+  @override
+  void initState() {
+    clienteCtrl.init(widget.cliente);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+        resizeAvoid: true,
+        appBar: AppBar(
+          leading: IconButton(
+              onPressed: () => pop(context),
+              icon: Icon(
+                Icons.arrow_back,
+                color: AppColors.white,
+              )),
+          title: Text('${clienteCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Cliente',
+              style: AppCss.largeBold.setColor(AppColors.white)),
+          actions: [
+            IconLoadingButton(() async =>
+                await clienteCtrl.onConfirm(context, widget.cliente, widget.isFromOrder))
+          ],
+          backgroundColor: AppColors.primaryMain,
+        ),
+        body: StreamOut(stream: clienteCtrl.formStream.listen, child: (_, form) => body(form)));
+  }
+
+  Widget body(ClienteCreateModel form) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        AppField(
+          label: 'Nome',
+          controller: form.nome,
+          onChanged: (_) => clienteCtrl.formStream.update(),
+        ),
+        const H(16),
+        AppField(
+          label: 'Telefone',
+          hint: '(00) 00000-000',
+          controller: form.telefone,
+          onChanged: (_) => clienteCtrl.formStream.update(),
+        ),
+        const H(16),
+        AppField(
+          label: 'CPF',
+          controller: form.cpf,
+          hint: '000.000.000-00',
+          onChanged: (_) => clienteCtrl.formStream.update(),
+        ),
+        const H(16),
+        InkWell(
+          onTap: () async {
+            final endereco = await push(context, EnderecoCreatePage(endereco: form.endereco));
+            if (endereco != null) {
+              form.endereco = endereco;
+              clienteCtrl.formStream.update();
+            }
+          },
+          child: IgnorePointer(
+            child: AppField(
+              label: 'Endereço',
+              suffixIconSize: 12,
+              suffixIcon: Icons.arrow_forward_ios,
+              controller: TextEditingController(text: form.endereco?.name.toString() ?? ''),
+              onChanged: (_) => clienteCtrl.formStream.update(),
+              hint: 'Clique para adicionar',
+            ),
+          ),
+        ),
+        const H(16),
+        AppMultipleRegisters<ObraModel>(
+          icon: Icons.construction,
+          title: 'Obras',
+          createPage: const ObraCreatePage(),
+          editPage: (e) => ObraCreatePage(obra: e),
+          onAdd: (e) {
+            form.obras.add(e);
+            clienteCtrl.formStream.update();
+          },
+          itens: form.obras,
+          titleBuilder: (e) => Row(
+            children: [
+              Text(
+                e.descricao,
+                style: AppCss.minimumRegular,
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                    color: e.status.color.withOpacity(0.5), borderRadius: AppCss.radius4),
+                child: Text(
+                  e.status.label,
+                  style: AppCss.minimumBold.setSize(11),
+                ),
+              )
+            ],
+          ),
+        ),
+        const H(24),
+        if (form.isEdit)
+          TextButton.icon(
+              style: ButtonStyle(
+                fixedSize: const MaterialStatePropertyAll(Size.fromWidth(double.maxFinite)),
+                foregroundColor: MaterialStatePropertyAll(AppColors.error),
+                backgroundColor: MaterialStatePropertyAll(AppColors.white),
+                shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                    borderRadius: AppCss.radius8, side: BorderSide(color: AppColors.error))),
+              ),
+              onPressed: () => clienteCtrl.onDelete(context, widget.cliente!),
+              label: const Text('Excluir'),
+              icon: const Icon(
+                Icons.delete_outline,
+              )),
+      ],
+    );
+  }
+}

@@ -12,7 +12,10 @@ class AppField extends StatefulWidget {
   final FocusNode? focus;
   final IconData? icon;
   final IconData? suffixIcon;
+  final double? suffixIconSize;
   final Function()? onSuffix;
+  final IconData? prefixIcon;
+  final Function()? onPrefix;
   final List<TextInputFormatter>? inputFormatters;
   final void Function(String)? onChanged;
   final void Function()? onEditingComplete;
@@ -33,12 +36,15 @@ class AppField extends StatefulWidget {
     this.onChanged,
     this.icon,
     this.suffixIcon,
+    this.suffixIconSize,
+    this.prefixIcon,
     this.hint = '',
     this.focus,
     this.action,
     this.inputFormatters,
     this.onEditingComplete,
     this.onSuffix,
+    this.onPrefix,
     this.onTap,
     this.type = TextInputType.text,
     this.autoFocus = false,
@@ -105,7 +111,10 @@ class _AppFieldState extends State<AppField> {
                       onTap: widget.onSuffix,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20, right: 10),
-                        child: Icon(widget.suffixIcon, weight: 800, color: AppColors.neutralMedium),
+                        child: Icon(widget.suffixIcon,
+                            weight: 800,
+                            size: widget.suffixIconSize,
+                            color: AppColors.neutralMedium),
                       ),
                     )
                   : null,

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:flutter/material.dart';
 
 class AppMultipleRegisters<T> extends StatelessWidget {
   final IconData icon;
@@ -9,7 +9,7 @@ class AppMultipleRegisters<T> extends StatelessWidget {
   final Function(T) editPage;
   final Function(T) onAdd;
   final List<T> itens;
-  final Function(T) itemLabel;
+  final Widget Function(T) titleBuilder;
 
   const AppMultipleRegisters({
     required this.icon,
@@ -18,7 +18,7 @@ class AppMultipleRegisters<T> extends StatelessWidget {
     required this.editPage,
     required this.onAdd,
     required this.itens,
-    required this.itemLabel,
+    required this.titleBuilder,
     super.key,
   });
 
@@ -26,21 +26,24 @@ class AppMultipleRegisters<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        GestureDetector(
-          onTap: () async {
-            final result = await push(context, createPage);
-            if (result != null) {
-              onAdd(result as T);
-            }
-          },
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(icon),
-            title: Text(
-              title,
-              style: AppCss.mediumRegular,
+        SizedBox(
+          height: 36,
+          child: GestureDetector(
+            onTap: () async {
+              final result = await push(context, createPage);
+              if (result != null) {
+                onAdd(result as T);
+              }
+            },
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(icon),
+              title: Text(
+                title + (itens.isNotEmpty ? '(${itens.length})' : ''),
+                style: AppCss.mediumRegular,
+              ),
+              trailing: const Icon(Icons.add),
             ),
-            trailing: const Icon(Icons.add),
           ),
         ),
         for (T item in itens)
@@ -48,10 +51,7 @@ class AppMultipleRegisters<T> extends StatelessWidget {
             onTap: () => push(context, editPage.call(item)),
             child: ListTile(
               contentPadding: const EdgeInsets.only(left: 8),
-              title: Text(
-                itemLabel.call(item),
-                style: AppCss.minimumRegular,
-              ),
+              title: titleBuilder(item),
               leading: Text(
                 (itens.indexOf(item) + 1).toString(),
                 style: AppCss.minimumRegular,
