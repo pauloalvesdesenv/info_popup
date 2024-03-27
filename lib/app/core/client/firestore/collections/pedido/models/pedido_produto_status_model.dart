@@ -2,11 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-enum PedidoProdutoStatus { aguardandoProducao, produzindo, pronto }
+enum PedidoProdutoStatus { separado, aguardandoProducao, produzindo, pronto }
+
+List<PedidoProdutoStatus> pedidoProdutoStatusValues = PedidoProdutoStatus.values.sublist(1);
 
 extension PedidoProdutoStatusExt on PedidoProdutoStatus {
   String get label {
     switch (this) {
+      case PedidoProdutoStatus.separado:
+        return 'Separado';
       case PedidoProdutoStatus.aguardandoProducao:
         return 'Aguardando Produção';
       case PedidoProdutoStatus.produzindo:
@@ -18,6 +22,8 @@ extension PedidoProdutoStatusExt on PedidoProdutoStatus {
 
   Color get color {
     switch (this) {
+      case PedidoProdutoStatus.separado:
+        return Colors.grey;
       case PedidoProdutoStatus.aguardandoProducao:
         return Colors.red;
       case PedidoProdutoStatus.produzindo:
@@ -58,4 +64,16 @@ class PedidoProdutoStatusModel {
 
   factory PedidoProdutoStatusModel.fromJson(String source) =>
       PedidoProdutoStatusModel.fromMap(json.decode(source));
+
+  PedidoProdutoStatusModel copyWith({
+    String? id,
+    PedidoProdutoStatus? status,
+    DateTime? createdAt,
+  }) {
+    return PedidoProdutoStatusModel(
+      id: id ?? this.id,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }

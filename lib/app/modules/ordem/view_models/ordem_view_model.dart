@@ -12,9 +12,6 @@ class OrdemUtils {
 class OrdemCreateModel {
   String id;
   ProdutoModel? produto;
-  ClienteModel? cliente;
-  ObraModel? obra;
-  PedidoProdutoModel? produtoPedido;
   List<PedidoProdutoModel> produtos = [];
 
   late bool isEdit;

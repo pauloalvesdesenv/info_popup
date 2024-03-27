@@ -22,16 +22,15 @@ class PedidoProdutoCreateModel {
       : id = produto.id,
         isEdit = true;
 
-  PedidoProdutoModel toPedidoProdutoModel(String pedidoId, ClienteModel cliente, ObraModel obra) => PedidoProdutoModel(
+  PedidoProdutoModel toPedidoProdutoModel(String pedidoId, ClienteModel cliente, ObraModel obra) =>
+      PedidoProdutoModel(
         id: id,
         pedidoId: pedidoId,
         produto: produtoModel!,
         qtde: qtde.numberValue,
         statusess: [
           PedidoProdutoStatusModel(
-              id: HashService.get,
-              status: PedidoProdutoStatus.aguardandoProducao,
-              createdAt: DateTime.now())
+              id: HashService.get, status: PedidoProdutoStatus.separado, createdAt: DateTime.now())
         ],
         clienteId: cliente.id,
         obraId: obra.id,

@@ -44,7 +44,7 @@ class _OrdemProdutoStatusBottomState extends State<OrdemProdutoStatusBottom> {
         onClosing: () {},
         builder: (context) => KeyboardVisibilityBuilder(builder: (context, isVisible) {
               return Container(
-                height: 390,
+                height: 400,
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: const BorderRadius.only(
@@ -80,7 +80,7 @@ class _OrdemProdutoStatusBottomState extends State<OrdemProdutoStatusBottom> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              for (var status in PedidoProdutoStatus.values)
+                              for (var status in pedidoProdutoStatusValues)
                                 Container(
                                   margin: const EdgeInsets.only(bottom: 8),
                                   decoration: BoxDecoration(
@@ -89,7 +89,9 @@ class _OrdemProdutoStatusBottomState extends State<OrdemProdutoStatusBottom> {
                                   child: RadioListTile<PedidoProdutoStatus>(
                                     title: Text(status.label, style: AppCss.mediumRegular),
                                     value: status,
-                                    groupValue: currentStatus,
+                                    groupValue: currentStatus == PedidoProdutoStatus.separado
+                                        ? PedidoProdutoStatus.aguardandoProducao
+                                        : currentStatus,
                                     onChanged: (value) {
                                       setState(() {
                                         currentStatus = value!;
