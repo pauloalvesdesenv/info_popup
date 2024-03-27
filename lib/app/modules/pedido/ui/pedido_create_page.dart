@@ -9,6 +9,7 @@ import 'package:aco_plus/app/core/components/done_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/enums/obra_status.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -72,7 +73,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
           label: 'Obra',
           item: form.obra,
           disable: form.cliente == null,
-          itens: form.cliente?.obras ?? [],
+          itens:
+              form.cliente?.obras.where((e) => e.status == ObraStatus.emAndamento).toList() ?? [],
           itemLabel: (e) => e!.descricao,
           onSelect: (e) {
             form.obra = e;

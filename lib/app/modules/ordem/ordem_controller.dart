@@ -34,13 +34,12 @@ class OrdemController {
     formStream.add(ordem != null ? OrdemCreateModel.edit(ordem) : OrdemCreateModel());
   }
 
-   List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto) {
+  List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
     for (var pedido in FirestoreClient.pedidos.data) {
       for (var pedidoProduto in pedido.produtos
-          .where((e) =>
-              e.status.status == PedidoProdutoStatus.aguardandoProducao &&
-              e.produto.id == produto.id)
+          .where(
+              (e) => e.status.status == PedidoProdutoStatus.separado && e.produto.id == produto.id)
           .toList()) {
         pedidos.add(pedidoProduto);
       }
@@ -92,12 +91,6 @@ class OrdemController {
     if (form.produtos.isEmpty) {
       if (form.produto == null) {
         throw Exception('Selecione o produto');
-      }
-      if (form.cliente == null) {
-        throw Exception('Selecione o cliente');
-      }
-      if (form.obra == null) {
-        throw Exception('Selecione a obra');
       }
     }
     if (form.produtos.isEmpty) {
