@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -9,6 +10,7 @@ import 'package:aco_plus/app/core/components/done_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/enums/obra_status.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -43,20 +45,41 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                 Icons.arrow_back,
                 color: AppColors.white,
               )),
-          title: Text('${pedidoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Pedido',
+          title: Text(
+              '${pedidoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Pedido',
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
-            IconLoadingButton(() async => await pedidoCtrl.onConfirm(context, widget.pedido, false))
+            IconLoadingButton(() async =>
+                await pedidoCtrl.onConfirm(context, widget.pedido, false))
           ],
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(stream: pedidoCtrl.formStream.listen, child: (_, form) => body(form)));
+        body: StreamOut(
+            stream: pedidoCtrl.formStream.listen,
+            child: (_, form) => body(form)));
   }
 
   Widget body(PedidoCreateModel form) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        AppField(
+          label: 'Localizador',
+          controller: form.localizador,
+          onChanged: (_) => pedidoCtrl.formStream.update(),
+        ),
+        const H(16),
+        AppDropDown<PedidoTipo?>(
+          label: 'Tipo',
+          item: form.tipo,
+          itens: PedidoTipo.values,
+          itemLabel: (e) => e!.label,
+          onSelect: (e) {
+            form.tipo = e;
+            pedidoCtrl.formStream.update();
+          },
+        ),
+        const H(16),
         AppDropDown<ClienteModel?>(
           label: 'Cliente',
           item: form.cliente,
@@ -72,7 +95,10 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
           label: 'Obra',
           item: form.obra,
           disable: form.cliente == null,
-          itens: form.cliente?.obras ?? [],
+          itens: form.cliente?.obras
+                  .where((e) => e.status == ObraStatus.emAndamento)
+                  .toList() ??
+              [],
           itemLabel: (e) => e!.descricao,
           onSelect: (e) {
             form.obra = e;
@@ -90,7 +116,9 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                     label: 'Produto',
                     item: form.produto.produtoModel,
                     itens: FirestoreClient.produtos.data
-                        .where((e) => !form.produtos.map((e) => e.produtoModel).contains(e))
+                        .where((e) => !form.produtos
+                            .map((e) => e.produtoModel)
+                            .contains(e))
                         .toList(),
                     itemLabel: (e) => e?.descricao ?? 'Selecione',
                     onSelect: (e) {
@@ -101,7 +129,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                   const H(6),
                   AppField(
                     label: 'Quantidade',
-                    type: const TextInputType.numberWithOptions(decimal: true, signed: false),
+                    type: const TextInputType.numberWithOptions(
+                        decimal: true, signed: false),
                     controller: form.produto.qtde,
                     onChanged: (_) => pedidoCtrl.formStream.update(),
                   ),
@@ -121,9 +150,10 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                         pedidoCtrl.formStream.update();
                       },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(form.produto.isEnable
-                      ? AppColors.primaryMain
-                      : AppColors.black.withOpacity(0.3)),
+                  backgroundColor: MaterialStateProperty.all(
+                      form.produto.isEnable
+                          ? AppColors.primaryMain
+                          : AppColors.black.withOpacity(0.3)),
                 ),
                 icon: Icon(
                   Icons.add,
@@ -135,8 +165,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
         ),
         for (PedidoProdutoCreateModel produto in form.produtos)
           ListTile(
-            leading:
-                Text((form.produtos.indexOf(produto) + 1).toString(), style: AppCss.mediumBold),
+            leading: Text((form.produtos.indexOf(produto) + 1).toString(),
+                style: AppCss.mediumBold),
             minLeadingWidth: 14,
             contentPadding: const EdgeInsets.only(left: 16),
             title: Text(produto.produtoModel?.descricao ?? ''),

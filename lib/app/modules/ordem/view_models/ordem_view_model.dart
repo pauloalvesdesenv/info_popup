@@ -10,7 +10,7 @@ class OrdemUtils {
 }
 
 class OrdemCreateModel {
-  final String id;
+  String id;
   ProdutoModel? produto;
   ClienteModel? cliente;
   ObraModel? obra;

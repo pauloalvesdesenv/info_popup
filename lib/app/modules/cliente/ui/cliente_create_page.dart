@@ -99,7 +99,7 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
         const H(16),
         AppMultipleRegisters<ObraModel>(
           icon: Icons.construction,
-          title: 'Obras',
+          title: 'Obras ',
           createPage: const ObraCreatePage(),
           editPage: (e) => ObraCreatePage(obra: e),
           onAdd: (e) {

@@ -1,3 +1,5 @@
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -54,12 +56,44 @@ class _PedidoPageState extends State<PedidoPage> {
           ]),
         ),
         const Divisor(),
+        Container(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Status do Pedido', style: AppCss.largeBold),
+              InkWell(
+                onTap: () => pedidoCtrl.onChangePedidoStatus(pedido),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                      color:
+                          pedido.statusess.last.status.color.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(4)),
+                  child: IntrinsicWidth(
+                    child: Row(
+                      children: [
+                        Text(pedido.statusess.last.status.label,
+                            style: AppCss.mediumRegular.setSize(12)),
+                        const W(2),
+                        Icon(Icons.keyboard_arrow_down,
+                            size: 16, color: AppColors.black.withOpacity(0.6))
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        const Divisor(),
         Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Status', style: AppCss.largeBold),
+              Text('Corte e Dobra', style: AppCss.largeBold),
               const H(8),
               Column(
                 children: [
@@ -132,7 +166,6 @@ class _PedidoPageState extends State<PedidoPage> {
             ],
           ),
         ),
-        const Divisor(),
         for (final produto in form.produtos)
           Column(
             children: [
@@ -194,6 +227,51 @@ class _PedidoPageState extends State<PedidoPage> {
               ),
               const Divisor(),
             ],
+          ),
+        const Divisor(),
+        if (pedido.tipo == PedidoTipo.cda)
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Armação', style: AppCss.largeBold),
+                for (final status in pedido.statusess.where((e) => [
+                      PedidoStatus.aguardandoProducaoCDA,
+                      PedidoStatus.produzindoCDA,
+                      PedidoStatus.pronto
+                    ].contains(e.status)))
+                  Builder(builder: (context) {
+                    final isLast = status == pedido.statusess.last;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: status.status.color
+                                  .withOpacity(isLast ? 0.4 : 0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(status.status.label,
+                                style: AppCss.mediumRegular
+                                    .setSize(14)
+                                    .setColor(AppColors.black
+                                        .withOpacity(isLast ? 1 : 0.4))),
+                          ),
+                          Text(status.createdAt.textHour(),
+                              style: AppCss.minimumRegular.setColor(AppColors
+                                  .black
+                                  .withOpacity(isLast ? 1 : 0.4))),
+                        ],
+                      ),
+                    );
+                  })
+              ],
+            ),
           ),
       ],
     );

@@ -137,7 +137,7 @@ class _OrdemPageState extends State<OrdemPage> {
         for (final produto in ordem.produtos)
           ListTile(
             title: Text(
-              '${produto.produto.nome} ${produto.produto.descricao} - ${produto.qtde}Kg',
+              '${produto.qtde}Kg',
               style: AppCss.minimumBold,
             ),
             subtitle: Column(

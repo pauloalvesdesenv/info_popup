@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/pedido/ui/pedido_status_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -79,6 +80,9 @@ class PedidoController {
     if (form.cliente == null) {
       throw Exception('Selecione o cliente do pedido');
     }
+    if (form.tipo == null) {
+      throw Exception('Selecione o tipo do pedido');
+    }
     if (form.obra == null) {
       throw Exception('Selecione a obra do pedido');
     }
@@ -93,5 +97,10 @@ class PedidoController {
 
   void onInitPage(PedidoModel pedido) {
     pedidoStream.add(pedido);
+  }
+
+  void onChangePedidoStatus(PedidoModel pedido) async {
+    final status = await showPedidoStatusBottom(pedido);
+    if (pedido.statusess.last.status == status) return;
   }
 }
