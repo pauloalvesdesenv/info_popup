@@ -8,7 +8,7 @@ import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
-Future<PedidoStatus?> showPedidoStatusBottom(PedidoModel pedido) async =>
+Future<PedidoStatus?>   showPedidoStatusBottom(PedidoModel pedido) async =>
     showModalBottomSheet(
       backgroundColor: AppColors.white,
       context: contextGlobal,
@@ -87,7 +87,7 @@ class _PedidoStatusBottomState extends State<PedidoStatusBottom> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               for (var status
-                                  in getaPedidosStatusByPedido(widget.pedido))
+                                  in getPedidosStatusByPedido(widget.pedido))
                                 Container(
                                   margin: const EdgeInsets.only(bottom: 8),
                                   decoration: BoxDecoration(

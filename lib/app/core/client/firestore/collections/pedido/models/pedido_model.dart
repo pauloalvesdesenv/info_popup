@@ -17,6 +17,14 @@ class PedidoModel {
   final PedidoTipo tipo;
   List<PedidoStatusModel> statusess;
 
+  bool get isChangeStatusAvailable =>
+      tipo == PedidoTipo.cda &&
+      [
+        PedidoStatus.aguardandoProducaoCDA,
+        PedidoStatus.produzindoCDA,
+        PedidoStatus.pronto
+      ].contains(statusess.last.status);
+
   PedidoModel({
     required this.id,
     required this.localizador,

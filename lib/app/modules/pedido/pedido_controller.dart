@@ -1,7 +1,9 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_status_bottom.dart';
@@ -101,6 +103,14 @@ class PedidoController {
 
   void onChangePedidoStatus(PedidoModel pedido) async {
     final status = await showPedidoStatusBottom(pedido);
+    if (status == null) return;
     if (pedido.statusess.last.status == status) return;
+    pedido.statusess.add(PedidoStatusModel(
+      id: HashService.get,
+      status: status,
+      createdAt: DateTime.now(),
+    ));
+    pedidoStream.update();
+    await FirestoreClient.pedidos.update(pedido);
   }
 }

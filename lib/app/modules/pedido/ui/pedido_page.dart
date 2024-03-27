@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/h.dart';
@@ -59,11 +60,13 @@ class _PedidoPageState extends State<PedidoPage> {
         Container(
           padding: const EdgeInsets.all(16),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Status do Pedido', style: AppCss.largeBold),
+              Expanded(
+                  child: Text('Status do Pedido', style: AppCss.largeBold)),
               InkWell(
-                onTap: () => pedidoCtrl.onChangePedidoStatus(pedido),
+                onTap: pedido.isChangeStatusAvailable
+                    ? () => pedidoCtrl.onChangePedidoStatus(pedido)
+                    : null,
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -76,9 +79,11 @@ class _PedidoPageState extends State<PedidoPage> {
                       children: [
                         Text(pedido.statusess.last.status.label,
                             style: AppCss.mediumRegular.setSize(12)),
-                        const W(2),
-                        Icon(Icons.keyboard_arrow_down,
-                            size: 16, color: AppColors.black.withOpacity(0.6))
+                        if (pedido.isChangeStatusAvailable) ...{
+                          const W(2),
+                          Icon(Icons.keyboard_arrow_down,
+                              size: 16, color: AppColors.black.withOpacity(0.6))
+                        }
                       ],
                     ),
                   ),
@@ -236,13 +241,14 @@ class _PedidoPageState extends State<PedidoPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Armação', style: AppCss.largeBold),
-                for (final status in pedido.statusess.where((e) => [
-                      PedidoStatus.aguardandoProducaoCDA,
-                      PedidoStatus.produzindoCDA,
-                      PedidoStatus.pronto
-                    ].contains(e.status)))
+                const H(16),
+                for (PedidoStatusModel status
+                    in pedido.statusess.map((e) => e.copyWith()).toList())
                   Builder(builder: (context) {
                     final isLast = status == pedido.statusess.last;
+                    if (status.status == PedidoStatus.produzindoCD) {
+                      status.status = PedidoStatus.aguardandoProducaoCD;
+                    }
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Row(

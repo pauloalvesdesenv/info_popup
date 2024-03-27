@@ -43,8 +43,9 @@ class OrdemController {
     List<PedidoProdutoModel> pedidos = [];
     for (var pedido in FirestoreClient.pedidos.data) {
       for (var pedidoProduto in pedido.produtos
-          .where(
-              (e) => e.status.status == PedidoProdutoStatus.separado && e.produto.id == produto.id)
+          .where((e) =>
+              e.status.status == PedidoProdutoStatus.separado &&
+              e.produto.id == produto.id)
           .toList()) {
         pedidos.add(pedidoProduto);
       }
@@ -186,6 +187,7 @@ class OrdemController {
     final pedido = FirestoreClient.pedidos.data
         .singleWhere((e) => e.id == produto.pedidoId);
     final status = PedidoStatusModel(
+      id: HashService.get,
         status: pedido.tipo == PedidoTipo.cd
             ? PedidoStatus.pronto
             : PedidoStatus.aguardandoProducaoCDA,

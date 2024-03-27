@@ -2,13 +2,21 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:flutter/material.dart';
 
-enum PedidoStatus { produzindoCD, aguardandoProducaoCDA, produzindoCDA, pronto }
+enum PedidoStatus {
+  produzindoCD,
+  aguardandoProducaoCD,
+  aguardandoProducaoCDA,
+  produzindoCDA,
+  pronto
+}
 
 extension PedidoStatusExtension on PedidoStatus {
   String get label {
     switch (this) {
       case PedidoStatus.produzindoCD:
         return 'Produzindo CD';
+      case PedidoStatus.aguardandoProducaoCD:
+        return 'Aguardando Produção CD';
       case PedidoStatus.aguardandoProducaoCDA:
         return 'Aguardando Produção CDA';
       case PedidoStatus.produzindoCDA:
@@ -22,6 +30,8 @@ extension PedidoStatusExtension on PedidoStatus {
     switch (this) {
       case PedidoStatus.produzindoCD:
         return Colors.yellow;
+      case PedidoStatus.aguardandoProducaoCD:
+        return Colors.grey[300]!;
       case PedidoStatus.aguardandoProducaoCDA:
         return Colors.grey;
       case PedidoStatus.produzindoCDA:
@@ -32,10 +42,9 @@ extension PedidoStatusExtension on PedidoStatus {
   }
 }
 
-List<PedidoStatus> getaPedidosStatusByPedido(PedidoModel pedido) =>
+List<PedidoStatus> getPedidosStatusByPedido(PedidoModel pedido) =>
     pedido.tipo == PedidoTipo.cda
         ? [
-            PedidoStatus.produzindoCD,
             PedidoStatus.aguardandoProducaoCDA,
             PedidoStatus.produzindoCDA,
             PedidoStatus.pronto

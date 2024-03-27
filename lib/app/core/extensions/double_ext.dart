@@ -25,5 +25,6 @@ extension DoubleExt on double {
     return toStringAsFixed(0);
   }
 
-  String toMoney() => MoneyMaskedTextController(leftSymbol: 'R\$ ', initialValue: this).text;
+  String toMoney() =>
+      MoneyMaskedTextController(leftSymbol: 'R\$ ', initialValue: this).text;
 }

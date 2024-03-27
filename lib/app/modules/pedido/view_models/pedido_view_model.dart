@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:flutter/material.dart';
 
@@ -36,7 +37,9 @@ class PedidoCreateModel {
         tipo: tipo!,
         statusess: [
           PedidoStatusModel(
-              status: PedidoStatus.produzindoCD, createdAt: DateTime.now())
+              id: HashService.get,
+              status: PedidoStatus.produzindoCD,
+              createdAt: DateTime.now())
         ],
         localizador: localizador.text,
         createdAt: DateTime.now(),
