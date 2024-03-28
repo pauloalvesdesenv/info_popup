@@ -132,6 +132,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                     type: const TextInputType.numberWithOptions(
                         decimal: true, signed: false),
                     controller: form.produto.qtde,
+                    suffixText: 'Kg',
                     onChanged: (_) => pedidoCtrl.formStream.update(),
                   ),
                 ],
@@ -170,7 +171,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
             minLeadingWidth: 14,
             contentPadding: const EdgeInsets.only(left: 16),
             title: Text(produto.produtoModel?.descricao ?? ''),
-            subtitle: Text('Quantidade: ${produto.qtde.text}'),
+            subtitle: Text('Quantidade: ${produto.qtde.text} Kg'),
             trailing: IconButton(
               onPressed: () {
                 form.produtos.remove(produto);

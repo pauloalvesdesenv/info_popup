@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 extension TextControllerExt on TextEditingController {
-  double get doubleValue => double.tryParse(text) ?? 0;
+  double get doubleValue => double.tryParse(text.replaceAll(',', '.')) ?? 0;
   int get intValue => int.tryParse(text) ?? 0;
   DateTime get ddMMyyyy {
     try {

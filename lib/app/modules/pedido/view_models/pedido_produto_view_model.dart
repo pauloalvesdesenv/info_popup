@@ -2,15 +2,16 @@ import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_m
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
+import 'package:aco_plus/app/core/extensions/text_controller_ext.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
-import 'package:flutter_masked_text2/flutter_masked_text2.dart';
+import 'package:flutter/material.dart';
 
 class PedidoProdutoCreateModel {
   final String id;
   ProdutoModel? produtoModel;
-  MoneyMaskedTextController qtde = MoneyMaskedTextController(rightSymbol: ' Kg');
+  TextEditingController qtde = TextEditingController();
 
-  bool get isEnable => produtoModel != null && qtde.numberValue > 0;
+  bool get isEnable => produtoModel != null && qtde.doubleValue > 0;
 
   late bool isEdit;
 
@@ -22,15 +23,18 @@ class PedidoProdutoCreateModel {
       : id = produto.id,
         isEdit = true;
 
-  PedidoProdutoModel toPedidoProdutoModel(String pedidoId, ClienteModel cliente, ObraModel obra) =>
+  PedidoProdutoModel toPedidoProdutoModel(
+          String pedidoId, ClienteModel cliente, ObraModel obra) =>
       PedidoProdutoModel(
         id: id,
         pedidoId: pedidoId,
         produto: produtoModel!,
-        qtde: qtde.numberValue,
+        qtde: qtde.doubleValue,
         statusess: [
           PedidoProdutoStatusModel(
-              id: HashService.get, status: PedidoProdutoStatus.separado, createdAt: DateTime.now())
+              id: HashService.get,
+              status: PedidoProdutoStatus.separado,
+              createdAt: DateTime.now())
         ],
         clienteId: cliente.id,
         obraId: obra.id,

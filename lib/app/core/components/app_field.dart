@@ -13,6 +13,7 @@ class AppField extends StatefulWidget {
   final IconData? icon;
   final IconData? suffixIcon;
   final double? suffixIconSize;
+  final String? suffixText;
   final Function()? onSuffix;
   final IconData? prefixIcon;
   final Function()? onPrefix;
@@ -53,6 +54,7 @@ class AppField extends StatefulWidget {
     this.maxLines,
     this.minLines,
     this.obscure = false,
+    this.suffixText,
     super.key,
   });
 
@@ -106,22 +108,36 @@ class _AppFieldState extends State<AppField> {
                       ),
                     )
                   : null,
-              suffixIcon: widget.suffixIcon != null
-                  ? InkWell(
-                      onTap: widget.onSuffix,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 10),
-                        child: Icon(widget.suffixIcon,
-                            weight: 800,
-                            size: widget.suffixIconSize,
-                            color: AppColors.neutralMedium),
-                      ),
-                    )
-                  : null,
+              suffixIcon: getSuffix(),
             ),
           ),
         ),
       ],
     );
+  }
+
+  Widget? getSuffix() {
+    if (widget.suffixText != null) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(
+          widget.suffixText!,
+          style: AppCss.smallRegular.setColor(AppColors.neutralMedium),
+        ),
+      );
+    }
+    if (widget.suffixIcon != null) {
+      InkWell(
+        onTap: widget.onSuffix,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 20, right: 10),
+          child: Icon(widget.suffixIcon,
+              weight: 800,
+              size: widget.suffixIconSize,
+              color: AppColors.neutralMedium),
+        ),
+      );
+    }
+    return null;
   }
 }
