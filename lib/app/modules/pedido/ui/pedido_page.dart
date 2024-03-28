@@ -37,13 +37,10 @@ class _PedidoPageState extends State<PedidoPage> {
     return AppScaffold(
         resizeAvoid: true,
         appBar: AppBar(
-          title: Text('Pedido ${widget.pedido.id}',
-              style: AppCss.largeBold.setColor(AppColors.white)),
+          title: Text(widget.pedido.localizador, style: AppCss.largeBold.setColor(AppColors.white)),
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(
-            stream: pedidoCtrl.pedidoStream.listen,
-            child: (_, form) => body(form)));
+        body: StreamOut(stream: pedidoCtrl.pedidoStream.listen, child: (_, form) => body(form)));
   }
 
   Widget body(PedidoModel form) {
@@ -61,18 +58,15 @@ class _PedidoPageState extends State<PedidoPage> {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Expanded(
-                  child: Text('Status do Pedido', style: AppCss.largeBold)),
+              Expanded(child: Text('Status do Pedido', style: AppCss.largeBold)),
               InkWell(
                 onTap: pedido.isChangeStatusAvailable
                     ? () => pedidoCtrl.onChangePedidoStatus(pedido)
                     : null,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
-                      color:
-                          pedido.statusess.last.status.color.withOpacity(0.4),
+                      color: pedido.statusess.last.status.color.withOpacity(0.4),
                       borderRadius: BorderRadius.circular(4)),
                   child: IntrinsicWidth(
                     child: Row(
@@ -104,9 +98,7 @@ class _PedidoPageState extends State<PedidoPage> {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                          child: Text('Aguardando Produção',
-                              style: AppCss.mediumRegular)),
+                      Expanded(child: Text('Aguardando Produção', style: AppCss.mediumRegular)),
                       Text(
                         '${form.getQtdeAguardandoProducao().formatted}Kg (${(form.getPrcntgAguardandoProducao() * 100).percent}%)',
                       )
@@ -115,11 +107,9 @@ class _PedidoPageState extends State<PedidoPage> {
                   const H(8),
                   LinearProgressIndicator(
                     value: form.getPrcntgAguardandoProducao(),
-                    backgroundColor: PedidoProdutoStatus
-                        .aguardandoProducao.color
-                        .withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation(
-                        PedidoProdutoStatus.aguardandoProducao.color),
+                    backgroundColor: PedidoProdutoStatus.aguardandoProducao.color.withOpacity(0.3),
+                    valueColor:
+                        AlwaysStoppedAnimation(PedidoProdutoStatus.aguardandoProducao.color),
                   ),
                 ],
               ),
@@ -128,9 +118,7 @@ class _PedidoPageState extends State<PedidoPage> {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                          child:
-                              Text('Produzindo', style: AppCss.mediumRegular)),
+                      Expanded(child: Text('Produzindo', style: AppCss.mediumRegular)),
                       Text(
                         '${form.getQtdeProduzindo().formatted}Kg (${(form.getPrcntgProduzindo() * 100).percent}%)',
                       )
@@ -139,10 +127,8 @@ class _PedidoPageState extends State<PedidoPage> {
                   const H(8),
                   LinearProgressIndicator(
                     value: form.getPrcntgProduzindo(),
-                    backgroundColor:
-                        PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation(
-                        PedidoProdutoStatus.produzindo.color),
+                    backgroundColor: PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
+                    valueColor: AlwaysStoppedAnimation(PedidoProdutoStatus.produzindo.color),
                   ),
                 ],
               ),
@@ -151,8 +137,7 @@ class _PedidoPageState extends State<PedidoPage> {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                          child: Text('Pronto', style: AppCss.mediumRegular)),
+                      Expanded(child: Text('Pronto', style: AppCss.mediumRegular)),
                       Text(
                         '${form.getQtdePronto().formatted}Kg (${(form.getPrcntgPronto() * 100).percent}%)',
                       )
@@ -161,10 +146,8 @@ class _PedidoPageState extends State<PedidoPage> {
                   const H(8),
                   LinearProgressIndicator(
                     value: form.getPrcntgPronto(),
-                    backgroundColor:
-                        PedidoProdutoStatus.pronto.color.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation(
-                        PedidoProdutoStatus.pronto.color),
+                    backgroundColor: PedidoProdutoStatus.pronto.color.withOpacity(0.3),
+                    valueColor: AlwaysStoppedAnimation(PedidoProdutoStatus.pronto.color),
                   ),
                 ],
               ),
@@ -177,17 +160,14 @@ class _PedidoPageState extends State<PedidoPage> {
               ExpansionTile(
                 title: Row(
                   children: [
-                    Text(
-                        '${produto.produto.nome} - ${produto.produto.descricao}'),
+                    Text('${produto.produto.nome} - ${produto.produto.descricao}'),
                     const W(16),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                          color: produto.statusess.last.status.color
-                              .withOpacity(0.4),
+                          color: produto.statusess.last.getStatusView().color.withOpacity(0.4),
                           borderRadius: BorderRadius.circular(4)),
-                      child: Text(produto.statusess.last.status.label,
+                      child: Text(produto.statusess.last.getStatusView().label,
                           style: AppCss.mediumRegular.setSize(12)),
                     )
                   ],
@@ -198,32 +178,29 @@ class _PedidoPageState extends State<PedidoPage> {
                   style: AppCss.minimumRegular,
                 ),
                 children: [
-                  for (final status in produto.statusess)
+                  for (final status in produto.statusess.map((e) => e.copyWith()).toList())
                     Builder(builder: (context) {
-                      final isLast = status == produto.statusess.last;
+                      final isLast = status.id == produto.statusess.last.id;
+
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: status.status.color
-                                    .withOpacity(isLast ? 0.4 : 0.2),
+                                color: status.getStatusView().color.withOpacity(isLast ? 0.4 : 0.2),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: Text(status.status.label,
+                              child: Text(status.getStatusView().label,
                                   style: AppCss.mediumRegular
                                       .setSize(14)
-                                      .setColor(AppColors.black
-                                          .withOpacity(isLast ? 1 : 0.4))),
+                                      .setColor(AppColors.black.withOpacity(isLast ? 1 : 0.4))),
                             ),
                             Text(status.createdAt.textHour(),
-                                style: AppCss.minimumRegular.setColor(AppColors
-                                    .black
-                                    .withOpacity(isLast ? 1 : 0.4))),
+                                style: AppCss.minimumRegular
+                                    .setColor(AppColors.black.withOpacity(isLast ? 1 : 0.4))),
                           ],
                         ),
                       );
@@ -242,10 +219,9 @@ class _PedidoPageState extends State<PedidoPage> {
               children: [
                 Text('Armação', style: AppCss.largeBold),
                 const H(16),
-                for (PedidoStatusModel status
-                    in pedido.statusess.map((e) => e.copyWith()).toList())
+                for (PedidoStatusModel status in pedido.statusess.map((e) => e.copyWith()).toList())
                   Builder(builder: (context) {
-                    final isLast = status == pedido.statusess.last;
+                    final isLast = status.id == pedido.statusess.last.id;
                     if (status.status == PedidoStatus.produzindoCD) {
                       status.status = PedidoStatus.aguardandoProducaoCD;
                     }
@@ -255,23 +231,19 @@ class _PedidoPageState extends State<PedidoPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: status.status.color
-                                  .withOpacity(isLast ? 0.4 : 0.2),
+                              color: status.status.color.withOpacity(isLast ? 0.4 : 0.2),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(status.status.label,
                                 style: AppCss.mediumRegular
                                     .setSize(14)
-                                    .setColor(AppColors.black
-                                        .withOpacity(isLast ? 1 : 0.4))),
+                                    .setColor(AppColors.black.withOpacity(isLast ? 1 : 0.4))),
                           ),
                           Text(status.createdAt.textHour(),
-                              style: AppCss.minimumRegular.setColor(AppColors
-                                  .black
-                                  .withOpacity(isLast ? 1 : 0.4))),
+                              style: AppCss.minimumRegular
+                                  .setColor(AppColors.black.withOpacity(isLast ? 1 : 0.4))),
                         ],
                       ),
                     );

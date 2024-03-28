@@ -15,6 +15,7 @@ import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_produto_status_bottom.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 final ordemCtrl = OrdemController();
@@ -27,25 +28,22 @@ class OrdemController {
 
   factory OrdemController() => _instance;
 
-  final AppStream<OrdemUtils> utilsStream =
-      AppStream<OrdemUtils>.seed(OrdemUtils());
+  final AppStream<OrdemUtils> utilsStream = AppStream<OrdemUtils>.seed(OrdemUtils());
   OrdemUtils get utils => utilsStream.value;
 
   final AppStream<OrdemCreateModel> formStream = AppStream<OrdemCreateModel>();
   OrdemCreateModel get form => formStream.value;
 
   void onInitCreatePage(OrdemModel? ordem) {
-    formStream
-        .add(ordem != null ? OrdemCreateModel.edit(ordem) : OrdemCreateModel());
+    formStream.add(ordem != null ? OrdemCreateModel.edit(ordem) : OrdemCreateModel());
   }
 
   List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
     for (var pedido in FirestoreClient.pedidos.data) {
       for (var pedidoProduto in pedido.produtos
-          .where((e) =>
-              e.status.status == PedidoProdutoStatus.separado &&
-              e.produto.id == produto.id)
+          .where(
+              (e) => e.status.status == PedidoProdutoStatus.separado && e.produto.id == produto.id)
           .toList()) {
         pedidos.add(pedidoProduto);
       }
@@ -72,7 +70,7 @@ class OrdemController {
         await FirestoreClient.ordens.update(edit);
       } else {
         form.id =
-            'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}';
+            'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${DateFormat('yyyyMMddHHmm').format(DateTime.now())}';
         final result = form.toOrdemModel();
         await FirestoreClient.ordens.add(result);
       }
@@ -82,20 +80,17 @@ class OrdemController {
         pop(_);
       }
       NotificationService.showPositive(
-          'Ordem ${form.isEdit ? 'Editada' : 'Adicionada'}',
-          'Operação realizada com sucesso',
+          'Ordem ${form.isEdit ? 'Editada' : 'Adicionada'}', 'Operação realizada com sucesso',
           position: NotificationPosition.bottom);
     } catch (e) {
-      NotificationService.showNegative('Erro', e.toString(),
-          position: NotificationPosition.bottom);
+      NotificationService.showNegative('Erro', e.toString(), position: NotificationPosition.bottom);
     }
   }
 
   Future<void> onDelete(_, OrdemModel ordem) async {
     await FirestoreClient.ordens.delete(ordem);
     pop(_);
-    NotificationService.showPositive(
-        'Ordem Excluida', 'Operação realizada com sucesso',
+    NotificationService.showPositive('Ordem Excluida', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
   }
 
@@ -129,13 +124,11 @@ class OrdemController {
         .toList();
   }
 
-  List<ObraModel> getObrasByClienteAndProduto(
-      ClienteModel? cliente, ProdutoModel? produto) {
+  List<ObraModel> getObrasByClienteAndProduto(ClienteModel? cliente, ProdutoModel? produto) {
     if (cliente == null || produto == null) return [];
     return FirestoreClient.pedidos.data
         .where((e) =>
-            e.cliente.id == cliente.id &&
-            e.produtos.map((e) => e.produto.id).contains(produto.id))
+            e.cliente.id == cliente.id && e.produtos.map((e) => e.produto.id).contains(produto.id))
         .toList()
         .map((e) => e.obra.id)
         .toSet()
@@ -155,8 +148,7 @@ class OrdemController {
     if (pedidos.isEmpty) return [];
     List<PedidoProdutoModel> pedidoProdutos = [];
     for (final pedido in pedidos) {
-      pedidoProdutos
-          .add(pedido.produtos.firstWhere((e) => e.produto.id == produto.id));
+      pedidoProdutos.add(pedido.produtos.firstWhere((e) => e.produto.id == produto.id));
     }
     return pedidoProdutos
         // .where((e) => !form.produtos.map((e) => e.produto.id).contains(e.produto.id))
@@ -167,13 +159,11 @@ class OrdemController {
     final produtoStatus = produto.statusess.last.status;
     final status = await showOrdemProdutoStatusBottom(produtoStatus);
     if (produtoStatus == status) return;
-    final statusModel = PedidoProdutoStatusModel(
-        id: HashService.get, status: status!, createdAt: DateTime.now());
+    final statusModel =
+        PedidoProdutoStatusModel(id: HashService.get, status: status!, createdAt: DateTime.now());
     produto.statusess.add(statusModel);
-    final pedido = FirestoreClient.pedidos.data
-        .singleWhere((e) => e.id == produto.pedidoId);
-    pedido.produtos[pedido.produtos.indexWhere((e) => e.id == produto.id)]
-        .statusess
+    final pedido = FirestoreClient.pedidos.data.singleWhere((e) => e.id == produto.pedidoId);
+    pedido.produtos[pedido.produtos.indexWhere((e) => e.id == produto.id)].statusess
         .add(statusModel);
     ordemStream.update();
     await FirestoreClient.ordens.update(ordem);
@@ -184,16 +174,17 @@ class OrdemController {
   }
 
   Future<void> onDonePedido(PedidoProdutoModel produto) async {
-    final pedido = FirestoreClient.pedidos.data
-        .singleWhere((e) => e.id == produto.pedidoId);
-    final status = PedidoStatusModel(
-      id: HashService.get,
-        status: pedido.tipo == PedidoTipo.cd
-            ? PedidoStatus.pronto
-            : PedidoStatus.aguardandoProducaoCDA,
-        createdAt: DateTime.now());
-    pedido.statusess.add(status);
-    ordemStream.update();
-    await FirestoreClient.pedidos.update(pedido);
+    final pedido = FirestoreClient.pedidos.data.singleWhere((e) => e.id == produto.pedidoId);
+    if (pedido.produtos.every((e) => e.status.status == PedidoProdutoStatus.pronto)) {
+      final status = PedidoStatusModel(
+          id: HashService.get,
+          status: pedido.tipo == PedidoTipo.cd
+              ? PedidoStatus.pronto
+              : PedidoStatus.aguardandoProducaoCDA,
+          createdAt: DateTime.now());
+      pedido.statusess.add(status);
+      ordemStream.update();
+      await FirestoreClient.pedidos.update(pedido);
+    }
   }
 }

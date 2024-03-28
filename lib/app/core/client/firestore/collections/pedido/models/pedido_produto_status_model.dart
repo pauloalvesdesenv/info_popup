@@ -36,8 +36,16 @@ extension PedidoProdutoStatusExt on PedidoProdutoStatus {
 
 class PedidoProdutoStatusModel {
   final String id;
-  final PedidoProdutoStatus status;
+  PedidoProdutoStatus status;
   final DateTime createdAt;
+
+  PedidoProdutoStatus getStatusView() {
+    if (status == PedidoProdutoStatus.separado) {
+      return PedidoProdutoStatus.aguardandoProducao;
+    }
+    return status;
+  }
+
   PedidoProdutoStatusModel({
     required this.id,
     required this.status,

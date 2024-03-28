@@ -19,11 +19,8 @@ class PedidoModel {
 
   bool get isChangeStatusAvailable =>
       tipo == PedidoTipo.cda &&
-      [
-        PedidoStatus.aguardandoProducaoCDA,
-        PedidoStatus.produzindoCDA,
-        PedidoStatus.pronto
-      ].contains(statusess.last.status);
+      [PedidoStatus.aguardandoProducaoCDA, PedidoStatus.produzindoCDA, PedidoStatus.pronto]
+          .contains(statusess.last.status);
 
   PedidoModel({
     required this.id,
@@ -45,14 +42,12 @@ class PedidoModel {
   }
 
   double getQtdeTotal() {
-    return produtos.fold(
-        0, (previousValue, element) => previousValue + element.qtde);
+    return produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
   }
 
   double getQtdeAguardandoProducao() {
     return produtos
-        .where((e) =>
-            e.statusess.last.status == PedidoProdutoStatus.aguardandoProducao)
+        .where((e) => e.statusess.last.getStatusView() == PedidoProdutoStatus.aguardandoProducao)
         .fold(0, (previousValue, element) => previousValue + element.qtde);
   }
 
@@ -110,15 +105,14 @@ class PedidoModel {
       cliente: ClienteModel.fromMap(map['cliente']),
       obra: ObraModel.fromMap(map['obra']),
       tipo: PedidoTipo.values[map['tipo']],
-      statusess: List<PedidoStatusModel>.from(
-          map['status']?.map((x) => PedidoStatusModel.fromMap(x))),
-      produtos: List<PedidoProdutoModel>.from(
-          map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
+      statusess:
+          List<PedidoStatusModel>.from(map['status']?.map((x) => PedidoStatusModel.fromMap(x))),
+      produtos:
+          List<PedidoProdutoModel>.from(map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory PedidoModel.fromJson(String source) =>
-      PedidoModel.fromMap(json.decode(source));
+  factory PedidoModel.fromJson(String source) => PedidoModel.fromMap(json.decode(source));
 }
