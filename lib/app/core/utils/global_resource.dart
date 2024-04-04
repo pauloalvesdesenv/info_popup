@@ -1,4 +1,6 @@
 import 'package:aco_plus/app/app_controller.dart';
+import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
+import 'package:aco_plus/app/core/dialogs/info_dialog.dart';
 import 'package:flutter/material.dart';
 
 const String empty = '';
@@ -41,3 +43,16 @@ void showDialogAndPush(context, Widget dialog, Widget page) async {
 }
 
 bool kIsLayoutMobile = true;
+
+Future<bool> onDeleteProcess(
+    {required String deleteTitle,
+    required String deleteMessage,
+    required String infoMessage,
+    required bool conditional}) async {
+  if (conditional) {
+    await showInfoDialog(infoMessage);
+    return false;
+  } else {
+    return await showConfirmDialog(deleteTitle, deleteMessage);
+  }
+}

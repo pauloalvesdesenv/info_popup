@@ -21,21 +21,17 @@ class PedidoController {
 
   factory PedidoController() => _instance;
 
-  final AppStream<PedidoUtils> utilsStream =
-      AppStream<PedidoUtils>.seed(PedidoUtils());
+  final AppStream<PedidoUtils> utilsStream = AppStream<PedidoUtils>.seed(PedidoUtils());
   PedidoUtils get utils => utilsStream.value;
 
-  final AppStream<PedidoCreateModel> formStream =
-      AppStream<PedidoCreateModel>();
+  final AppStream<PedidoCreateModel> formStream = AppStream<PedidoCreateModel>();
   PedidoCreateModel get form => formStream.value;
 
   void onInitCreatePage(PedidoModel? pedido) {
-    formStream.add(
-        pedido != null ? PedidoCreateModel.edit(pedido) : PedidoCreateModel());
+    formStream.add(pedido != null ? PedidoCreateModel.edit(pedido) : PedidoCreateModel());
   }
 
-  List<PedidoModel> getPedidoesFiltered(
-      String search, List<PedidoModel> pedidos) {
+  List<PedidoModel> getPedidoesFiltered(String search, List<PedidoModel> pedidos) {
     if (search.length < 3) return pedidos;
     List<PedidoModel> filtered = [];
     for (final pedido in pedidos) {
@@ -61,22 +57,30 @@ class PedidoController {
         pop(_);
       }
       NotificationService.showPositive(
-          'Pedido ${form.isEdit ? 'Editada' : 'Adicionada'}',
-          'Operação realizada com sucesso',
+          'Pedido ${form.isEdit ? 'Editada' : 'Adicionada'}', 'Operação realizada com sucesso',
           position: NotificationPosition.bottom);
     } catch (e) {
-      NotificationService.showNegative('Erro', e.toString(),
-          position: NotificationPosition.bottom);
+      NotificationService.showNegative('Erro', e.toString(), position: NotificationPosition.bottom);
     }
   }
 
   Future<void> onDelete(_, PedidoModel pedido) async {
+    if (await _isDeleteUnavailable(pedido)) return;
     await FirestoreClient.pedidos.delete(pedido);
     pop(_);
-    NotificationService.showPositive(
-        'Pedido Excluida', 'Operação realizada com sucesso',
+    NotificationService.showPositive('Pedido Excluida', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
   }
+
+  Future<bool> _isDeleteUnavailable(PedidoModel pedido) async => !await onDeleteProcess(
+        deleteTitle: 'Deseja excluir o pedido?',
+        deleteMessage: 'Todos seus dados do pedido apagados do sistema',
+        infoMessage:
+            'Não é possível exlcuir o pedido, pois ele está vinculado a uma ordem de produção.',
+        conditional: FirestoreClient.ordens.data
+            .expand((e) => e.produtos.map((e) => e.pedidoId))
+            .any((e) => e == pedido.id),
+      );
 
   void onValid() {
     if (form.cliente == null) {

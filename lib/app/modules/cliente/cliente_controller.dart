@@ -65,11 +65,19 @@ class ClienteController {
   }
 
   Future<void> onDelete(_, ClienteModel cliente) async {
+    if (await _isDeleteUnavailable(cliente)) return;
     await FirestoreClient.clientes.delete(cliente);
     pop(_);
-    NotificationService.showPositive('Cliente Excluida', 'Operação realizada com sucesso',
+    NotificationService.showPositive('Cliente Excluido', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
   }
+
+  Future<bool> _isDeleteUnavailable(ClienteModel cliente) async => !await onDeleteProcess(
+        deleteTitle: 'Deseja excluir o cliente?',
+        deleteMessage: 'Todos seus dados serão apagados do sistema',
+        infoMessage: 'Não é possível exlcuir o cliente, pois ele está vinculado a um pedido.',
+        conditional: FirestoreClient.pedidos.data.any((e) => e.cliente.id == cliente.id),
+      );
 
   void onValid() {
     if (form.nome.text.length < 2) {

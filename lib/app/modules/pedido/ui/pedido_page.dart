@@ -39,6 +39,11 @@ class _PedidoPageState extends State<PedidoPage> {
         appBar: AppBar(
           title: Text(widget.pedido.localizador, style: AppCss.largeBold.setColor(AppColors.white)),
           backgroundColor: AppColors.primaryMain,
+          actions: [
+            IconButton(
+                onPressed: () async => pedidoCtrl.onDelete(context, widget.pedido),
+                icon: Icon(Icons.delete, color: AppColors.white))
+          ],
         ),
         body: StreamOut(stream: pedidoCtrl.pedidoStream.listen, child: (_, form) => body(form)));
   }

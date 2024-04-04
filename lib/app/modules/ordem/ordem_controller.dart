@@ -30,7 +30,6 @@ class OrdemController {
 
   final AppStream<OrdemUtils> utilsStream = AppStream<OrdemUtils>.seed(OrdemUtils());
   OrdemUtils get utils => utilsStream.value;
-
   final AppStream<OrdemCreateModel> formStream = AppStream<OrdemCreateModel>();
   OrdemCreateModel get form => formStream.value;
 
