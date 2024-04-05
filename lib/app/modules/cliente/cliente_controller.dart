@@ -86,11 +86,5 @@ class ClienteController {
     if (form.telefone.text.length < 15) {
       throw Exception('Telefone inválido');
     }
-    if (form.cpf.text.length < 14) {
-      throw Exception('CPF inválido');
-    }
-    if (form.endereco == null) {
-      throw Exception('Selecione o endereço do cliente');
-    }
   }
 }

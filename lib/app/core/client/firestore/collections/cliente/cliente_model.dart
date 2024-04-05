@@ -44,16 +44,23 @@ class ClienteModel {
   String toJson() => json.encode(toMap());
 
   factory ClienteModel.fromJson(String source) => ClienteModel.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'ClienteModel(id: $id, nome: $nome, telefone: $telefone, cpf: $cpf, endereco: $endereco, obras: $obras)';
+  }
 }
 
 class ObraModel {
   final String id;
   final String descricao;
-  final EnderecoModel endereco;
+  final String telefoneFixo;
+  final EnderecoModel? endereco;
   final ObraStatus status;
   ObraModel({
     required this.id,
     required this.descricao,
+    required this.telefoneFixo,
     required this.endereco,
     required this.status,
   });
@@ -62,7 +69,8 @@ class ObraModel {
     return {
       'id': id,
       'descricao': descricao,
-      'endereco': endereco.toMap(),
+      'telefoneFixo': telefoneFixo,
+      'endereco': endereco?.toMap(),
       'status': status.index,
     };
   }
@@ -71,7 +79,8 @@ class ObraModel {
     return ObraModel(
       id: map['id'] ?? '',
       descricao: map['descricao'] ?? '',
-      endereco: EnderecoModel.fromMap(map['endereco']),
+      telefoneFixo: map['telefoneFixo'] ?? '',
+      endereco: map['endereco'] != null ? EnderecoModel.fromMap(map['endereco']) : null,
       status: ObraStatus.values[map['status']],
     );
   }
@@ -79,4 +88,11 @@ class ObraModel {
   String toJson() => json.encode(toMap());
 
   factory ObraModel.fromJson(String source) => ObraModel.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'ObraModel(id: $id, descricao: $descricao, telefoneFixo: $telefoneFixo, endereco: $endereco, status: $status)';
+  }
 }
+
+ObraModel obraDeleteObj = ObraModel(id: 'delete', descricao: '', endereco: null, status: ObraStatus.emAndamento, telefoneFixo: '');

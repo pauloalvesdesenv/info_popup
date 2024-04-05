@@ -72,6 +72,7 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
         const H(16),
         AppField(
           label: 'CPF',
+          required: false,
           controller: form.cpf,
           hint: '000.000.000-00',
           onChanged: (_) => clienteCtrl.formStream.update(),
@@ -88,6 +89,7 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
           child: IgnorePointer(
             child: AppField(
               label: 'Endereço',
+              required: false,
               suffixIconSize: 12,
               suffixIcon: Icons.arrow_forward_ios,
               controller: TextEditingController(text: form.endereco?.name.toString() ?? ''),
@@ -100,8 +102,19 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
         AppMultipleRegisters<ObraModel>(
           icon: Icons.construction,
           title: 'Obras ',
-          createPage: const ObraCreatePage(),
-          editPage: (e) => ObraCreatePage(obra: e),
+          createPage: ObraCreatePage(endereco: form.endereco),
+          onEdit: (obraForm) async {
+            ObraModel? obra = await push(context, ObraCreatePage(obra: obraForm));
+            if (obra != null) {
+              final i = form.obras.map((e) => e.id).toList().indexOf(obraForm.id);
+              if (obra.id != 'delete') {
+                form.obras[i] = obra;
+              } else {
+                form.obras.removeAt(i);
+              }
+            }
+            clienteCtrl.formStream.update();
+          },
           onAdd: (e) {
             form.obras.add(e);
             clienteCtrl.formStream.update();

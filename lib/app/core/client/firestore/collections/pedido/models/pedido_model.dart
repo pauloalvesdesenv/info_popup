@@ -10,6 +10,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 class PedidoModel {
   final String id;
   final String localizador;
+  final String descricao;
   final DateTime createdAt;
   final ClienteModel cliente;
   final ObraModel obra;
@@ -25,6 +26,7 @@ class PedidoModel {
   PedidoModel({
     required this.id,
     required this.localizador,
+    required this.descricao,
     required this.createdAt,
     required this.cliente,
     required this.obra,
@@ -100,6 +102,7 @@ class PedidoModel {
   factory PedidoModel.fromMap(Map<String, dynamic> map) {
     return PedidoModel(
       localizador: map['localizador'] ?? '',
+      descricao: map['descricao'] ?? '',
       id: map['id'] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
       cliente: ClienteModel.fromMap(map['cliente']),
@@ -115,4 +118,9 @@ class PedidoModel {
   String toJson() => json.encode(toMap());
 
   factory PedidoModel.fromJson(String source) => PedidoModel.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'PedidoModel(id: $id, localizador: $localizador, createdAt: $createdAt, cliente: $cliente, obra: $obra, produtos: $produtos, tipo: $tipo, statusess: $statusess)';
+  }
 }

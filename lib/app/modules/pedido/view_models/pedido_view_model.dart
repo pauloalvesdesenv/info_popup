@@ -16,6 +16,7 @@ class PedidoCreateModel {
   final String id;
   final TextEditingController localizador = TextEditingController();
   final TextEditingController nome = TextEditingController();
+  final TextEditingController descricao = TextEditingController();
   ClienteModel? cliente;
   ObraModel? obra;
   PedidoTipo? tipo;
@@ -35,18 +36,16 @@ class PedidoCreateModel {
   PedidoModel toPedidoModel() => PedidoModel(
         id: id,
         tipo: tipo!,
+        descricao: descricao.text,
         statusess: [
           PedidoStatusModel(
-              id: HashService.get,
-              status: PedidoStatus.produzindoCD,
-              createdAt: DateTime.now())
+              id: HashService.get, status: PedidoStatus.produzindoCD, createdAt: DateTime.now())
         ],
         localizador: localizador.text,
         createdAt: DateTime.now(),
         cliente: cliente!,
         obra: obra!,
-        produtos: produtos
-            .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
-            .toList(),
+        produtos:
+            produtos.map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith()).toList(),
       );
 }

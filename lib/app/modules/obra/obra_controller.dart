@@ -1,12 +1,12 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:aco_plus/app/core/models/endereco_model.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/modules/obra/obra_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 final obraCtrl = ObraController();
-ObraModel get obra => obraCtrl.obra!;
 
 class ObraController {
   static final ObraController _instance = ObraController._();
@@ -15,17 +15,15 @@ class ObraController {
 
   factory ObraController() => _instance;
 
-  final AppStream<ObraModel?> obraStream = AppStream<ObraModel?>.seed(null);
-  ObraModel? get obra => obraStream.value;
-
-  final AppStream<ObraUtils> utilsStream = AppStream<ObraUtils>.seed(ObraUtils());
-  ObraUtils get utils => utilsStream.value;
-
   final AppStream<ObraCreateModel> formStream = AppStream<ObraCreateModel>();
   ObraCreateModel get form => formStream.value;
 
-  void init(ObraModel? obra) {
+  void init(ObraModel? obra, EnderecoModel? enderecoModel) {
     formStream.add(obra != null ? ObraCreateModel.edit(obra) : ObraCreateModel());
+    if (!form.isEdit) {
+      form.endereco = enderecoModel;
+      formStream.update();
+    }
   }
 
   Future<void> onConfirm(_) async {
@@ -46,9 +44,6 @@ class ObraController {
     }
     if (form.status == null) {
       throw Exception('Selecione um status para a obra');
-    }
-    if (form.endereco == null) {
-      throw Exception('Selecione um endereço para a obra');
     }
   }
 }

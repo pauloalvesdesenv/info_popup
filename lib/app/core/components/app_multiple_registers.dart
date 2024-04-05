@@ -6,7 +6,7 @@ class AppMultipleRegisters<T> extends StatelessWidget {
   final IconData icon;
   final String title;
   final Widget createPage;
-  final Function(T) editPage;
+  final Function(T) onEdit;
   final Function(T) onAdd;
   final List<T> itens;
   final Widget Function(T) titleBuilder;
@@ -15,7 +15,7 @@ class AppMultipleRegisters<T> extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.createPage,
-    required this.editPage,
+    required this.onEdit,
     required this.onAdd,
     required this.itens,
     required this.titleBuilder,
@@ -48,7 +48,7 @@ class AppMultipleRegisters<T> extends StatelessWidget {
         ),
         for (T item in itens)
           GestureDetector(
-            onTap: () => push(context, editPage.call(item)),
+            onTap: () => onEdit.call(item),
             child: ListTile(
               contentPadding: const EdgeInsets.only(left: 8),
               title: titleBuilder(item),

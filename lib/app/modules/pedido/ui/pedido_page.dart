@@ -53,10 +53,17 @@ class _PedidoPageState extends State<PedidoPage> {
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
-          child: RowItensLabel([
-            ItemLabel('Cliente', form.cliente.nome),
-            ItemLabel('Obra', form.obra.descricao),
-          ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RowItensLabel([
+                ItemLabel('Cliente', form.cliente.nome),
+                ItemLabel('Obra', form.obra.descricao),
+              ]),
+              const H(16),
+              if (form.descricao.isNotEmpty) ItemLabel('Descrição', form.descricao),
+            ],
+          ),
         ),
         const Divisor(),
         Container(
