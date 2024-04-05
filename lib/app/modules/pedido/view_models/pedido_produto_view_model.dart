@@ -21,7 +21,10 @@ class PedidoProdutoCreateModel {
 
   PedidoProdutoCreateModel.edit(PedidoProdutoModel produto)
       : id = produto.id,
-        isEdit = true;
+        isEdit = true{
+    produtoModel = produto.produto;
+    qtde.text = produto.qtde.toString();
+        }
 
   PedidoProdutoModel toPedidoProdutoModel(
           String pedidoId, ClienteModel cliente, ObraModel obra) =>

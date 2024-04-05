@@ -27,7 +27,11 @@ class EnderecoModel {
     required this.lon,
   });
 
-  String get name => '$logradouro, $numero - $bairro. $localidade-${estado.toUpperCase()}';
+  EnderecoModel.empty();
+
+  String get name => localidade.isEmpty
+      ? 'Endereço Indisponível'
+      : '$logradouro, $numero - $bairro. $localidade-${estado.toUpperCase()}';
 
   EnderecoModel.fromViacep(ViacepEndereco viacep) {
     cep = viacep.cep;

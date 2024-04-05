@@ -57,7 +57,7 @@ class ClienteController {
         pop(_);
       }
       NotificationService.showPositive(
-          'Cliente ${form.isEdit ? 'Editada' : 'Adicionada'}', 'Operação realizada com sucesso',
+          'Cliente ${form.isEdit ? 'Editado' : 'Adicionado'}', 'Operação realizada com sucesso',
           position: NotificationPosition.bottom);
     } catch (e) {
       NotificationService.showNegative('Erro', e.toString(), position: NotificationPosition.bottom);

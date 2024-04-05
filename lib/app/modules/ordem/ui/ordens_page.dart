@@ -40,8 +40,7 @@ class _OrdensPageState extends State<OrdensPage> {
             color: AppColors.white,
           ),
         ),
-        title:
-            Text('Ordens', style: AppCss.largeBold.setColor(AppColors.white)),
+        title: Text('Ordens', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
           IconButton(
               onPressed: () => push(context, const OrdemCreatePage()),
@@ -57,8 +56,7 @@ class _OrdensPageState extends State<OrdensPage> {
         child: (_, __) => StreamOut<OrdemUtils>(
           stream: ordemCtrl.utilsStream.listen,
           child: (_, utils) {
-            final ordens =
-                ordemCtrl.getOrdemesFiltered(utils.search.text, __).toList();
+            final ordens = ordemCtrl.getOrdemesFiltered(utils.search.text, __).toList();
             return Column(
               children: [
                 Padding(
@@ -99,33 +97,27 @@ class _OrdensPageState extends State<OrdensPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Ordem ${ordem.id}',
+                    ordem.id,
                     style: AppCss.mediumBold,
                   ),
                   Text(
                     '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.map((e) => e.qtde)}Kg',
-                    style: AppCss.minimumRegular
-                        .setSize(11)
-                        .setColor(AppColors.black),
+                    style: AppCss.minimumRegular.setSize(11).setColor(AppColors.black),
                   ),
                   Text(
                     'Criada dia ${ordem.createdAt.text()}',
-                    style: AppCss.minimumRegular
-                        .setSize(11)
-                        .setColor(AppColors.neutralMedium),
+                    style: AppCss.minimumRegular.setSize(11).setColor(AppColors.neutralMedium),
                   ),
                 ],
               ),
             ),
             const W(8),
-            _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
-                ordem.getPrcntgAguardando()),
-            const W(16),
             _progressChartWidget(
-                PedidoProdutoStatus.produzindo, ordem.getPrcntgProduzindo()),
+                PedidoProdutoStatus.aguardandoProducao, ordem.getPrcntgAguardando()),
             const W(16),
-            _progressChartWidget(
-                PedidoProdutoStatus.pronto, ordem.getPrcntgPronto()),
+            _progressChartWidget(PedidoProdutoStatus.produzindo, ordem.getPrcntgProduzindo()),
+            const W(16),
+            _progressChartWidget(PedidoProdutoStatus.pronto, ordem.getPrcntgPronto()),
             const W(16),
             Icon(
               Icons.arrow_forward_ios,

@@ -11,7 +11,9 @@ import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/ordem/ordem_controller.dart';
+import 'package:aco_plus/app/modules/ordem/ui/ordem_create_page.dart';
 import 'package:flutter/material.dart';
 
 class OrdemPage extends StatefulWidget {
@@ -34,6 +36,14 @@ class _OrdemPageState extends State<OrdemPage> {
     return AppScaffold(
         resizeAvoid: true,
         appBar: AppBar(
+          actions: [
+            IconButton(
+                onPressed: () async => push(context, OrdemCreatePage(ordem: widget.ordem)),
+                icon: Icon(Icons.edit, color: AppColors.white)),
+            IconButton(
+                onPressed: () async => ordemCtrl.onDelete(context, widget.ordem),
+                icon: Icon(Icons.delete, color: AppColors.white))
+          ],
           title:
               Text('Ordem ${widget.ordem.id}', style: AppCss.largeBold.setColor(AppColors.white)),
           backgroundColor: AppColors.primaryMain,
@@ -41,15 +51,15 @@ class _OrdemPageState extends State<OrdemPage> {
         body: StreamOut(stream: ordemCtrl.ordemStream.listen, child: (_, form) => body(form)));
   }
 
-  Widget body(OrdemModel form) {
+  Widget body(OrdemModel ordem) {
     return ListView(
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
           child: RowItensLabel([
-            ItemLabel('Produto', '${form.produto.nome} - ${form.produto.descricao}'),
-            ItemLabel('Iniciada', form.createdAt.text()),
-            if (form.endAt != null) ItemLabel('Finalizada', form.endAt.text()),
+            ItemLabel('Produto', '${ordem.produto.nome} - ${ordem.produto.descricao}'),
+            ItemLabel('Iniciada', ordem.createdAt.text()),
+            if (ordem.endAt != null) ItemLabel('Finalizada', ordem.endAt.text()),
           ]),
         ),
         const Divisor(),

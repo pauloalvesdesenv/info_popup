@@ -6,6 +6,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class PedidoUtils {
@@ -18,6 +19,7 @@ class PedidoCreateModel {
   final TextEditingController nome = TextEditingController();
   final TextEditingController descricao = TextEditingController();
   ClienteModel? cliente;
+  ClienteModel? clienteAdd;
   ObraModel? obra;
   PedidoTipo? tipo;
   PedidoProdutoCreateModel produto = PedidoProdutoCreateModel();
@@ -31,18 +33,27 @@ class PedidoCreateModel {
 
   PedidoCreateModel.edit(PedidoModel pedido)
       : id = pedido.id,
-        isEdit = true;
+        isEdit = true {
+    localizador.text = pedido.localizador;
+    descricao.text = pedido.descricao;
+    cliente = FirestoreClient.clientes.getById(pedido.cliente.id);
+    obra = cliente?.obras.firstWhereOrNull((e) => e.id == pedido.obra.id);
+    tipo = pedido.tipo;
+    produtos = pedido.produtos.map((e) => PedidoProdutoCreateModel.edit(e)).toList();
+  }
 
-  PedidoModel toPedidoModel() => PedidoModel(
+  PedidoModel toPedidoModel(PedidoModel? pedido) => PedidoModel(
         id: id,
         tipo: tipo!,
         descricao: descricao.text,
         statusess: [
           PedidoStatusModel(
-              id: HashService.get, status: PedidoStatus.produzindoCD, createdAt: DateTime.now())
+              id: HashService.get,
+              status: PedidoStatus.produzindoCD,
+              createdAt: pedido?.statusess.first.createdAt ?? DateTime.now())
         ],
         localizador: localizador.text,
-        createdAt: DateTime.now(),
+        createdAt: pedido?.createdAt ?? DateTime.now(),
         cliente: cliente!,
         obra: obra!,
         produtos:

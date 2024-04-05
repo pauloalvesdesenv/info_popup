@@ -13,6 +13,7 @@ class PedidoProdutoModel {
   final ProdutoModel produto;
   final List<PedidoProdutoStatusModel> statusess;
   final double qtde;
+  bool selected = true;
 
   ClienteModel get cliente => FirestoreClient.clientes.getById(clienteId);
   ObraModel get obra => cliente.obras.firstWhere((e) => e.id == obraId);

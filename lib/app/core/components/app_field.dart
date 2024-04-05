@@ -27,7 +27,7 @@ class AppField extends StatefulWidget {
   final TextAlign align;
   final int? maxLines;
   final int? minLines;
-  final bool ignore;
+  final bool isDisable;
   final bool obscure;
 
   const AppField({
@@ -50,7 +50,7 @@ class AppField extends StatefulWidget {
     this.type = TextInputType.text,
     this.autoFocus = false,
     this.required = true,
-    this.ignore = false,
+    this.isDisable = false,
     this.maxLines,
     this.minLines,
     this.obscure = false,
@@ -75,7 +75,7 @@ class _AppFieldState extends State<AppField> {
           ),
         if (widget.label != null) const H(4),
         IgnorePointer(
-          ignoring: widget.ignore,
+          ignoring: widget.isDisable,
           child: TextFormField(
             obscureText: widget.obscure,
             textAlign: widget.align,
@@ -95,7 +95,7 @@ class _AppFieldState extends State<AppField> {
             minLines: widget.minLines,
             decoration: InputDecoration(
               filled: true,
-              fillColor: widget.ignore ? Colors.grey[400]! : Colors.transparent,
+              fillColor: widget.isDisable ? Colors.grey[400]! : Colors.transparent,
               hintText: widget.hint,
               hintStyle: AppCss.smallRegular.setColor(AppColors.neutralDark),
               prefixIcon: widget.icon != null

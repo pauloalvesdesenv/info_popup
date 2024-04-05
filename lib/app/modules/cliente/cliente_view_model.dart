@@ -36,7 +36,7 @@ class ClienteCreateModel {
         nome: nome.text,
         telefone: telefone.text,
         cpf: cpf.text,
-        endereco: endereco!,
+        endereco: endereco ?? EnderecoModel.empty(),
         obras: obras,
       );
 }

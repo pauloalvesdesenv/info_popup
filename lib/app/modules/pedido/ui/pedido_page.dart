@@ -14,7 +14,9 @@ import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
+import 'package:aco_plus/app/modules/pedido/ui/pedido_create_page.dart';
 import 'package:flutter/material.dart';
 
 class PedidoPage extends StatefulWidget {
@@ -40,6 +42,9 @@ class _PedidoPageState extends State<PedidoPage> {
           title: Text(widget.pedido.localizador, style: AppCss.largeBold.setColor(AppColors.white)),
           backgroundColor: AppColors.primaryMain,
           actions: [
+            IconButton(
+                onPressed: () async => push(context, PedidoCreatePage(pedido: widget.pedido)),
+                icon: Icon(Icons.edit, color: AppColors.white)),
             IconButton(
                 onPressed: () async => pedidoCtrl.onDelete(context, widget.pedido),
                 icon: Icon(Icons.delete, color: AppColors.white))

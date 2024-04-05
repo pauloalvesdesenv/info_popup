@@ -14,6 +14,7 @@ import 'package:aco_plus/app/core/enums/obra_status.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/cliente/ui/cliente_create_simplify_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
@@ -60,13 +61,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
       padding: const EdgeInsets.all(16),
       children: [
         AppField(
+          isDisable: form.isEdit,
           label: 'Localizador',
-          controller: form.localizador,
-          onChanged: (_) => pedidoCtrl.formStream.update(),
-        ),
-        const H(16),
-        AppField(
-          label: 'Descrição',
           controller: form.localizador,
           onChanged: (_) => pedidoCtrl.formStream.update(),
         ),
@@ -84,17 +80,32 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
         const H(16),
         AppField(
           label: 'Descrição',
-          controller: form.localizador,
+          controller: form.descricao,
           onChanged: (_) => pedidoCtrl.formStream.update(),
         ),
         const H(16),
         AppDropDown<ClienteModel?>(
           label: 'Cliente',
+          disable: form.isEdit,
           item: form.cliente,
-          itens: FirestoreClient.clientes.data,
-          itemLabel: (e) => e!.nome,
-          onSelect: (e) {
-            form.cliente = e;
+          itens: [
+            ClienteAdd(),
+            if (form.clienteAdd != null) form.clienteAdd,
+            ...FirestoreClient.clientes.data
+          ],
+          itemLabel: (e) => e?.nome ?? 'ADICIONAR CLIENTE',
+          onSelect: (e) async {
+            if (e?.id == 'add') {
+              final created = await showClienteCreateSimplifyBottom();
+              if (created != null) {
+                form.clienteAdd = created;
+                form.cliente = created;
+                form.obra = form.cliente!.obras.first;
+                pedidoCtrl.formStream.update();
+              }
+            } else {
+              form.cliente = e;
+            }
             pedidoCtrl.formStream.update();
           },
         ),
@@ -102,7 +113,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
         AppDropDown<ObraModel?>(
           label: 'Obra',
           item: form.obra,
-          disable: form.cliente == null,
+          disable: form.isEdit ? form.isEdit : form.cliente == null,
           itens:
               form.cliente?.obras.where((e) => e.status == ObraStatus.emAndamento).toList() ?? [],
           itemLabel: (e) => e!.descricao,
@@ -122,7 +133,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                     label: 'Produto',
                     item: form.produto.produtoModel,
                     itens: FirestoreClient.produtos.data
-                        .where((e) => !form.produtos.map((e) => e.produtoModel).contains(e))
+                        .where((e) => !form.produtos.map((e) => e.produtoModel?.id).contains(e.id))
                         .toList(),
                     itemLabel: (e) => e?.descricao ?? 'Selecione',
                     onSelect: (e) {
@@ -167,24 +178,45 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
           ],
         ),
         for (PedidoProdutoCreateModel produto in form.produtos)
-          ListTile(
-            leading:
-                Text((form.produtos.indexOf(produto) + 1).toString(), style: AppCss.mediumBold),
-            minLeadingWidth: 14,
-            contentPadding: const EdgeInsets.only(left: 16),
-            title: Text(produto.produtoModel?.descricao ?? ''),
-            subtitle: Text('Quantidade: ${produto.qtde.text} Kg'),
-            trailing: IconButton(
-              onPressed: () {
-                form.produtos.remove(produto);
-                pedidoCtrl.formStream.update();
-              },
-              icon: const Icon(
-                Icons.delete,
-                color: Colors.red,
+          Builder(builder: (context) {
+            bool isDisabled = form.isEdit &&
+                FirestoreClient.ordens.data
+                    .expand((e) => e.produtos.map((e) => e.produto.id))
+                    .any((e) => e == produto.produtoModel?.id);
+            return IgnorePointer(
+              ignoring: isDisabled,
+              child: Container(
+                color: isDisabled ? Colors.grey[300] : Colors.transparent,
+                child: ListTile(
+                  leading: Text((form.produtos.indexOf(produto) + 1).toString(),
+                      style: AppCss.mediumBold),
+                  minLeadingWidth: 14,
+                  contentPadding: const EdgeInsets.only(left: 16),
+                  title: Row(
+                    children: [
+                      Text(produto.produtoModel?.descricao ?? ''),
+                      if (isDisabled)
+                        Text(' Produto já foi adicionado há uma ordem',
+                            style: AppCss.mediumRegular.setColor(Colors.red[500]!).setSize(11))
+                    ],
+                  ),
+                  subtitle: Text('Quantidade: ${produto.qtde.text} Kg'),
+                  trailing: isDisabled
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            form.produtos.remove(produto);
+                            pedidoCtrl.formStream.update();
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                        ),
+                ),
               ),
-            ),
-          )
+            );
+          })
       ],
     );
   }

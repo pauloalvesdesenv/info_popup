@@ -46,10 +46,13 @@ class PedidoController {
     try {
       onValid();
       if (form.isEdit) {
-        final edit = form.toPedidoModel();
-        await FirestoreClient.pedidos.update(edit);
+        final edit = form.toPedidoModel(pedido);
+        final update = await FirestoreClient.pedidos.update(edit);
+        if (update != null) {
+          pedidoStream.add(update);
+        }
       } else {
-        await FirestoreClient.pedidos.add(form.toPedidoModel());
+        await FirestoreClient.pedidos.add(form.toPedidoModel(pedido));
       }
       if (isFromOrder) {
         Navigator.pop(_, form.isEdit ? pedido : null);
@@ -57,7 +60,7 @@ class PedidoController {
         pop(_);
       }
       NotificationService.showPositive(
-          'Pedido ${form.isEdit ? 'Editada' : 'Adicionada'}', 'Operação realizada com sucesso',
+          'Pedido ${form.isEdit ? 'Editado' : 'Adicionado'}', 'Operação realizada com sucesso',
           position: NotificationPosition.bottom);
     } catch (e) {
       NotificationService.showNegative('Erro', e.toString(), position: NotificationPosition.bottom);

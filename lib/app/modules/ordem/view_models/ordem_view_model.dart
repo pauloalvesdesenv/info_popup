@@ -21,12 +21,17 @@ class OrdemCreateModel {
 
   OrdemCreateModel.edit(OrdemModel pedido)
       : id = pedido.id,
-        isEdit = true;
+        isEdit = true {
+    produto = FirestoreClient.produtos.data.firstWhere((e) => e.id == pedido.produto.id);
+  }
 
-  OrdemModel toOrdemModel() => OrdemModel(
-        id: id,
-        createdAt: DateTime.now(),
-        produto: produto!,
-        produtos: produtos.map((e) => e.copyWith()).toList(),
-      );
+  OrdemModel toOrdemModel(OrdemModel? ordem) {
+    final products = produtos.map((e) => e.copyWith()).toList();
+    return OrdemModel(
+      id: id,
+      createdAt: DateTime.now(),
+      produto: produto!,
+      produtos: ordem != null ? (ordem.produtos..addAll(products)) : produtos,
+    );
+  }
 }

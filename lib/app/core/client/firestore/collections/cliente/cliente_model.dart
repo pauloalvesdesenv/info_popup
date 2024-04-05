@@ -95,4 +95,16 @@ class ObraModel {
   }
 }
 
-ObraModel obraDeleteObj = ObraModel(id: 'delete', descricao: '', endereco: null, status: ObraStatus.emAndamento, telefoneFixo: '');
+ObraModel obraDeleteObj = ObraModel(
+    id: 'delete', descricao: '', endereco: null, status: ObraStatus.emAndamento, telefoneFixo: '');
+
+class ClienteAdd extends ClienteModel {
+  ClienteAdd()
+      : super(
+            id: 'add',
+            nome: 'ADICIONAR CLIENTE',
+            telefone: '',
+            cpf: '',
+            endereco: EnderecoModel.empty(),
+            obras: []);
+}
