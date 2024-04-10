@@ -5,6 +5,7 @@ import 'package:aco_plus/app/core/components/app_text_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/enums/obra_status.dart';
 import 'package:aco_plus/app/core/models/endereco_model.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
@@ -27,8 +28,8 @@ class ClienteCreateSimplifyBottom extends StatefulWidget {
 }
 
 class _ClienteCreateSimplifyBottomState extends State<ClienteCreateSimplifyBottom> {
-  final TextEditingController cliente = TextEditingController();
-  final TextEditingController obra = TextEditingController();
+  final TextController cliente = TextController();
+  final TextController obra = TextController();
 
   @override
   void dispose() {

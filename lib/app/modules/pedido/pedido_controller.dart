@@ -87,16 +87,16 @@ class PedidoController {
 
   void onValid() {
     if (form.cliente == null) {
+      throw Exception('Localizador não pode ser vazio');
+    }       
+    if (form.cliente == null) {
       throw Exception('Selecione o cliente do pedido');
-    }
+    }       
     if (form.tipo == null) {
       throw Exception('Selecione o tipo do pedido');
     }
     if (form.obra == null) {
       throw Exception('Selecione a obra do pedido');
-    }
-    if (form.produtos.isEmpty) {
-      throw Exception('Adicione ao menos um produto ao pedido');
     }
   }
 

@@ -48,7 +48,7 @@ class _OrdemPageState extends State<OrdemPage> {
               Text('Ordem ${widget.ordem.id}', style: AppCss.largeBold.setColor(AppColors.white)),
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(stream: ordemCtrl.ordemStream.listen, child: (_, form) => body(form)));
+        body: StreamOut(stream: ordemCtrl.ordemStream.listen, builder: (_, form) => body(form)));
   }
 
   Widget body(OrdemModel ordem) {

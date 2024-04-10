@@ -8,6 +8,7 @@ import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/enums/obra_status.dart';
 import 'package:aco_plus/app/core/models/endereco_model.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -48,7 +49,7 @@ class _ObraCreatePageState extends State<ObraCreatePage> {
           actions: [IconLoadingButton(() async => await obraCtrl.onConfirm(context))],
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(stream: obraCtrl.formStream.listen, child: (_, form) => body(form)));
+        body: StreamOut(stream: obraCtrl.formStream.listen, builder: (_, form) => body(form)));
   }
 
   Widget body(ObraCreateModel form) {
@@ -63,7 +64,7 @@ class _ObraCreatePageState extends State<ObraCreatePage> {
         const H(16),
         AppField(
           label: 'Telefone Fixo',
-              required: false,
+          required: false,
           controller: form.telefoneFixo,
           onChanged: (_) => obraCtrl.formStream.update(),
         ),
@@ -93,7 +94,7 @@ class _ObraCreatePageState extends State<ObraCreatePage> {
               required: false,
               suffixIconSize: 12,
               suffixIcon: Icons.arrow_forward_ios,
-              controller: TextEditingController(text: form.endereco?.name.toString() ?? ''),
+              controller: TextController(text: form.endereco?.name.toString() ?? ''),
               onChanged: (_) => obraCtrl.formStream.update(),
             ),
           ),

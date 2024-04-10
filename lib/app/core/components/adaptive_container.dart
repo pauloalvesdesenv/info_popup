@@ -14,7 +14,7 @@ class ContainerAdaptive extends StatelessWidget {
     return LayoutBuilder(
         builder: (context, constraints) => StreamOut<bool>(
             stream: KeyboardVisibleService.isVisible.listen,
-            child: (context, isVisible) => _body(isVisible, constraints)));
+            builder: (context, isVisible) => _body(isVisible, constraints)));
   }
 
   ListView _body(bool isVisible, BoxConstraints constraints) {

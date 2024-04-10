@@ -2,10 +2,10 @@ import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/orde
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:flutter/material.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 
 class OrdemUtils {
-  final TextEditingController search = TextEditingController();
+  final TextController search = TextController();
 }
 
 class OrdemCreateModel {
@@ -26,12 +26,14 @@ class OrdemCreateModel {
   }
 
   OrdemModel toOrdemModel(OrdemModel? ordem) {
-    final products = produtos.map((e) => e.copyWith()).toList();
+    final products = produtos.where((e) => e.selected).map((e) => e.copyWith()).toList();
     return OrdemModel(
       id: id,
       createdAt: DateTime.now(),
       produto: produto!,
-      produtos: ordem != null ? (ordem.produtos..addAll(products)) : produtos,
+      produtos: ordem != null
+          ? (ordem.produtos.where((e) => e.selected).toList()..addAll(products))
+          : produtos,
     );
   }
 }

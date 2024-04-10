@@ -4,25 +4,26 @@
 // import 'package:aco_plus/app/core/enums/country_states.dart';
 // import 'package:aco_plus/app/core/enums/usuario_role.dart';
 // import 'package:aco_plus/app/core/enums/usuario_status.dart';
-// import 'package:aco_plus/app/core/services/hash_service.dart';
+// import 'package:aco_plus/app/core/models/text_controller.dart';
+
 
 // class UsuarioUtils {
-//   final TextEditingController search = TextEditingController();
+//   final TextController search = TextController();
 //   UsuarioStatus? status;
 // }
 
 // class UsuarioCreateModel {
 //   final String id;
-//   TextEditingController nome = TextEditingController();
-//   TextEditingController email = TextEditingController();
-//   TextEditingController telefone =
+//   TextController nome = TextController();
+//   TextController email = TextController();
+//   TextController telefone =
 //       MaskedTextController(mask: '(00) 00000-0000');
-//   TextEditingController funcao = TextEditingController();
+//   TextController funcao = TextController();
 //   List<CountryState> estados = [];
 //   UsuarioRole? role;
 //   UsuarioStatus? status;
 //   late bool isEdit;
-//   TextEditingController senha = TextEditingController();
+//   TextController senha = TextController();
 
 //   UsuarioCreateModel()
 //       : id = HashService.get,

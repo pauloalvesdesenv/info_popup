@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class StreamOut<T> extends StatelessWidget {
   final Stream<T> stream;
-  final Widget Function(BuildContext context, T data) child;
+  final Widget Function(BuildContext context, T data) builder;
   final Function? preFunction;
   final bool condition;
   final Function? request;
@@ -11,7 +11,7 @@ class StreamOut<T> extends StatelessWidget {
   const StreamOut({
     Key? key,
     required this.stream,
-    required this.child,
+    required this.builder,
     this.preFunction,
     this.condition = true,
     this.request,
@@ -26,7 +26,7 @@ class StreamOut<T> extends StatelessWidget {
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.active || snapshot.hasData) {
           if (snapshot.data != null) {
-            return child(_, snapshot.requireData);
+            return builder(_, snapshot.requireData);
           } else {
             return loading;
           }

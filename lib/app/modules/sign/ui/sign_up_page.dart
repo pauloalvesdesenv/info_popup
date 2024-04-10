@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/app_text_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/sign/sign_controller.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +15,8 @@ class SignUpPage extends StatefulWidget {
 }
 
 class SignUpPageState extends State<SignUpPage> {
-  final TextEditingController email = TextEditingController();
-  final TextEditingController senha = TextEditingController();
+  final TextController email = TextController();
+  final TextController senha = TextController();
 
   @override
   Widget build(BuildContext context) {

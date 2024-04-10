@@ -53,9 +53,9 @@ class _OrdensPageState extends State<OrdensPage> {
       ),
       body: StreamOut<List<OrdemModel>>(
         stream: FirestoreClient.ordens.dataStream.listen,
-        child: (_, __) => StreamOut<OrdemUtils>(
+        builder: (_, __) => StreamOut<OrdemUtils>(
           stream: ordemCtrl.utilsStream.listen,
-          child: (_, utils) {
+          builder: (_, utils) {
             final ordens = ordemCtrl.getOrdemesFiltered(utils.search.text, __).toList();
             return Column(
               children: [
@@ -101,7 +101,7 @@ class _OrdensPageState extends State<OrdensPage> {
                     style: AppCss.mediumBold,
                   ),
                   Text(
-                    '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.map((e) => e.qtde)}Kg',
+                    '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.map((e) => e.qtde).reduce((a, b) => a + b)}Kg',
                     style: AppCss.minimumRegular.setSize(11).setColor(AppColors.black),
                   ),
                   Text(

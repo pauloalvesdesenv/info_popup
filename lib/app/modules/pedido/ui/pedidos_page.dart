@@ -53,9 +53,9 @@ class _PedidosPageState extends State<PedidosPage> {
       ),
       body: StreamOut<List<PedidoModel>>(
         stream: FirestoreClient.pedidos.dataStream.listen,
-        child: (_, __) => StreamOut<PedidoUtils>(
+        builder: (_, __) => StreamOut<PedidoUtils>(
           stream: pedidoCtrl.utilsStream.listen,
-          child: (_, utils) {
+          builder: (_, utils) {
             final pedidos = pedidoCtrl.getPedidoesFiltered(utils.search.text, __).toList();
             return Column(
               children: [

@@ -5,8 +5,9 @@ class ProdutoModel {
   final String nome;
   final String descricao;
 
-  double get number =>
-      double.parse(descricao.substring(0, descricao.length - 2));
+  String get descricaoReplaced => descricao.replaceAll('mm', '').replaceAll('.0', '');
+
+  double get number => double.parse(descricao.substring(0, descricao.length - 2));
 
   ProdutoModel({
     required this.id,
@@ -34,6 +35,5 @@ class ProdutoModel {
 
   String toJson() => json.encode(toMap());
 
-  factory ProdutoModel.fromJson(String source) =>
-      ProdutoModel.fromMap(json.decode(source));
+  factory ProdutoModel.fromJson(String source) => ProdutoModel.fromMap(json.decode(source));
 }

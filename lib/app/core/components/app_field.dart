@@ -1,15 +1,15 @@
 import 'package:aco_plus/app/core/components/h.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AppField extends StatefulWidget {
-  final TextEditingController controller;
+  final TextController controller;
   final String? label;
   final String hint;
   final TextInputAction? action;
-  final FocusNode? focus;
   final IconData? icon;
   final IconData? suffixIcon;
   final double? suffixIconSize;
@@ -29,6 +29,7 @@ class AppField extends StatefulWidget {
   final int? minLines;
   final bool isDisable;
   final bool obscure;
+  final TextCapitalization? capitalization;
 
   const AppField({
     required this.controller,
@@ -40,7 +41,6 @@ class AppField extends StatefulWidget {
     this.suffixIconSize,
     this.prefixIcon,
     this.hint = '',
-    this.focus,
     this.action,
     this.inputFormatters,
     this.onEditingComplete,
@@ -55,6 +55,7 @@ class AppField extends StatefulWidget {
     this.minLines,
     this.obscure = false,
     this.suffixText,
+    this.capitalization,
     super.key,
   });
 
@@ -80,13 +81,13 @@ class _AppFieldState extends State<AppField> {
             obscureText: widget.obscure,
             textAlign: widget.align,
             onTap: widget.onTap,
-            focusNode: widget.focus,
+            focusNode: widget.controller.focus,
             autofocus: widget.autoFocus,
-            controller: widget.controller,
+            controller: widget.controller.controller,
             inputFormatters: widget.inputFormatters,
             keyboardType: widget.type,
             textInputAction: widget.action,
-            textCapitalization: TextCapitalization.sentences,
+            textCapitalization: widget.capitalization ?? TextCapitalization.sentences,
             style: AppCss.smallRegular,
             cursorColor: AppColors.neutralDark,
             onEditingComplete: widget.onEditingComplete,
@@ -132,9 +133,7 @@ class _AppFieldState extends State<AppField> {
         child: Padding(
           padding: const EdgeInsets.only(left: 20, right: 10),
           child: Icon(widget.suffixIcon,
-              weight: 800,
-              size: widget.suffixIconSize,
-              color: AppColors.neutralMedium),
+              weight: 800, size: widget.suffixIconSize, color: AppColors.neutralMedium),
         ),
       );
     }

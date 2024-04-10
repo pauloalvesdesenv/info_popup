@@ -10,7 +10,10 @@ import 'package:aco_plus/app/core/components/done_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/enums/obra_status.dart';
+import 'package:aco_plus/app/core/formatters/uper_case_formatter.dart';
+import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -19,6 +22,7 @@ import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 class PedidoCreatePage extends StatefulWidget {
   final PedidoModel? pedido;
@@ -29,6 +33,7 @@ class PedidoCreatePage extends StatefulWidget {
 }
 
 class _PedidoCreatePageState extends State<PedidoCreatePage> {
+  final FocusNode focusQtde = FocusNode();
   @override
   void initState() {
     pedidoCtrl.onInitCreatePage(widget.pedido);
@@ -38,22 +43,28 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-        resizeAvoid: true,
-        appBar: AppBar(
-          leading: IconButton(
-              onPressed: () => pop(context),
-              icon: Icon(
-                Icons.arrow_back,
-                color: AppColors.white,
-              )),
-          title: Text('${pedidoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Pedido',
-              style: AppCss.largeBold.setColor(AppColors.white)),
-          actions: [
-            IconLoadingButton(() async => await pedidoCtrl.onConfirm(context, widget.pedido, false))
-          ],
-          backgroundColor: AppColors.primaryMain,
-        ),
-        body: StreamOut(stream: pedidoCtrl.formStream.listen, child: (_, form) => body(form)));
+      resizeAvoid: true,
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () async {
+              if (await showConfirmDialog(
+                  'Deseja realmente sair?', 'Os dados do pedido serão perdidos.')) {
+                pop(context);
+              }
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: AppColors.white,
+            )),
+        title: Text('${pedidoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Pedido',
+            style: AppCss.largeBold.setColor(AppColors.white)),
+        actions: [
+          IconLoadingButton(() async => await pedidoCtrl.onConfirm(context, widget.pedido, false))
+        ],
+        backgroundColor: AppColors.primaryMain,
+      ),
+      body: StreamOut(stream: pedidoCtrl.formStream.listen, builder: (_, form) => body(form)),
+    );
   }
 
   Widget body(PedidoCreateModel form) {
@@ -61,10 +72,22 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
       padding: const EdgeInsets.all(16),
       children: [
         AppField(
-          isDisable: form.isEdit,
           label: 'Localizador',
+          inputFormatters: [UpperCaseFormatter()],
+          capitalization: TextCapitalization.characters,
           controller: form.localizador,
+          type: TextInputType.name,
+          action: TextInputAction.next,
           onChanged: (_) => pedidoCtrl.formStream.update(),
+          onEditingComplete: () {
+            if (form.localizador.text.isEmpty) {
+              NotificationService.showNegative('Localizador não pode ser vazio',
+                  'Não será possível salvar o pedido sem um localizador',
+                  position: NotificationPosition.bottom);
+            } else {
+              FocusScope.of(context).unfocus();
+            }
+          },
         ),
         const H(16),
         AppDropDown<PedidoTipo?>(
@@ -146,8 +169,17 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                     label: 'Quantidade',
                     type: const TextInputType.numberWithOptions(decimal: true, signed: false),
                     controller: form.produto.qtde,
+                    action: TextInputAction.done,
                     suffixText: 'Kg',
                     onChanged: (_) => pedidoCtrl.formStream.update(),
+                    onEditingComplete: () {
+                      if (form.produto.isEnable) {
+                        FocusScope.of(context).unfocus();
+                        form.produtos.add(form.produto);
+                        form.produto = PedidoProdutoCreateModel();
+                        pedidoCtrl.formStream.update();
+                      }
+                    },
                   ),
                 ],
               ),

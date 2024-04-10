@@ -6,6 +6,7 @@ import 'package:aco_plus/app/core/components/done_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/enums/obra_status.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -50,7 +51,7 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
           ],
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(stream: clienteCtrl.formStream.listen, child: (_, form) => body(form)));
+        body: StreamOut(stream: clienteCtrl.formStream.listen, builder: (_, form) => body(form)));
   }
 
   Widget body(ClienteCreateModel form) {
@@ -92,7 +93,7 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
               required: false,
               suffixIconSize: 12,
               suffixIcon: Icons.arrow_forward_ios,
-              controller: TextEditingController(text: form.endereco?.name.toString() ?? ''),
+              controller: TextController(text: form.endereco?.name.toString() ?? ''),
               onChanged: (_) => clienteCtrl.formStream.update(),
               hint: 'Clique para adicionar',
             ),

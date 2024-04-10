@@ -1,3 +1,4 @@
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -53,10 +54,13 @@ extension DateExt on DateTime {
     }
     throw Exception();
   }
+
+  String toFileName() => DateFormat('dd_mm_yyyy_HH_mm').format(this).toLowerCase();
+
 }
 
 extension DateNullExt on DateTime? {
-  TextEditingController textEC() => TextEditingController(text: text());
+  TextController textEC() => TextController(text: text());
   String text() => this?.ddMMyyyy() ?? '';
   String textHour() => this != null ? DateFormat("dd/MM/yyyy 'ás' HH:mm").format(this!) : '-';
 }

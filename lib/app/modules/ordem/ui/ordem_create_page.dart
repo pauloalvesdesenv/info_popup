@@ -49,7 +49,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
           ],
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(stream: ordemCtrl.formStream.listen, child: (_, form) => body(form)));
+        body: StreamOut(stream: ordemCtrl.formStream.listen, builder: (_, form) => body(form)));
   }
 
   Widget body(OrdemCreateModel form) {

@@ -1,7 +1,8 @@
 // import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 // import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 // import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
-// import 'package:aco_plus/app/core/services/hash_service.dart';
+// import 'package:aco_plus/app/core/models/text_controller.dart';
+
 // import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 // class PedidoProdutoCreateModel {

@@ -50,7 +50,7 @@ class _PedidoPageState extends State<PedidoPage> {
                 icon: Icon(Icons.delete, color: AppColors.white))
           ],
         ),
-        body: StreamOut(stream: pedidoCtrl.pedidoStream.listen, child: (_, form) => body(form)));
+        body: StreamOut(stream: pedidoCtrl.pedidoStream.listen, builder: (_, form) => body(form)));
   }
 
   Widget body(PedidoModel form) {

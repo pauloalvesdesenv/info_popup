@@ -1,18 +1,18 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/models/endereco_model.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class ClienteUtils {
-  final TextEditingController search = TextEditingController();
+  final TextController search = TextController();
 }
 
 class ClienteCreateModel {
   final String id;
-  TextEditingController nome = TextEditingController();
-  TextEditingController telefone = MaskedTextController(mask: '(00) 00000-0000');
-  TextEditingController cpf = MaskedTextController(mask: '000.000.000-00');
+  TextController nome = TextController();
+  TextController telefone = TextController.phone();
+  TextController cpf = TextController.cpf();
   EnderecoModel? endereco;
   List<ObraModel> obras = [];
   late bool isEdit;

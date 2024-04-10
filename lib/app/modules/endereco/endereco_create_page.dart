@@ -43,7 +43,7 @@ class _EnderecoCreatePageState extends State<EnderecoCreatePage> {
           backgroundColor: AppColors.primaryMain,
         ),
         body: StreamOut(
-            stream: enderecoCtrl.enderecoCreateStream.listen, child: (_, form) => body(form)));
+            stream: enderecoCtrl.enderecoCreateStream.listen, builder: (_, form) => body(form)));
   }
 
   Widget body(EnderecoCreateModel form) {

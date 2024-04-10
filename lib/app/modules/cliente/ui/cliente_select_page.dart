@@ -38,9 +38,9 @@ class _ClienteSelectPageState extends State<ClienteSelectPage> {
       ),
       body: StreamOut<List<ClienteModel>>(
         stream: FirestoreClient.clientes.dataStream.listen,
-        child: (_, __) => StreamOut<ClienteUtils>(
+        builder: (_, __) => StreamOut<ClienteUtils>(
           stream: clienteCtrl.utilsStream.listen,
-          child: (_, utils) {
+          builder: (_, utils) {
             final clientes = clienteCtrl.getClienteesFiltered(utils.search.text, __).toList();
             return Column(
               children: [

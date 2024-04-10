@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:aco_plus/app/core/client/http/viacep/viacep_model.dart';
 import 'package:aco_plus/app/core/extensions/text_controller_ext.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
@@ -81,15 +82,15 @@ class EnderecoModel {
 }
 
 class EnderecoCreateModel {
-  final MaskedTextController cep = MaskedTextController(mask: '00000-000');
-  final TextEditingController logradouro = TextEditingController();
-  final TextEditingController bairro = TextEditingController();
-  final TextEditingController localidade = TextEditingController();
-  final TextEditingController estado = TextEditingController();
-  final TextEditingController numero = TextEditingController();
-  final TextEditingController complemento = TextEditingController();
-  final TextEditingController lat = TextEditingController();
-  final TextEditingController lon = TextEditingController();
+  final TextController cep = TextController.cep();
+  final TextController logradouro = TextController();
+  final TextController bairro = TextController();
+  final TextController localidade = TextController();
+  final TextController estado = TextController();
+  final TextController numero = TextController();
+  final TextController complemento = TextController();
+  final TextController lat = TextController();
+  final TextController lon = TextController();
   bool isEdit = false;
 
   EnderecoCreateModel();

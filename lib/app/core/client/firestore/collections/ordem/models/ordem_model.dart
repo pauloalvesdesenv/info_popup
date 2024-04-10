@@ -9,7 +9,7 @@ class OrdemModel {
   final ProdutoModel produto;
   final DateTime createdAt;
   DateTime? endAt;
-  final List<PedidoProdutoModel> produtos;
+  List<PedidoProdutoModel> produtos;
 
   double quantideTotal() {
     return produtos.fold(0, (previousValue, element) => previousValue + element.qtde);

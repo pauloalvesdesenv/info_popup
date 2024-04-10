@@ -79,9 +79,10 @@ class OrdemController {
             await FirestoreClient.pedidos.update(pedido);
           }
         }
+        ordemStream.add(edit);
       } else {
         form.id =
-            'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${DateFormat('yyyyMMddHHmm').format(DateTime.now())}';
+            'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}';
         final result = form.toOrdemModel(ordem);
         await FirestoreClient.ordens.add(result);
         for (var pedido in FirestoreClient.pedidos.data) {

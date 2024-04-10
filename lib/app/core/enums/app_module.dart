@@ -1,9 +1,15 @@
 import 'package:aco_plus/app/modules/cliente/ui/clientes_page.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordens_page.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedidos_page.dart';
+import 'package:aco_plus/app/modules/relatorio/ui/relatorios_page.dart';
 import 'package:flutter/material.dart';
 
-enum AppModule { cliente, pedidos, ordens }
+enum AppModule {
+  cliente,
+  pedidos,
+  ordens,
+  relatorios,
+}
 
 extension AppModuleExt on AppModule {
   Widget get widget {
@@ -14,6 +20,8 @@ extension AppModuleExt on AppModule {
         return const PedidosPage();
       case AppModule.ordens:
         return const OrdensPage();
+      case AppModule.relatorios:
+        return const RelatoriosPage();
     }
   }
 
@@ -25,6 +33,8 @@ extension AppModuleExt on AppModule {
         return Icons.shopping_cart_outlined;
       case AppModule.ordens:
         return Icons.work_outline;
+      case AppModule.relatorios:
+        return Icons.analytics_outlined;
     }
   }
 
@@ -36,6 +46,8 @@ extension AppModuleExt on AppModule {
         return 'Pedidos';
       case AppModule.ordens:
         return 'Ordens';
+      case AppModule.relatorios:
+        return 'Relatórios';
     }
   }
 }

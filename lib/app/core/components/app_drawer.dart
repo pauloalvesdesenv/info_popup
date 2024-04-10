@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/enums/app_module.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/base/base_controller.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
+import 'package:flutter/material.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -14,7 +14,7 @@ class AppDrawer extends StatelessWidget {
     return Drawer(
       child: StreamOut<AppModule>(
         stream: baseCtrl.moduleStream.listen,
-        child: (_, module) => Column(
+        builder: (_, module) => Column(
           children: [
             Expanded(
               child: ListView(

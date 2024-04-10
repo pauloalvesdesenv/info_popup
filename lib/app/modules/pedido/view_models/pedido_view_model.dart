@@ -4,20 +4,20 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 
 class PedidoUtils {
-  final TextEditingController search = TextEditingController();
+  final TextController search = TextController();
 }
 
 class PedidoCreateModel {
   final String id;
-  final TextEditingController localizador = TextEditingController();
-  final TextEditingController nome = TextEditingController();
-  final TextEditingController descricao = TextEditingController();
+  final TextController localizador = TextController();
+  final TextController nome = TextController();
+  final TextController descricao = TextController();
   ClienteModel? cliente;
   ClienteModel? clienteAdd;
   ObraModel? obra;
