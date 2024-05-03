@@ -162,6 +162,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                     onSelect: (e) {
                       form.produto.produtoModel = e;
                       pedidoCtrl.formStream.update();
+                      form.produto.qtde.focus.requestFocus();
                     },
                   ),
                   const H(6),

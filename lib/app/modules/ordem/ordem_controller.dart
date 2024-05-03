@@ -82,7 +82,7 @@ class OrdemController {
         ordemStream.add(edit);
       } else {
         form.id =
-            'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}';
+            'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${form.id}';
         final result = form.toOrdemModel(ordem);
         await FirestoreClient.ordens.add(result);
         for (var pedido in FirestoreClient.pedidos.data) {
@@ -123,7 +123,7 @@ class OrdemController {
         deleteMessage: 'Todos seus dados da ordem apagados do sistema',
         infoMessage: 'Para excluir a ordem todos os produtos devem estar em "Aguardando Produção".',
         conditional:
-            ordem.produtos.every((e) => e.status.status == PedidoProdutoStatus.aguardandoProducao),
+            !ordem.produtos.every((e) => e.status.status == PedidoProdutoStatus.aguardandoProducao),
       );
 
   void onValid() {

@@ -11,6 +11,8 @@ class OrdemModel {
   DateTime? endAt;
   List<PedidoProdutoModel> produtos;
 
+  double get qtdeTotal => produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
+
   double quantideTotal() {
     return produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
   }
