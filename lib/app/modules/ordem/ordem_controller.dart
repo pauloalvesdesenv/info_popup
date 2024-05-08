@@ -75,19 +75,23 @@ class OrdemController {
       if (form.isEdit) {
         final edit = form.toOrdemModel(ordem);
         await FirestoreClient.ordens.update(edit);
-        for (var pedido in pedidos) {
-          for (var pedidoProduto in pedido.produtos
-              .where((e) =>
-                  e.produto.id == form.produto!.id &&
-                  !ordem!.produtos.map((e) => e.id).contains(pedido.id))
-              .toList()) {
-            pedidoProduto.statusess.add(PedidoProdutoStatusModel(
-                id: HashService.get,
-                status: PedidoProdutoStatus.aguardandoProducao,
-                createdAt: DateTime.now()));
-            await FirestoreClient.pedidos.update(pedido);
+        for (var pedidoProdutoOrdem in ordem!.produtos) {
+          var isProdutoRemoved =
+              !form.produtos.map((e) => e.id).contains(pedidoProdutoOrdem.id);
+          if (isProdutoRemoved) {
+            for (var pedido in pedidos) {
+              final pedidoProduto = pedido.produtos
+                  .firstWhere((e) => e.id == pedidoProdutoOrdem.id);
+              pedidoProduto.statusess.clear();
+              pedidoProduto.statusess.add(PedidoProdutoStatusModel(
+                  id: HashService.get,
+                  status: PedidoProdutoStatus.separado,
+                  createdAt: DateTime.now()));
+              await FirestoreClient.pedidos.update(pedido);
+            }
           }
         }
+
         ordemStream.add(edit);
       } else {
         form.id =
