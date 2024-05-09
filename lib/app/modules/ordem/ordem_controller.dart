@@ -14,6 +14,7 @@ import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_produto_status_bottom.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
+import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 final ordemCtrl = OrdemController();
@@ -130,14 +131,49 @@ class OrdemController {
   //   }
   // }
 
-  Future<void> onCreate() async {
-    
+  Future<void> onConfirm(_, OrdemModel? ordem) async {
+    onValid();
+    for (var pedidoProduto in form.produtos) {
+      pedidoProduto.statusess.clear();
+      pedidoProduto.statusess.add(PedidoProdutoStatusModel(
+          id: HashService.get,
+          status: pedidoProduto.selected
+              ? PedidoProdutoStatus.aguardandoProducao
+              : PedidoProdutoStatus.separado,
+          createdAt: DateTime.now()));
+    }
+    if (!form.isEdit) {
+      form.id =
+          'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${form.id}';
+    }
+
+    final result = form.toOrdemModel(ordem);
+    if (form.isEdit) {
+      await FirestoreClient.ordens.update(result);
+    } else {
+      await FirestoreClient.ordens.add(result);
+    }
+    await FirestoreClient.pedidos.fetchAllItens();
+    Navigator.pop(_);
+    NotificationService.showPositive(
+        'Ordem ${form.isEdit ? 'Editada' : 'Adicionada'}',
+        'Operação realizada com sucesso',
+        position: NotificationPosition.bottom);
   }
 
   Future<void> onEdit() async {}
 
   Future<void> onDelete(_, OrdemModel ordem) async {
     if (await _isDeleteUnavailable(ordem)) return;
+    for (var pedidoProduto in form.produtos) {
+      pedidoProduto.statusess.clear();
+      pedidoProduto.statusess.add(PedidoProdutoStatusModel(
+          id: HashService.get,
+          status: PedidoProdutoStatus.separado,
+          createdAt: DateTime.now()));
+    }
+    await FirestoreClient.pedidos.fetchAllItens();
+
     await FirestoreClient.ordens.delete(ordem);
     pop(_);
     NotificationService.showPositive(

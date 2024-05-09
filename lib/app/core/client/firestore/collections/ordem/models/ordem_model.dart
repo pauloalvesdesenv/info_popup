@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 
 class OrdemModel {
   final String id;
@@ -11,15 +12,18 @@ class OrdemModel {
   DateTime? endAt;
   List<PedidoProdutoModel> produtos;
 
-  double get qtdeTotal => produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
+  double get qtdeTotal => produtos.fold(
+      0, (previousValue, element) => previousValue + element.qtde);
 
   double quantideTotal() {
-    return produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
+    return produtos.fold(
+        0, (previousValue, element) => previousValue + element.qtde);
   }
 
   double qtdeAguardando() {
     return produtos
-        .where((e) => e.statusView.status == PedidoProdutoStatus.aguardandoProducao)
+        .where((e) =>
+            e.statusView.status == PedidoProdutoStatus.aguardandoProducao)
         .fold(0, (previousValue, element) => previousValue + element.qtde);
   }
 
@@ -77,22 +81,28 @@ class OrdemModel {
       'createdAt': createdAt.millisecondsSinceEpoch,
       'endAt': endAt?.millisecondsSinceEpoch,
       'produto': produto.toMap(),
-      'produtos': produtos.map((x) => x.toMap()).toList(),
+      'idPedidosProdutos': produtos
+          .map((x) => {'pedidoId': x.pedidoId, 'produtoId': x.id})
+          .toList(),
     };
   }
 
   factory OrdemModel.fromMap(Map<String, dynamic> map) {
     return OrdemModel(
-      id: map['id'] ?? '',
-      produto: ProdutoModel.fromMap(map['produto']),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      endAt: map['endAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['endAt']) : null,
-      produtos:
-          List<PedidoProdutoModel>.from(map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
-    );
+        id: map['id'] ?? '',
+        produto: ProdutoModel.fromMap(map['produto']),
+        createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+        endAt: map['endAt'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(map['endAt'])
+            : null,
+        produtos: List<PedidoProdutoModel>.from(
+          map['idPedidosProdutos']?.map((x) => FirestoreClient.pedidos
+              .getProdutoByPedidoId(x['pedidoId'], x['produtoId'])),
+        ));
   }
 
   String toJson() => json.encode(toMap());
 
-  factory OrdemModel.fromJson(String source) => OrdemModel.fromMap(json.decode(source));
+  factory OrdemModel.fromJson(String source) =>
+      OrdemModel.fromMap(json.decode(source));
 }

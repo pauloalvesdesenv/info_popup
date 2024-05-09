@@ -26,18 +26,16 @@ class OrdemCreateModel {
         .firstWhere((e) => e.id == pedido.produto.id);
   }
 
-
-
   OrdemModel toOrdemModel(OrdemModel? ordem) {
-    final products =
-        produtos.where((e) => e.selected).map((e) => e.copyWith()).toList();
     return OrdemModel(
       id: id,
       createdAt: DateTime.now(),
       produto: produto!,
-      produtos: ordem != null
-          ? (ordem.produtos.where((e) => e.selected).toList()..addAll(products))
-          : produtos,
+      produtos: [
+        ...produtos.where((e) => e.selected).toList(),
+        if (ordem != null)
+          ...ordem.produtos.where((e) => e.status.status.index >= 2).toList()
+      ],
     );
   }
 }

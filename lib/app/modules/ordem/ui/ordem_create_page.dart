@@ -1,6 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_checkbox.dart';
@@ -45,11 +44,14 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
           title: Text('${ordemCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Ordem',
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
-            IconLoadingButton(() async => await ordemCtrl.onConfirm(context, widget.ordem, false))
+            IconLoadingButton(
+                () async => await ordemCtrl.onConfirm(context, widget.ordem))
           ],
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(stream: ordemCtrl.formStream.listen, builder: (_, form) => body(form)));
+        body: StreamOut(
+            stream: ordemCtrl.formStream.listen,
+            builder: (_, form) => body(form)));
   }
 
   Widget body(OrdemCreateModel form) {
@@ -78,15 +80,19 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
               if (form.isEdit)
                 for (var produto in widget.ordem!.produtos)
                   _itemProduto(
-                      produto: produto,
-                      check: produto.selected,
-                      onTap: () {
-                        produto.selected = !produto.selected;
-                        ordemCtrl.formStream.update();
-                      }),
+                    produto: produto,
+                    check: produto.selected,
+                    onTap: () {
+                      produto.selected = !produto.selected;
+                      ordemCtrl.formStream.update();
+                    },
+                    isEnable: produto.status.status.index <= 1,
+                  ),
               if (form.produto != null)
-                for (var produto in ordemCtrl.getPedidosPorProduto(form.produto!))
+                for (var produto
+                    in ordemCtrl.getPedidosPorProduto(form.produto!))
                   _itemProduto(
+                      isEnable: true,
                       produto: produto,
                       check: form.produtos.contains(produto),
                       onTap: () {
@@ -104,7 +110,9 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
               color: AppColors.white,
-              border: Border(top: BorderSide(color: AppColors.black.withOpacity(0.04), width: 1))),
+              border: Border(
+                  top: BorderSide(
+                      color: AppColors.black.withOpacity(0.04), width: 1))),
           child: Row(
             children: [
               Expanded(
@@ -132,23 +140,22 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
     );
   }
 
-  Widget _itemProduto({
-    required PedidoProdutoModel produto,
-    required bool check,
-    required void Function() onTap,
-  }) {
+  Widget _itemProduto(
+      {required PedidoProdutoModel produto,
+      required bool check,
+      required void Function() onTap,
+      required bool isEnable}) {
     return Container(
-      color: produto.status.status != PedidoProdutoStatus.separado
-          ? AppColors.black.withOpacity(0.04)
-          : null,
+      color: !isEnable ? AppColors.black.withOpacity(0.04) : null,
       child: IgnorePointer(
-        ignoring: produto.status.status != PedidoProdutoStatus.separado,
+        ignoring: !isEnable,
         child: InkWell(
           onTap: onTap,
           child: IgnorePointer(
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.black.withOpacity(0.04), width: 1),
+                border: Border.all(
+                    color: AppColors.black.withOpacity(0.04), width: 1),
                 borderRadius: BorderRadius.circular(4),
               ),
               padding: const EdgeInsets.all(16),
