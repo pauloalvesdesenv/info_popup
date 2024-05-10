@@ -1,6 +1,21 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:flutter/material.dart';
+
+enum RelatorioOrdemType {
+  STATUS,
+  ORDEM,
+}
+
+extension RelatorioOrdemTypeExt on RelatorioOrdemType {
+  String get label {
+    switch (this) {
+      case RelatorioOrdemType.STATUS:
+        return 'Status';
+      case RelatorioOrdemType.ORDEM:
+        return 'Ordem';
+    }
+  }
+}
 
 enum RelatorioOrdemStatus {
   AGUARDANDO_PRODUCAO,
@@ -19,20 +34,23 @@ extension RelatorioOrdemStatusExt on RelatorioOrdemStatus {
         return 'Produzidas';
     }
   }
-
 }
 
 class RelatorioOrdemViewModel {
+  RelatorioOrdemType? type;
   RelatorioOrdemStatus? status;
   DateTimeRange? dates;
   RelatorioOrdemModel? relatorio;
+  OrdemModel? ordem;
 }
 
 class RelatorioOrdemModel {
-  final RelatorioOrdemStatus status;
-  final List<OrdemModel> ordens;
-  final DateTimeRange? dates;
+  late RelatorioOrdemStatus status;
+  late List<OrdemModel> ordens;
+  late DateTimeRange? dates;
+  late OrdemModel ordem;
   final DateTime createdAt = DateTime.now();
 
-  RelatorioOrdemModel(this.status, this.ordens, {this.dates});
+  RelatorioOrdemModel.status(this.status, this.ordens, {this.dates});
+  RelatorioOrdemModel.ordem(this.ordem);
 }

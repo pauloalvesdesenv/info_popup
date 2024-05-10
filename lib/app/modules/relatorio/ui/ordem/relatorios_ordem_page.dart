@@ -1,10 +1,12 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/components/type_selector_widget.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
@@ -33,14 +35,16 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
     return AppScaffold(
       resizeAvoid: true,
       appBar: AppBar(
-        title: Text('Relatórios de Ordem', style: AppCss.largeBold.setColor(AppColors.white)),
+        title: Text('Relatórios de Ordem',
+            style: AppCss.largeBold.setColor(AppColors.white)),
         backgroundColor: AppColors.primaryMain,
         actions: [
           StreamOut(
             stream: relatorioCtrl.ordemViewModelStream.listen,
             builder: (_, model) => IconButton(
-              onPressed:
-                  model.relatorio != null ? () => relatorioCtrl.onExportRelatorioOrdemPDF() : null,
+              onPressed: model.relatorio != null
+                  ? () => relatorioCtrl.onExportRelatorioOrdemPDF()
+                  : null,
               icon: Icon(
                 Icons.picture_as_pdf_outlined,
                 color: model.relatorio != null ? null : Colors.grey[500],
@@ -57,76 +61,117 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  AppDropDown<RelatorioOrdemStatus?>(
-                      label: 'Status',
-                      item: model.status,
-                      itens: RelatorioOrdemStatus.values,
-                      itemLabel: (e) => e?.label ?? 'SELECIONE O STATUS',
-                      onSelect: (e) {
-                        model.status = e;
-                        relatorioCtrl.ordemViewModelStream.add(model);
-                        relatorioCtrl.onCreateRelatorioOrdem();
-                      }),
-                  const H(16),
-                  InkWell(
-                    onTap: () async {
-                      final dates = await showDateRangePicker(
-                        context: contextGlobal,
-                        firstDate: DateTime(2010),
-                        lastDate: DateTime(2030),
-                      );
-                      if (dates == null) return;
-                      model.dates = dates;
-                      relatorioCtrl.ordemViewModelStream.update();
-                      relatorioCtrl.onCreateRelatorioOrdem();
-                      setState(() {});
+                  TypeSelectorWidget<RelatorioOrdemType?>(
+                    label: 'Selecione o modelo de relatório',
+                    values: RelatorioOrdemType.values,
+                    value: relatorioCtrl.ordemViewModel.type,
+                    onChanged: (e) {
+                      model.type = e;
+                      if (e == RelatorioOrdemType.STATUS) {
+                        model.ordem = null;
+                      } else {
+                        model.status = null;
+                        model.dates = null;
+                      }
+                      relatorioCtrl.ordemViewModelStream.add(model);
                     },
-                    child: Stack(
-                      children: [
-                        IgnorePointer(
-                          ignoring: true,
-                          child: AppField(
-                            required: false,
-                            label: 'Datas: (Opcional)',
-                            controller: TextController(
-                                text: model.dates != null
-                                    ? ([model.dates!.start, model.dates!.end]
-                                        .map((e) => DateFormat('dd/MM/yyy').format(e))
-                                        .join(' até '))
-                                    : 'Selecione'),
-                          ),
-                        ),
-                        if (model.dates != null)
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: Container(
-                              padding: const EdgeInsets.only(top: 26),
-                              child: IconButton(
-                                onPressed: () {
-                                  model.dates = null;
-                                  relatorioCtrl.onExportRelatorioPedidoPDF();
-                                  relatorioCtrl.ordemViewModelStream.update();
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                  foregroundColor: MaterialStateProperty.all(Colors.black),
-                                ),
-                                icon: Icon(Icons.close, color: Colors.grey[500]),
-                              ),
-                            ),
-                          )
-                      ],
-                    ),
+                    itemLabel: (e) => e?.label ?? 'SELECIONE O MODELO',
                   ),
+                  if (model.type == RelatorioOrdemType.ORDEM) ...{
+                    AppDropDown<OrdemModel?>(
+                        label: 'Ordem única',
+                        item: model.ordem,
+                        itens: FirestoreClient.ordens.data,
+                        itemLabel: (e) => e?.id ?? 'SELECIONE A ORDEM',
+                        onSelect: (e) {
+                          model.ordem = e;
+                          relatorioCtrl.ordemViewModelStream.add(model);
+                          relatorioCtrl.onCreateRelatorioOrdemStatus();
+                        }),
+                    const H(16),
+                  },
+                  if (model.type == RelatorioOrdemType.STATUS) ...{
+                    AppDropDown<RelatorioOrdemStatus?>(
+                        label: 'Status',
+                        item: model.status,
+                        itens: RelatorioOrdemStatus.values,
+                        itemLabel: (e) => e?.label ?? 'SELECIONE O STATUS',
+                        onSelect: (e) {
+                          model.status = e;
+                          relatorioCtrl.ordemViewModelStream.add(model);
+                          relatorioCtrl.onCreateRelatorioOrdemStatus();
+                        }),
+                    const H(16),
+                    InkWell(
+                      onTap: () async {
+                        final dates = await showDateRangePicker(
+                          context: contextGlobal,
+                          firstDate: DateTime(2010),
+                          lastDate: DateTime(2030),
+                        );
+                        if (dates == null) return;
+                        model.dates = dates;
+                        relatorioCtrl.ordemViewModelStream.update();
+                        relatorioCtrl.onCreateRelatorioOrdemStatus();
+                        setState(() {});
+                      },
+                      child: Stack(
+                        children: [
+                          IgnorePointer(
+                            ignoring: true,
+                            child: AppField(
+                              required: false,
+                              label: 'Datas: (Opcional)',
+                              controller: TextController(
+                                  text: model.dates != null
+                                      ? ([model.dates!.start, model.dates!.end]
+                                          .map((e) =>
+                                              DateFormat('dd/MM/yyy').format(e))
+                                          .join(' até '))
+                                      : 'Selecione'),
+                            ),
+                          ),
+                          if (model.dates != null)
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Container(
+                                padding: const EdgeInsets.only(top: 26),
+                                child: IconButton(
+                                  onPressed: () {
+                                    model.dates = null;
+                                    relatorioCtrl.onExportRelatorioPedidoPDF();
+                                    relatorioCtrl.ordemViewModelStream.update();
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        Colors.transparent),
+                                    foregroundColor:
+                                        MaterialStateProperty.all(Colors.black),
+                                  ),
+                                  icon: Icon(Icons.close,
+                                      color: Colors.grey[500]),
+                                ),
+                              ),
+                            )
+                        ],
+                      ),
+                    ),
+                  },
                 ],
               ),
             ),
             Divisor(color: Colors.grey[700]!, height: 1.5),
             if (model.relatorio != null)
               Column(
-                children: model.relatorio!.ordens.map((e) => itemRelatorio(e)).toList(),
+                children: [
+                  if (model.type == RelatorioOrdemType.ORDEM)
+                    model.relatorio!.ordem,
+                  if (model.type == RelatorioOrdemType.STATUS)
+                    ...model.relatorio!.ordens
+                ].map((e) => itemRelatorio(e)).toList(),
               ),
-            if (model.relatorio != null)
+            if (model.type == RelatorioOrdemType.STATUS &&
+                model.relatorio != null)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: itemInfo('Total', '${relatorioCtrl.getOrdemTotal()} Kg'),
@@ -153,7 +198,9 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(child: Text(ordem.id, style: AppCss.mediumBold)),
-              Text(DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm").format(ordem.createdAt),
+              Text(
+                  DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm")
+                      .format(ordem.createdAt),
                   style: AppCss.minimumRegular.setSize(11)),
             ],
           ),
@@ -162,8 +209,8 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
           for (final produto in ordem.produtos)
             Column(
               children: [
-                itemInfo(
-                    '${produto.cliente.nome} - ${produto.obra.descricao}', '${produto.qtde}Kg'),
+                itemInfo('${produto.cliente.nome} - ${produto.obra.descricao}',
+                    '${produto.qtde}Kg'),
                 Divisor(
                   color: Colors.grey[200],
                 ),
@@ -181,8 +228,9 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child:
-                Text('$label:', style: AppCss.minimumRegular.copyWith(fontWeight: FontWeight.w500)),
+            child: Text('$label:',
+                style: AppCss.minimumRegular
+                    .copyWith(fontWeight: FontWeight.w500)),
           ),
           Expanded(
               flex: 2,
