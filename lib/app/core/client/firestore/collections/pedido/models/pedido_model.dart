@@ -90,6 +90,7 @@ class PedidoModel {
     return {
       'id': id,
       'localizador': localizador,
+      'descricao': descricao,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'cliente': cliente.toMap(),
       'obra': obra.toMap(),
@@ -122,5 +123,29 @@ class PedidoModel {
   @override
   String toString() {
     return 'PedidoModel(id: $id, localizador: $localizador, createdAt: $createdAt, cliente: $cliente, obra: $obra, produtos: $produtos, tipo: $tipo, statusess: $statusess)';
+  }
+
+  PedidoModel copyWith({
+    String? id,
+    String? localizador,
+    String? descricao,
+    DateTime? createdAt,
+    ClienteModel? cliente,
+    ObraModel? obra,
+    List<PedidoProdutoModel>? produtos,
+    PedidoTipo? tipo,
+    List<PedidoStatusModel>? statusess,
+  }) {
+    return PedidoModel(
+      id: id ?? this.id,
+      localizador: localizador ?? this.localizador,
+      descricao: descricao ?? this.descricao,
+      createdAt: createdAt ?? this.createdAt,
+      cliente: cliente ?? this.cliente,
+      obra: obra ?? this.obra,
+      produtos: produtos ?? this.produtos,
+      tipo: tipo ?? this.tipo,
+      statusess: statusess ?? this.statusess,
+    );
   }
 }

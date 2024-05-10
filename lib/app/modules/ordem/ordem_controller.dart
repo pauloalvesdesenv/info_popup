@@ -62,78 +62,46 @@ class OrdemController {
     return filtered;
   }
 
-  // Future<void> onConfirm(_, OrdemModel? ordem, bool isFromOrder) async {
-  //   try {
-  //     onValid();
-  //     List<PedidoModel> pedidos = [];
-  //     for (var produto in form.produtos) {
-  //       final pedido = FirestoreClient.pedidos.data
-  //           .singleWhere((e) => e.id == produto.pedidoId);
-  //       pedidos.add(pedido);
-  //     }
-  //     if (form.isEdit) {
-  //       final edit = form.toOrdemModel(ordem);
-  //       await FirestoreClient.ordens.update(edit);
-  //       for (var pedidoProdutoOrdem in ordem!.produtos) {
-  //         var isProdutoRemoved =
-  //             !form.produtos.map((e) => e.id).contains(pedidoProdutoOrdem.id);
-  //         if (isProdutoRemoved) {
-  //           for (var pedido in pedidos) {
-  //             final pedidoProduto = pedido.produtos
-  //                 .firstWhere((e) => e.id == pedidoProdutoOrdem.id);
-  //             pedidoProduto.statusess.clear();
-  //             pedidoProduto.statusess.add(PedidoProdutoStatusModel(
-  //                 id: HashService.get,
-  //                 status: PedidoProdutoStatus.separado,
-  //                 createdAt: DateTime.now()));
-  //             await FirestoreClient.pedidos.update(pedido);
-  //           }
-  //         }
-  //       }
-
-  //       ordemStream.add(edit);
-  //     } else {
-  //       form.id =
-  //           'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${form.id}';
-  //       for (var produto in form.produtos) {
-  //         produto.statusess.add(PedidoProdutoStatusModel(
-  //             id: HashService.get,
-  //             status: PedidoProdutoStatus.aguardandoProducao,
-  //             createdAt: DateTime.now()));
-  //       }
-  //       final result = form.toOrdemModel(ordem);
-  //       await FirestoreClient.ordens.add(result);
-  //       // for (var pedido in pedidos) {
-  //       //   for (var pedidoProduto in pedido.produtos
-  //       //       .where((e) => e.produto.id == form.produto!.id)
-  //       //       .toList()) {
-  //       //     pedidoProduto.statusess.add(PedidoProdutoStatusModel(
-  //       //         id: HashService.get,
-  //       //         status: PedidoProdutoStatus.aguardandoProducao,
-  //       //         createdAt: DateTime.now()));
-  //       //     await FirestoreClient.pedidos.update(pedido);
-  //       //   }
-  //       // }
-  //     }
-
-  //     if (isFromOrder) {
-  //       Navigator.pop(_, form.isEdit ? ordem : null);
-  //     } else {
-  //       pop(_);
-  //     }
-  //     NotificationService.showPositive(
-  //         'Ordem ${form.isEdit ? 'Editada' : 'Adicionada'}',
-  //         'Operação realizada com sucesso',
-  //         position: NotificationPosition.bottom);
-  //   } catch (e) {
-  //     NotificationService.showNegative('Erro', e.toString(),
-  //         position: NotificationPosition.bottom);
-  //   }
-  // }
-
   Future<void> onConfirm(_, OrdemModel? ordem) async {
-    onValid();
-    for (var pedidoProduto in form.produtos) {
+    try {
+      onValid(ordem);
+      for (var pedidoProduto in form.produtos) {
+        pedidoProduto.statusess.clear();
+        pedidoProduto.statusess.add(PedidoProdutoStatusModel(
+            id: HashService.get,
+            status: pedidoProduto.selected
+                ? PedidoProdutoStatus.aguardandoProducao
+                : PedidoProdutoStatus.separado,
+            createdAt: DateTime.now()));
+      }
+      if (ordem != null) {
+        onEdit(_, ordem);
+      } else {
+        onCreate(_);
+      }
+    } catch (_) {
+      NotificationService.showNegative('Erro', _.toString(),
+          position: NotificationPosition.bottom);
+    }
+  }
+
+  Future<void> onCreate(_) async {
+    form.id =
+        'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${form.id}';
+
+    final result = form.toOrdemModel(null);
+    await FirestoreClient.ordens.add(result);
+    await FirestoreClient.pedidos.fetchAllItens();
+    Navigator.pop(_);
+
+    NotificationService.showPositive(
+        'Ordem Adicionada', 'Operação realizada com sucesso',
+        position: NotificationPosition.bottom);
+  }
+
+  Future<void> onEdit(_, OrdemModel ordem) async {
+    for (var pedidoProduto
+        in ordem.produtos.where((e) => e.status.status.index <= 1).toList()) {
       pedidoProduto.statusess.clear();
       pedidoProduto.statusess.add(PedidoProdutoStatusModel(
           id: HashService.get,
@@ -142,38 +110,28 @@ class OrdemController {
               : PedidoProdutoStatus.separado,
           createdAt: DateTime.now()));
     }
-    if (!form.isEdit) {
-      form.id =
-          'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${form.id}';
-    }
-
-    final result = form.toOrdemModel(ordem);
-    if (form.isEdit) {
-      await FirestoreClient.ordens.update(result);
-    } else {
-      await FirestoreClient.ordens.add(result);
-    }
     await FirestoreClient.pedidos.fetchAllItens();
+    ordem.produtos.removeWhere((e) => e.status.status.index == 0);
+    final result = form.toOrdemModel(ordem);
+    await FirestoreClient.ordens.update(result);
+    Navigator.pop(_);
     Navigator.pop(_);
     NotificationService.showPositive(
-        'Ordem ${form.isEdit ? 'Editada' : 'Adicionada'}',
-        'Operação realizada com sucesso',
+        'Ordem Editada', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
   }
 
-  Future<void> onEdit() async {}
-
   Future<void> onDelete(_, OrdemModel ordem) async {
     if (await _isDeleteUnavailable(ordem)) return;
-    for (var pedidoProduto in form.produtos) {
+    for (var pedidoProduto in ordem.produtos.map((e) => FirestoreClient.pedidos.getProdutoByPedidoId(e.pedidoId, e.id)).toList()) {
       pedidoProduto.statusess.clear();
       pedidoProduto.statusess.add(PedidoProdutoStatusModel(
           id: HashService.get,
           status: PedidoProdutoStatus.separado,
           createdAt: DateTime.now()));
     }
+    ordem.produtos.clear();
     await FirestoreClient.pedidos.fetchAllItens();
-
     await FirestoreClient.ordens.delete(ordem);
     pop(_);
     NotificationService.showPositive(
@@ -191,16 +149,19 @@ class OrdemController {
             (e) => e.status.status == PedidoProdutoStatus.aguardandoProducao),
       );
 
-  void onValid() {
-    final produtos = [if (form.isEdit) ...ordem.produtos, ...form.produtos];
-    if (produtos.isEmpty) {
-      if (form.produto == null) {
-        throw Exception('Selecione o produto');
-      }
+  void onValid(OrdemModel? ordem) {
+    if (form.produto == null) {
+      throw Exception('Selecione o produto');
     }
-    if (produtos.isEmpty) {
-      throw Exception('Selecione ao menos um produto do pedido');
+    if (_checkIsEmpty(ordem)) {
+      throw Exception('A lista de produtos não pode ser vazia');
     }
+  }
+
+  bool _checkIsEmpty(OrdemModel? ordem) {
+    final edit = form.toOrdemModel(ordem).copyWith();
+    edit.produtos.removeWhere((e) => e.status.status.index <= 1 && !e.selected);
+    return edit.produtos.isEmpty;
   }
 
   //PEDIDO

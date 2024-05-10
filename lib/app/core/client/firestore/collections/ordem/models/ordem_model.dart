@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
+
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
@@ -105,4 +107,20 @@ class OrdemModel {
 
   factory OrdemModel.fromJson(String source) =>
       OrdemModel.fromMap(json.decode(source));
+
+  OrdemModel copyWith({
+    String? id,
+    ProdutoModel? produto,
+    DateTime? createdAt,
+    ValueGetter<DateTime?>? endAt,
+    List<PedidoProdutoModel>? produtos,
+  }) {
+    return OrdemModel(
+      id: id ?? this.id,
+      produto: produto ?? this.produto,
+      createdAt: createdAt ?? this.createdAt,
+      endAt: endAt != null ? endAt() : this.endAt,
+      produtos: produtos ?? this.produtos,
+    );
+  }
 }

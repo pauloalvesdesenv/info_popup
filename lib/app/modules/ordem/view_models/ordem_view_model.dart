@@ -34,7 +34,7 @@ class OrdemCreateModel {
       produtos: [
         ...produtos.where((e) => e.selected).toList(),
         if (ordem != null)
-          ...ordem.produtos.where((e) => e.status.status.index >= 2).toList()
+          ...ordem.produtos.where((e) => e.status.status.index >= 2 || e.selected).toList()
       ],
     );
   }

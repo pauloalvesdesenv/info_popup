@@ -21,17 +21,21 @@ class PedidoController {
 
   factory PedidoController() => _instance;
 
-  final AppStream<PedidoUtils> utilsStream = AppStream<PedidoUtils>.seed(PedidoUtils());
+  final AppStream<PedidoUtils> utilsStream =
+      AppStream<PedidoUtils>.seed(PedidoUtils());
   PedidoUtils get utils => utilsStream.value;
 
-  final AppStream<PedidoCreateModel> formStream = AppStream<PedidoCreateModel>();
+  final AppStream<PedidoCreateModel> formStream =
+      AppStream<PedidoCreateModel>();
   PedidoCreateModel get form => formStream.value;
 
   void onInitCreatePage(PedidoModel? pedido) {
-    formStream.add(pedido != null ? PedidoCreateModel.edit(pedido) : PedidoCreateModel());
+    formStream.add(
+        pedido != null ? PedidoCreateModel.edit(pedido) : PedidoCreateModel());
   }
 
-  List<PedidoModel> getPedidoesFiltered(String search, List<PedidoModel> pedidos) {
+  List<PedidoModel> getPedidoesFiltered(
+      String search, List<PedidoModel> pedidos) {
     if (search.length < 3) return pedidos;
     List<PedidoModel> filtered = [];
     for (final pedido in pedidos) {
@@ -60,10 +64,12 @@ class PedidoController {
         pop(_);
       }
       NotificationService.showPositive(
-          'Pedido ${form.isEdit ? 'Editado' : 'Adicionado'}', 'Operação realizada com sucesso',
+          'Pedido ${form.isEdit ? 'Editado' : 'Adicionado'}',
+          'Operação realizada com sucesso',
           position: NotificationPosition.bottom);
     } catch (e) {
-      NotificationService.showNegative('Erro', e.toString(), position: NotificationPosition.bottom);
+      NotificationService.showNegative('Erro', e.toString(),
+          position: NotificationPosition.bottom);
     }
   }
 
@@ -71,11 +77,13 @@ class PedidoController {
     if (await _isDeleteUnavailable(pedido)) return;
     await FirestoreClient.pedidos.delete(pedido);
     pop(_);
-    NotificationService.showPositive('Pedido Excluida', 'Operação realizada com sucesso',
+    NotificationService.showPositive(
+        'Pedido Excluida', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
   }
 
-  Future<bool> _isDeleteUnavailable(PedidoModel pedido) async => !await onDeleteProcess(
+  Future<bool> _isDeleteUnavailable(PedidoModel pedido) async =>
+      !await onDeleteProcess(
         deleteTitle: 'Deseja excluir o pedido?',
         deleteMessage: 'Todos seus dados do pedido apagados do sistema',
         infoMessage:
@@ -88,17 +96,20 @@ class PedidoController {
   void onValid() {
     if (form.cliente == null) {
       throw Exception('Localizador não pode ser vazio');
-    }       
+    }
     if (form.cliente == null) {
       throw Exception('Selecione o cliente do pedido');
-    }       
+    }
     if (form.tipo == null) {
       throw Exception('Selecione o tipo do pedido');
     }
     if (form.obra == null) {
       throw Exception('Selecione a obra do pedido');
     }
+
   }
+
+
 
   //PEDIDO
   final AppStream<PedidoModel> pedidoStream = AppStream<PedidoModel>();
