@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
@@ -130,5 +131,30 @@ class PedidoController {
     ));
     pedidoStream.update();
     await FirestoreClient.pedidos.update(pedido);
+  }
+
+  Future<void> onVerifyPedidoStatus()async {
+    final ordens = FirestoreClient.ordens.data;
+    for (var pedido in FirestoreClient.pedidos.data) {
+      for (var produtoPedido in pedido.produtos) {
+      bool hasInOrder = false;
+for (var ordem in ordens) {
+        for (var produtoOrdem in ordem.produtos) {
+          if(pedido.id == produtoOrdem.pedidoId && produtoPedido.id ==produtoOrdem.id){
+            hasInOrder = true;
+            break;
+          }
+        }
+      }    
+      if(!hasInOrder && produtoPedido.status.status == PedidoProdutoStatus.aguardandoProducao){
+        produtoPedido.statusess.clear();
+      produtoPedido.statusess.add(PedidoProdutoStatusModel(
+          id: HashService.get,
+          status: PedidoProdutoStatus.separado,
+          createdAt: DateTime.now()));
+      }    
+      }
+      await FirestoreClient.pedidos.update(pedido);
+    }
   }
 }
