@@ -3,27 +3,25 @@ import 'dart:typed_data';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/components/pdf_divisor.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
-import 'package:aco_plus/app/core/utils/global_resource.dart';
-import 'package:aco_plus/app/modules/relatorio/relatorio_controller.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_ordem_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-class RelatorioOrdemPdfPage {
+class RelatorioOrdemPdfOrdemPage {
   final RelatorioOrdemModel model;
-  RelatorioOrdemPdfPage(this.model);
+  RelatorioOrdemPdfOrdemPage(this.model);
 
   pw.Widget build(Uint8List bytes) => pw.Column(
         children: [
           pw.Image(pw.MemoryImage(bytes), width: 60, height: 60),
           pw.SizedBox(height: 24),
-          pw.Text('RELATÓRIO DE BITOLA POR STATUS${model.dates != null ? ' E PERÍODO' : empty}'),
+          pw.Text('RELATÓRIO DE ORDEM DE PRODUÇÃO ${model.ordem.id}'),
           pw.SizedBox(height: 16),
           _itemHeader(model),
           pw.SizedBox(height: 24),
-          for (final pedido in model.ordens) _itemRelatorio(pedido),
+          _itemRelatorio(model.ordem),
         ],
       );
 
@@ -32,7 +30,8 @@ class RelatorioOrdemPdfPage {
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
         color: PdfColor.fromInt(Colors.white.value),
-        border: pw.Border.all(color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
+        border: pw.Border.all(
+            color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
       ),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -44,13 +43,13 @@ class RelatorioOrdemPdfPage {
                   child: pw.Text(ordem.id,
                       style: pw.TextStyle(
                           fontSize: 14,
-                          font: pw.Font.times(),
                           fontWeight: pw.FontWeight.bold,
                           color: PdfColor.fromInt(AppColors.black.value)))),
-              pw.Text(DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm").format(ordem.createdAt),
+              pw.Text(
+                  DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm")
+                      .format(ordem.createdAt),
                   style: pw.TextStyle(
                       fontSize: 11,
-                      font: pw.Font.times(),
                       fontWeight: pw.FontWeight.normal,
                       color: PdfColor.fromInt(AppColors.black.value))),
             ],
@@ -60,8 +59,8 @@ class RelatorioOrdemPdfPage {
           for (final produto in ordem.produtos)
             pw.Column(
               children: [
-                _itemInfo(
-                    '${produto.cliente.nome} - ${produto.obra.descricao}', '${produto.qtde} kg'),
+                _itemInfo('${produto.cliente.nome} - ${produto.obra.descricao}',
+                    '${produto.qtde} kg'),
                 PdfDivisor.build(
                   color: Colors.grey[200],
                 ),
@@ -77,27 +76,31 @@ class RelatorioOrdemPdfPage {
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
         color: PdfColor.fromInt(Colors.white.value),
-        border: pw.Border.all(color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
+        border: pw.Border.all(
+            color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
       ),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text(relatorio.status.label,
-              style: pw.TextStyle(
-                  fontSize: 11,
-                  font: pw.Font.times(),
-                  fontWeight: pw.FontWeight.normal,
-                  color: PdfColor.fromInt(AppColors.black.value))),
-          pw.SizedBox(height: 8),
-          _itemInfo('Data Criação Relatório',
-              DateFormat("dd/MM/yyyy' ás 'HH:mm").format(relatorio.createdAt).toString()),
-          PdfDivisor.build(
-            color: Colors.grey[200],
-          ),
-          _itemInfo('Quantidade Total Bitolas', '${relatorioCtrl.getOrdemTotal()} Kg'),
-          PdfDivisor.build(
-            color: Colors.grey[200],
-          ),
+          // pw.Text(relatorio.status.label,
+          //     style: pw.TextStyle(
+          //         fontSize: 11,
+          //         fontWeight: pw.FontWeight.normal,
+          //         color: PdfColor.fromInt(AppColors.black.value))),
+          // pw.SizedBox(height: 8),
+          // _itemInfo(
+          //     'Data Criação Relatório',
+          //     DateFormat("dd/MM/yyyy' ás 'HH:mm")
+          //         .format(relatorio.createdAt)
+          //         .toString()),
+          // PdfDivisor.build(
+          //   color: Colors.grey[200],
+          // ),
+          // _itemInfo('Quantidade Total Bitolas',
+          //     '${relatorioCtrl.getOrdemTotal()} Kg'),
+          // PdfDivisor.build(
+          //   color: Colors.grey[200],
+          // ),
           if (relatorio.dates != null)
             _itemInfo('Período',
                 '${DateFormat("dd/MM/yyyy").format(relatorio.dates!.start)} - ${DateFormat("dd/MM/yyyy").format(relatorio.dates!.end)}'),
@@ -120,7 +123,6 @@ class RelatorioOrdemPdfPage {
           pw.Expanded(
             child: pw.Text(label,
                 style: pw.TextStyle(
-                    font: pw.Font.times(),
                     fontSize: 12,
                     fontWeight: pw.FontWeight.bold,
                     color: PdfColor.fromInt(Colors.grey[800]!.value))),
@@ -130,7 +132,6 @@ class RelatorioOrdemPdfPage {
               child: pw.Text(
                 value,
                 style: pw.TextStyle(
-                    font: pw.Font.times(),
                     fontSize: 12,
                     fontWeight: pw.FontWeight.normal,
                     color: PdfColor.fromInt(Colors.grey[800]!.value)),

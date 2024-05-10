@@ -13,6 +13,7 @@ class OrdemModel {
   final DateTime createdAt;
   DateTime? endAt;
   List<PedidoProdutoModel> produtos;
+  bool selected = true;
 
   double get qtdeTotal => produtos.fold(
       0, (previousValue, element) => previousValue + element.qtde);
