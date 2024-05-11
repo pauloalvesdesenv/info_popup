@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrdemCollection {
@@ -29,7 +30,8 @@ class OrdemCollection {
     if (_isStarted && lock) return;
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
-    final countries = data.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
+    final countries =
+        data.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
     countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     dataStream.add(countries);
   }
@@ -69,9 +71,11 @@ class OrdemCollection {
             : collection)
         .snapshots()
         .listen((e) {
-      final countries = e.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
+      final countries =
+          e.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
       countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
       dataStream.add(countries);
+      pedidoCtrl.onVerifyPedidoStatus();
     });
   }
 
