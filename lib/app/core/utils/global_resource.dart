@@ -25,8 +25,9 @@ dynamic push([a, b]) async {
   } else {
     context = b;
   }
-  var result = await Navigator.push(
-      context ?? contextGlobal, MaterialPageRoute(builder: (_) => widget ?? Container()));
+  pedidoCtrl.onVerifyPedidoStatus();
+  var result = await Navigator.push(context ?? contextGlobal,
+      MaterialPageRoute(builder: (_) => widget ?? Container()));
   return result;
 }
 

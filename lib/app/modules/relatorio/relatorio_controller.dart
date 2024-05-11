@@ -5,9 +5,12 @@ import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/orde
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
+import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_ordem_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_status_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/pedido/relatorio_pedido_pdf_page.dart';
@@ -80,7 +83,7 @@ class PedidoController {
   }
 
   void onCreateRelatorioOrdemStatus() {
-    List<OrdemModel> ordens = FirestoreClient.ordens.data;
+    List<OrdemModel> ordens = FirestoreClient.ordens.data.toList();
     for (final ordem in ordens) {
       ordem.produtos = ordem.produtos
           .where((e) => _whereProductStatus(e, ordemViewModel.status!))
@@ -139,28 +142,85 @@ class PedidoController {
     return double.parse(qtde.toStringAsFixed(2));
   }
 
+  List<ProdutoModel> getTiposProdutosId() {
+    List<ProdutoModel> produtos = [];
+    for (var ordem in ordemViewModel.relatorio!.ordens) {
+      for (var produto in ordem.produtos) {
+        if (produtos.map((e) => e.id).contains(produto.produto.id) == false) {
+          produtos.add(produto.produto);
+        }
+      }
+    }
+    return produtos.toList();
+  }
+
+  List<PedidoProdutoModel> getOrdemTotalProduto() {
+    List<PedidoProdutoModel> pedidoProdutos = [];
+    final types = getTiposProdutosId();
+    for (var type in types) {
+      double qtde = 0;
+      for (var ordem in ordemViewModel.relatorio!.ordens) {
+        for (var produto in ordem.produtos) {
+          if (produto.produto.id == type.id) {
+            qtde = qtde + produto.qtde;
+          }
+        }
+      }
+      pedidoProdutos.add(PedidoProdutoModel(
+          id: 'total',
+          produto: type,
+          qtde: qtde,
+          statusess: [],
+          clienteId: '',
+          obraId: '',
+          pedidoId: ''));
+    }
+    pedidoProdutos.sort((a, b) => a.produto.number.compareTo(b.produto.number));
+    return pedidoProdutos;
+  }
+
   Future<void> onExportRelatorioOrdemPDF() async {
     final pdf = pw.Document();
 
     final img = await rootBundle.load('assets/images/logo.png');
     final imageBytes = img.buffer.asUint8List();
 
+    var isOrdemType = ordemViewModel.type == RelatorioOrdemType.ORDEM;
+
     pdf.addPage(pw.Page(
-        pageFormat: PdfPageFormat.undefined,
-        build: (pw.Context context) =>
-            (ordemViewModel.type == RelatorioOrdemType.ORDEM
-                ? RelatorioOrdemPdfOrdemPage(ordemViewModel.relatorio!)
-                    .build(imageBytes)
-                : RelatorioOrdemPdfStatusPage(ordemViewModel.relatorio!)
-                    .build(imageBytes))));
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return (isOrdemType
+              ? RelatorioOrdemPdfOrdemPage(ordemViewModel.relatorio!)
+                  .build(imageBytes)
+              : RelatorioOrdemPdfStatusPage(ordemViewModel.relatorio!)
+                  .build(imageBytes));
+        }));
 
     var savedFile = await pdf.save();
     List<int> fileInts = List.from(savedFile);
     html.AnchorElement(
         href:
             "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}")
-      ..setAttribute("download",
-          "m2_relatorio_bitola_status_${ordemViewModel.status!.label.toLowerCase()}${DateTime.now().toFileName()}.pdf")
+      ..setAttribute(
+          "download",
+          isOrdemType
+              ? "m2_relatorio_ordem_${ordemViewModel.relatorio!.ordem.id.toLowerCase()}${DateTime.now().toFileName()}.pdf"
+              : "m2_relatorio_bitola_status_${ordemViewModel.status!.label.toLowerCase()}${DateTime.now().toFileName()}.pdf")
       ..click();
+  }
+
+  Future<void> onSearchRelatorio() async {
+    try {
+      final ordem = FirestoreClient.ordens.data.firstWhere((e) =>
+          e.id.toCompare.contains(ordemViewModel.ordemEC.text.toCompare));
+      ordemViewModel.ordem = ordem;
+      ordemViewModelStream.update();
+      onCreateRelatorio();
+    } catch (e) {
+      NotificationService.showNegative(
+          'Não foi encontrado ordem com esse filtro',
+          'Verifique o filtro informado');
+    }
   }
 }

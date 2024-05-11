@@ -1,8 +1,8 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
-import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
+import 'package:aco_plus/app/core/components/app_text_button.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
@@ -66,28 +66,41 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
                     values: RelatorioOrdemType.values,
                     value: relatorioCtrl.ordemViewModel.type,
                     onChanged: (e) {
+                      model.ordem = null;
+                      model.status = null;
+                      model.dates = null;
+                      model.relatorio = null;
                       model.type = e;
-                      if (e == RelatorioOrdemType.STATUS) {
-                        model.ordem = null;
-                      } else {
-                        model.status = null;
-                        model.dates = null;
-                      }
                       relatorioCtrl.ordemViewModelStream.add(model);
                     },
                     itemLabel: (e) => e?.label ?? 'SELECIONE O MODELO',
                   ),
                   if (model.type == RelatorioOrdemType.ORDEM) ...{
-                    AppDropDown<OrdemModel?>(
-                        label: 'Ordem única',
-                        item: model.ordem,
-                        itens: FirestoreClient.ordens.data,
-                        itemLabel: (e) => e?.id ?? 'SELECIONE A ORDEM',
-                        onSelect: (e) {
-                          model.ordem = e;
-                          relatorioCtrl.ordemViewModelStream.add(model);
-                          relatorioCtrl.onCreateRelatorioOrdemStatus();
-                        }),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: AppField(
+                            required: false,
+                            label: 'Ordem única',
+                            controller: model.ordemEC,
+                            onEditingComplete: () =>
+                                relatorioCtrl.onSearchRelatorio(),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 23, left: 12),
+                            child: AppTextButton(
+                              label: 'Buscar',
+                              onPressed: () =>
+                                  relatorioCtrl.onSearchRelatorio(),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+
                     const H(16),
                   },
                   if (model.type == RelatorioOrdemType.STATUS) ...{
@@ -99,7 +112,7 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
                         onSelect: (e) {
                           model.status = e;
                           relatorioCtrl.ordemViewModelStream.add(model);
-                          relatorioCtrl.onCreateRelatorioOrdemStatus();
+                          relatorioCtrl.onCreateRelatorio();
                         }),
                     const H(16),
                     InkWell(
@@ -112,7 +125,7 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
                         if (dates == null) return;
                         model.dates = dates;
                         relatorioCtrl.ordemViewModelStream.update();
-                        relatorioCtrl.onCreateRelatorioOrdemStatus();
+                        relatorioCtrl.onCreateRelatorio();
                         setState(() {});
                       },
                       child: Stack(
@@ -171,11 +184,31 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
                 ].map((e) => itemRelatorio(e)).toList(),
               ),
             if (model.type == RelatorioOrdemType.STATUS &&
-                model.relatorio != null)
+                model.relatorio != null) ...[
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Totais',
+                  style: AppCss.mediumBold,
+                ),
+              ),
+              for (final produto in relatorioCtrl.getOrdemTotalProduto())
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: itemInfo(
+                          produto.produto.descricao, '${produto.qtde} Kg'),
+                    ),
+                    const Divisor(),
+                  ],
+                ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: itemInfo('Total', '${relatorioCtrl.getOrdemTotal()} Kg'),
+                child: itemInfo(
+                    'Total Geral', '${relatorioCtrl.getOrdemTotal()} Kg'),
               ),
+            ]
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:flutter/material.dart';
 
 enum RelatorioOrdemType {
@@ -41,6 +42,7 @@ class RelatorioOrdemViewModel {
   RelatorioOrdemStatus? status;
   DateTimeRange? dates;
   RelatorioOrdemModel? relatorio;
+  TextController ordemEC = TextController();
   OrdemModel? ordem;
 }
 

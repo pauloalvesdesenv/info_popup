@@ -19,8 +19,6 @@ class RelatorioOrdemPdfOrdemPage {
           pw.SizedBox(height: 24),
           pw.Text('RELATÓRIO DE ORDEM DE PRODUÇÃO ${model.ordem.id}'),
           pw.SizedBox(height: 16),
-          _itemHeader(model),
-          pw.SizedBox(height: 24),
           _itemRelatorio(model.ordem),
         ],
       );
@@ -66,49 +64,9 @@ class RelatorioOrdemPdfOrdemPage {
                 ),
               ],
             ),
-        ],
-      ),
-    );
-  }
-
-  pw.Widget _itemHeader(RelatorioOrdemModel relatorio) {
-    return pw.Container(
-      padding: const pw.EdgeInsets.all(16),
-      decoration: pw.BoxDecoration(
-        color: PdfColor.fromInt(Colors.white.value),
-        border: pw.Border.all(
-            color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
-      ),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          // pw.Text(relatorio.status.label,
-          //     style: pw.TextStyle(
-          //         fontSize: 11,
-          //         fontWeight: pw.FontWeight.normal,
-          //         color: PdfColor.fromInt(AppColors.black.value))),
-          // pw.SizedBox(height: 8),
-          // _itemInfo(
-          //     'Data Criação Relatório',
-          //     DateFormat("dd/MM/yyyy' ás 'HH:mm")
-          //         .format(relatorio.createdAt)
-          //         .toString()),
-          // PdfDivisor.build(
-          //   color: Colors.grey[200],
-          // ),
-          // _itemInfo('Quantidade Total Bitolas',
-          //     '${relatorioCtrl.getOrdemTotal()} Kg'),
-          // PdfDivisor.build(
-          //   color: Colors.grey[200],
-          // ),
-          if (relatorio.dates != null)
-            _itemInfo('Período',
-                '${DateFormat("dd/MM/yyyy").format(relatorio.dates!.start)} - ${DateFormat("dd/MM/yyyy").format(relatorio.dates!.end)}'),
-          // _itemInfo('Quantidade Total de Bitolas',
-          //     "${relatorio.pedidos.fold<double>(0, (a, b) => a + (b.produtos.fold(0, (c, d) => c + d.qtde))).toStringAsFixed(2)} kg"),
-          PdfDivisor.build(
-            color: Colors.grey[200],
-          ),
+          PdfDivisor.build(),
+          _itemInfo('Total',
+              '${ordem.produtos.map((e) => e.qtde).toList().fold(.0, (previousValue, element) => previousValue + element)}Kg')
         ],
       ),
     );

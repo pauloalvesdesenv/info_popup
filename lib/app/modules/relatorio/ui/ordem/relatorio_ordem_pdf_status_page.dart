@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/orde
 import 'package:aco_plus/app/core/components/pdf_divisor.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/relatorio/relatorio_controller.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_ordem_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -23,7 +24,7 @@ class RelatorioOrdemPdfStatusPage {
           pw.SizedBox(height: 16),
           _itemHeader(model),
           pw.SizedBox(height: 24),
-          for (final  pedido in model.ordens) _itemRelatorio(pedido),
+          for (final pedido in model.ordens) _itemRelatorio(pedido),
         ],
       );
 
@@ -84,33 +85,39 @@ class RelatorioOrdemPdfStatusPage {
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          // pw.Text(relatorio.status.label,
-          //     style: pw.TextStyle(
-          //         fontSize: 11,
-          //         fontWeight: pw.FontWeight.normal,
-          //         color: PdfColor.fromInt(AppColors.black.value))),
-          // pw.SizedBox(height: 8),
-          // _itemInfo(
-          //     'Data Criação Relatório',
-          //     DateFormat("dd/MM/yyyy' ás 'HH:mm")
-          //         .format(relatorio.createdAt)
-          //         .toString()),
-          // PdfDivisor.build(
-          //   color: Colors.grey[200],
-          // ),
-          // _itemInfo('Quantidade Total Bitolas',
-          //     '${relatorioCtrl.getOrdemTotal()} Kg'),
-          // PdfDivisor.build(
-          //   color: Colors.grey[200],
-          // ),
-          if (relatorio.dates != null)
-            _itemInfo('Período',
-                '${DateFormat("dd/MM/yyyy").format(relatorio.dates!.start)} - ${DateFormat("dd/MM/yyyy").format(relatorio.dates!.end)}'),
-          // _itemInfo('Quantidade Total de Bitolas',
-          //     "${relatorio.pedidos.fold<double>(0, (a, b) => a + (b.produtos.fold(0, (c, d) => c + d.qtde))).toStringAsFixed(2)} kg"),
+          pw.Text(relatorio.status.label,
+              style: pw.TextStyle(
+                  fontSize: 11,
+                  fontWeight: pw.FontWeight.normal,
+                  color: PdfColor.fromInt(AppColors.black.value))),
+          pw.SizedBox(height: 8),
+          _itemInfo(
+              'Data Criação Relatório',
+              DateFormat("dd/MM/yyyy' ás 'HH:mm")
+                  .format(relatorio.createdAt)
+                  .toString()),
           PdfDivisor.build(
             color: Colors.grey[200],
           ),
+          if (relatorio.dates != null)
+            _itemInfo('Período',
+                '${DateFormat("dd/MM/yyyy").format(relatorio.dates!.start)} - ${DateFormat("dd/MM/yyyy").format(relatorio.dates!.end)}'),
+          PdfDivisor.build(
+            color: Colors.grey[200],
+          ),
+          for (final produto in relatorioCtrl.getOrdemTotalProduto())
+            pw.Column(
+              children: [
+                _itemInfo(
+                    'Quantidade Total Bitola ${produto.produto.descricao}',
+                    '${produto.qtde} Kg'),
+                PdfDivisor.build(
+                  color: Colors.grey[200],
+                ),
+              ],
+            ),
+          _itemInfo('Quantidade Total Bitolas',
+              '${relatorioCtrl.getOrdemTotal()} Kg'),
         ],
       ),
     );
