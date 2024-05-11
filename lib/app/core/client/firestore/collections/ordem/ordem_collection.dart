@@ -75,7 +75,6 @@ class OrdemCollection {
           e.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
       countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
       dataStream.add(countries);
-      pedidoCtrl.onVerifyPedidoStatus();
     });
   }
 
