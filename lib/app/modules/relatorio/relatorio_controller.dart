@@ -38,6 +38,8 @@ class PedidoController {
       pedidoViewModel.cliente!,
       pedidoViewModel.status!,
       FirestoreClient.pedidos.data
+          .map((e) => e.copyWith())
+          .toList()
           .where((e) =>
               pedidoViewModel.status == RelatorioPedidoStatus.produzindo
                   ? e.statusess.last.status != PedidoStatus.pronto
@@ -83,7 +85,7 @@ class PedidoController {
   }
 
   void onCreateRelatorioOrdemStatus() {
-    List<OrdemModel> ordens = FirestoreClient.ordens.data.toList();
+    List<OrdemModel> ordens = FirestoreClient.ordens.data.map((e) => e.copyWith()).toList();
     for (final ordem in ordens) {
       ordem.produtos = ordem.produtos
           .where((e) => _whereProductStatus(e, ordemViewModel.status!))
@@ -212,7 +214,7 @@ class PedidoController {
 
   Future<void> onSearchRelatorio() async {
     try {
-      final ordem = FirestoreClient.ordens.data.firstWhere((e) =>
+      final ordem = FirestoreClient.ordens.data.map((e) => e.copyWith()).firstWhere((e) =>
           e.id.toCompare.contains(ordemViewModel.ordemEC.text.toCompare));
       ordemViewModel.ordem = ordem;
       ordemViewModelStream.update();
