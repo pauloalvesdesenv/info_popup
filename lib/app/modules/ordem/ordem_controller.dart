@@ -7,6 +7,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
@@ -40,7 +41,9 @@ class OrdemController {
   List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
     for (var pedido in FirestoreClient.pedidos.data
-        .where((e) => form.cliente == null || form.cliente!.id == e.cliente.id)
+        .where((e) =>
+            form.cliente.text.isEmpty ||
+            e.cliente.nome.toCompare.contains(form.cliente.text.toCompare))
         .toList()) {
       for (var pedidoProduto in pedido.produtos
           .where((e) =>
@@ -50,6 +53,18 @@ class OrdemController {
         pedidos.add(pedidoProduto);
       }
     }
+    onSortPedidos(pedidos);
+    return pedidos;
+  }
+
+  List<PedidoProdutoModel> getPedidosPorProdutoEdit(OrdemModel ordem) {
+    final pedidos = ordem.produtos
+        .where((e) =>
+            form.cliente.text.isEmpty ||
+            e.cliente.nome.toCompare.contains(form.cliente.text.toCompare))
+        .toList();
+    onSortPedidos(pedidos);
+
     return pedidos;
   }
 
@@ -167,6 +182,24 @@ class OrdemController {
     final edit = form.toOrdemModel(ordem).copyWith();
     edit.produtos.removeWhere((e) => e.status.status.index <= 1 && !e.selected);
     return edit.produtos.isEmpty;
+  }
+
+  void onSortPedidos(List<PedidoProdutoModel> pedidos) {
+    bool isAsc = form.sortOrder == SortOrder.asc;
+    switch (form.sortType) {
+      case SortType.alfabetic:
+        pedidos.sort((a, b) => isAsc
+            ? a.cliente.nome.compareTo(b.cliente.nome)
+            : b.cliente.nome.compareTo(a.cliente.nome));
+        break;
+      case SortType.date:
+        pedidos.sort((a, b) => isAsc
+            ? (a.pedido.deliveryAt ?? DateTime.now())
+                .compareTo((b.pedido.deliveryAt ?? DateTime.now()))
+            : (b.pedido.deliveryAt ?? DateTime.now())
+                .compareTo((a.pedido.deliveryAt ?? DateTime.now())));
+        break;
+    }
   }
 
   //PEDIDO

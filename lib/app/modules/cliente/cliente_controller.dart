@@ -92,11 +92,14 @@ class ClienteController {
       );
 
   void onValid() {
-    if (FirestoreClient.clientes.data.any((e) => e.nome == form.nome.text)) {
-      throw Exception('Já existe um cliente com esse nome');
-    }
-    if (FirestoreClient.clientes.data.any((e) => e.cpf == form.cpf.text)) {
-      throw Exception('Já existe um cliente com esse CPF/CNPJ');
+    if (!form.isEdit) {
+      if (FirestoreClient.clientes.data.any((e) => e.nome == form.nome.text)) {
+        throw Exception('Já existe um cliente com esse nome');
+      }
+      if (form.cpf.text.isNotEmpty &&
+          FirestoreClient.clientes.data.any((e) => e.cpf == form.cpf.text)) {
+        throw Exception('Já existe um cliente com esse CPF/CNPJ');
+      }
     }
     if (FirestoreClient.clientes.data.any((e) => e.cpf == form.cpf.text)) {
       throw Exception('Já existe um cliente com esse nome');
@@ -109,3 +112,5 @@ class ClienteController {
     }
   }
 }
+
+

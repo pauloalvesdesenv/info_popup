@@ -1,4 +1,3 @@
-import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
@@ -6,11 +5,13 @@ import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_m
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_checkbox.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
+import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/done_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
@@ -82,26 +83,50 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                       },
                     ),
                     const H(16),
-                    AppDropDown<ClienteModel?>(
+                    AppField(
                       label: 'Filtrar por cliente',
                       required: false,
-                      item: form.cliente,
-                      itens: FirestoreClient.clientes.data,
-                      itemLabel: (e) => e!.nome,
-                      onSelect: (e) {
-                        form.cliente = e;
+                      controller: form.cliente,
+                      onChanged: (e) {
                         ordemCtrl.formStream.update();
                       },
                     ),
+                    const H(16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppDropDown<SortType>(
+                            label: 'Ordernar por',
+                            item: form.sortType,
+                            itens: SortType.values,
+                            itemLabel: (e) => e.name,
+                            onSelect: (e) {
+                              form.sortType = e;
+                              ordemCtrl.formStream.update();
+                            },
+                          ),
+                        ),
+                        const W(16),
+                        Expanded(
+                          child: AppDropDown<SortOrder>(
+                            label: 'Ordernar',
+                            item: form.sortOrder,
+                            itens: SortOrder.values,
+                            itemLabel: (e) => e.name,
+                            onSelect: (e) {
+                              form.sortOrder = e;
+                              ordemCtrl.formStream.update();
+                            },
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
               if (form.isEdit)
-                for (var produto in widget.ordem!.produtos
-                    .where((e) =>
-                        form.cliente == null ||
-                        form.cliente!.id == e.pedido.cliente.id)
-                    .toList())
+                for (var produto
+                    in ordemCtrl.getPedidosPorProdutoEdit(widget.ordem!))
                   _itemProduto(
                     produto: produto,
                     check: produto.selected,

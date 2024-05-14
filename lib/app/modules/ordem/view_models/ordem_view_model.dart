@@ -1,8 +1,8 @@
-import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 
 class OrdemUtils {
@@ -12,8 +12,10 @@ class OrdemUtils {
 class OrdemCreateModel {
   String id;
   ProdutoModel? produto;
-  ClienteModel? cliente;
+  TextController cliente = TextController();
   List<PedidoProdutoModel> produtos = [];
+  SortType sortType = SortType.alfabetic;
+  SortOrder sortOrder = SortOrder.asc;
 
   late bool isEdit;
 
