@@ -39,7 +39,9 @@ class OrdemController {
 
   List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
-    for (var pedido in FirestoreClient.pedidos.data) {
+    for (var pedido in FirestoreClient.pedidos.data
+        .where((e) => form.cliente == null || form.cliente!.id! == e.cliente.id)
+        .toList()) {
       for (var pedidoProduto in pedido.produtos
           .where((e) =>
               e.status.status == PedidoProdutoStatus.separado &&
@@ -123,7 +125,10 @@ class OrdemController {
 
   Future<void> onDelete(_, OrdemModel ordem) async {
     if (await _isDeleteUnavailable(ordem)) return;
-    for (var pedidoProduto in ordem.produtos.map((e) => FirestoreClient.pedidos.getProdutoByPedidoId(e.pedidoId, e.id)).toList()) {
+    for (var pedidoProduto in ordem.produtos
+        .map((e) =>
+            FirestoreClient.pedidos.getProdutoByPedidoId(e.pedidoId, e.id))
+        .toList()) {
       pedidoProduto.statusess.clear();
       pedidoProduto.statusess.add(PedidoProdutoStatusModel(
           id: HashService.get,
@@ -253,6 +258,4 @@ class OrdemController {
     ordemStream.update();
     await FirestoreClient.pedidos.update(pedido);
   }
-
-  
 }

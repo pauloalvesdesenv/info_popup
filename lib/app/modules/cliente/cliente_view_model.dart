@@ -12,7 +12,7 @@ class ClienteCreateModel {
   final String id;
   TextController nome = TextController();
   TextController telefone = TextController.phone();
-  TextController cpf = TextController.cpf();
+  TextController cpf = TextController(mask: '00000000000000000');
   EnderecoModel? endereco;
   List<ObraModel> obras = [];
   late bool isEdit;

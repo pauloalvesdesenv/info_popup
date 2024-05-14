@@ -57,7 +57,7 @@ class RelatorioOrdemPdfOrdemPage {
           for (final produto in ordem.produtos)
             pw.Column(
               children: [
-                _itemInfo('${produto.cliente.nome} - ${produto.obra.descricao}',
+                _itemInfo('${produto.pedido.localizador} - ${produto.cliente.nome} - ${produto.obra.descricao}',
                     '${produto.qtde} kg'),
                 PdfDivisor.build(
                   color: Colors.grey[200],

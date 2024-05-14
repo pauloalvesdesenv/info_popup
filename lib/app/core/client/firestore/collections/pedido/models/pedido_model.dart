@@ -12,6 +12,7 @@ class PedidoModel {
   final String localizador;
   final String descricao;
   final DateTime createdAt;
+  final DateTime? deliveryAt;
   final ClienteModel cliente;
   final ObraModel obra;
   final List<PedidoProdutoModel> produtos;
@@ -20,14 +21,18 @@ class PedidoModel {
 
   bool get isChangeStatusAvailable =>
       tipo == PedidoTipo.cda &&
-      [PedidoStatus.aguardandoProducaoCDA, PedidoStatus.produzindoCDA, PedidoStatus.pronto]
-          .contains(statusess.last.status);
+      [
+        PedidoStatus.aguardandoProducaoCDA,
+        PedidoStatus.produzindoCDA,
+        PedidoStatus.pronto
+      ].contains(statusess.last.status);
 
   PedidoModel({
     required this.id,
     required this.localizador,
     required this.descricao,
     required this.createdAt,
+    required this.deliveryAt,
     required this.cliente,
     required this.obra,
     required this.produtos,
@@ -44,12 +49,15 @@ class PedidoModel {
   }
 
   double getQtdeTotal() {
-    return produtos.fold(0, (previousValue, element) => previousValue + element.qtde);
+    return produtos.fold(
+        0, (previousValue, element) => previousValue + element.qtde);
   }
 
   double getQtdeAguardandoProducao() {
     return produtos
-        .where((e) => e.statusess.last.getStatusView() == PedidoProdutoStatus.aguardandoProducao)
+        .where((e) =>
+            e.statusess.last.getStatusView() ==
+            PedidoProdutoStatus.aguardandoProducao)
         .fold(0, (previousValue, element) => previousValue + element.qtde);
   }
 
@@ -97,6 +105,7 @@ class PedidoModel {
       'produtos': produtos.map((x) => x.toMap()).toList(),
       'tipo': tipo.index,
       'status': statusess.map((x) => x.toMap()).toList(),
+      'deliveryAt': deliveryAt?.millisecondsSinceEpoch,
     };
   }
 
@@ -106,19 +115,23 @@ class PedidoModel {
       descricao: map['descricao'] ?? '',
       id: map['id'] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      deliveryAt: map['deliveryAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['deliveryAt'])
+          : null,
       cliente: ClienteModel.fromMap(map['cliente']),
       obra: ObraModel.fromMap(map['obra']),
       tipo: PedidoTipo.values[map['tipo']],
-      statusess:
-          List<PedidoStatusModel>.from(map['status']?.map((x) => PedidoStatusModel.fromMap(x))),
-      produtos:
-          List<PedidoProdutoModel>.from(map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
+      statusess: List<PedidoStatusModel>.from(
+          map['status']?.map((x) => PedidoStatusModel.fromMap(x))),
+      produtos: List<PedidoProdutoModel>.from(
+          map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory PedidoModel.fromJson(String source) => PedidoModel.fromMap(json.decode(source));
+  factory PedidoModel.fromJson(String source) =>
+      PedidoModel.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -135,6 +148,7 @@ class PedidoModel {
     List<PedidoProdutoModel>? produtos,
     PedidoTipo? tipo,
     List<PedidoStatusModel>? statusess,
+    DateTime? deliveryAt,
   }) {
     return PedidoModel(
       id: id ?? this.id,
@@ -146,6 +160,7 @@ class PedidoModel {
       produtos: produtos ?? this.produtos,
       tipo: tipo ?? this.tipo,
       statusess: statusess ?? this.statusess,
+      deliveryAt: deliveryAt ?? this.deliveryAt,
     );
   }
 }

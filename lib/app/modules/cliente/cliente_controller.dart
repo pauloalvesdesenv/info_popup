@@ -18,20 +18,26 @@ class ClienteController {
 
   factory ClienteController() => _instance;
 
-  final AppStream<ClienteModel?> clienteStream = AppStream<ClienteModel?>.seed(null);
+  final AppStream<ClienteModel?> clienteStream =
+      AppStream<ClienteModel?>.seed(null);
   ClienteModel? get cliente => clienteStream.value;
 
-  final AppStream<ClienteUtils> utilsStream = AppStream<ClienteUtils>.seed(ClienteUtils());
+  final AppStream<ClienteUtils> utilsStream =
+      AppStream<ClienteUtils>.seed(ClienteUtils());
   ClienteUtils get utils => utilsStream.value;
 
-  final AppStream<ClienteCreateModel> formStream = AppStream<ClienteCreateModel>();
+  final AppStream<ClienteCreateModel> formStream =
+      AppStream<ClienteCreateModel>();
   ClienteCreateModel get form => formStream.value;
 
   void init(ClienteModel? cliente) {
-    formStream.add(cliente != null ? ClienteCreateModel.edit(cliente) : ClienteCreateModel());
+    formStream.add(cliente != null
+        ? ClienteCreateModel.edit(cliente)
+        : ClienteCreateModel());
   }
 
-  List<ClienteModel> getClienteesFiltered(String search, List<ClienteModel> clientes) {
+  List<ClienteModel> getClienteesFiltered(
+      String search, List<ClienteModel> clientes) {
     if (search.length < 3) return clientes;
     List<ClienteModel> filtered = [];
     for (final cliente in clientes) {
@@ -57,10 +63,12 @@ class ClienteController {
         pop(_);
       }
       NotificationService.showPositive(
-          'Cliente ${form.isEdit ? 'Editado' : 'Adicionado'}', 'Operação realizada com sucesso',
+          'Cliente ${form.isEdit ? 'Editado' : 'Adicionado'}',
+          'Operação realizada com sucesso',
           position: NotificationPosition.bottom);
     } catch (e) {
-      NotificationService.showNegative('Erro', e.toString(), position: NotificationPosition.bottom);
+      NotificationService.showNegative('Erro', e.toString(),
+          position: NotificationPosition.bottom);
     }
   }
 
@@ -68,18 +76,31 @@ class ClienteController {
     if (await _isDeleteUnavailable(cliente)) return;
     await FirestoreClient.clientes.delete(cliente);
     pop(_);
-    NotificationService.showPositive('Cliente Excluido', 'Operação realizada com sucesso',
+    NotificationService.showPositive(
+        'Cliente Excluido', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
   }
 
-  Future<bool> _isDeleteUnavailable(ClienteModel cliente) async => !await onDeleteProcess(
+  Future<bool> _isDeleteUnavailable(ClienteModel cliente) async =>
+      !await onDeleteProcess(
         deleteTitle: 'Deseja excluir o cliente?',
         deleteMessage: 'Todos seus dados serão apagados do sistema',
-        infoMessage: 'Não é possível exlcuir o cliente, pois ele está vinculado a um pedido.',
-        conditional: FirestoreClient.pedidos.data.any((e) => e.cliente.id == cliente.id),
+        infoMessage:
+            'Não é possível exlcuir o cliente, pois ele está vinculado a um pedido.',
+        conditional:
+            FirestoreClient.pedidos.data.any((e) => e.cliente.id == cliente.id),
       );
 
   void onValid() {
+    if (FirestoreClient.clientes.data.any((e) => e.nome == form.nome.text)) {
+      throw Exception('Já existe um cliente com esse nome');
+    }
+    if (FirestoreClient.clientes.data.any((e) => e.cpf == form.cpf.text)) {
+      throw Exception('Já existe um cliente com esse CPF/CNPJ');
+    }
+    if (FirestoreClient.clientes.data.any((e) => e.cpf == form.cpf.text)) {
+      throw Exception('Já existe um cliente com esse nome');
+    }
     if (form.nome.text.length < 2) {
       throw Exception('Nome deve conter no mínimo 3 caracteres');
     }

@@ -4,10 +4,12 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 
 class PedidoUtils {
   final TextController search = TextController();
@@ -23,13 +25,33 @@ class PedidoCreateModel {
   ObraModel? obra;
   PedidoTipo? tipo;
   PedidoProdutoCreateModel produto = PedidoProdutoCreateModel();
+  FocusNode produtoFocus = FocusNode();
+  final GlobalKey produtoKey = GlobalKey();
   List<PedidoProdutoCreateModel> produtos = [];
+  DateTime? deliveryAt;
+  ExpansionTileController tileController = ExpansionTileController();
 
   late bool isEdit;
 
   PedidoCreateModel()
       : id = (FirestoreClient.pedidos.data.length + 1).toString(),
         isEdit = false;
+
+  String getDetails() {
+    List<String> localizador = [];
+    localizador.add(this.localizador.text.isEmpty
+        ? 'Localizador não informado'
+        : this.localizador.text);
+    localizador.add(tipo?.label ?? 'Tipo não informado');
+    localizador.add(
+        descricao.text.isEmpty ? 'Descrição não informada' : descricao.text);
+    localizador.add(cliente?.nome ?? 'Cliente não informado');
+    localizador.add(obra?.descricao ?? 'Obra não informada');
+    localizador.add(deliveryAt == null
+        ? 'Data de entrega não informada'
+        : deliveryAt!.text());
+    return localizador.join(' - ');
+  }
 
   PedidoCreateModel.edit(PedidoModel pedido)
       : id = pedido.id,
@@ -39,7 +61,9 @@ class PedidoCreateModel {
     cliente = FirestoreClient.clientes.getById(pedido.cliente.id);
     obra = cliente?.obras.firstWhereOrNull((e) => e.id == pedido.obra.id);
     tipo = pedido.tipo;
-    produtos = pedido.produtos.map((e) => PedidoProdutoCreateModel.edit(e)).toList();
+    produtos =
+        pedido.produtos.map((e) => PedidoProdutoCreateModel.edit(e)).toList();
+    deliveryAt = pedido.deliveryAt;
   }
 
   PedidoModel toPedidoModel(PedidoModel? pedido) => PedidoModel(
@@ -56,7 +80,9 @@ class PedidoCreateModel {
         createdAt: pedido?.createdAt ?? DateTime.now(),
         cliente: cliente!,
         obra: obra!,
-        produtos:
-            produtos.map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith()).toList(),
+        produtos: produtos
+            .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
+            .toList(),
+        deliveryAt: deliveryAt,
       );
 }

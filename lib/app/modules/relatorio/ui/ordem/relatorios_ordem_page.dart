@@ -100,7 +100,6 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
                         )
                       ],
                     ),
-
                     const H(16),
                   },
                   if (model.type == RelatorioOrdemType.STATUS) ...{
@@ -242,7 +241,8 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
           for (final produto in ordem.produtos)
             Column(
               children: [
-                itemInfo('${produto.cliente.nome} - ${produto.obra.descricao}',
+                itemInfo(
+                    '${produto.pedido.localizador} - ${produto.cliente.nome} - ${produto.obra.descricao}',
                     '${produto.qtde}Kg'),
                 Divisor(
                   color: Colors.grey[200],

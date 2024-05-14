@@ -1,4 +1,6 @@
+import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -8,6 +10,8 @@ import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/done_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -63,22 +67,41 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: AppDropDown<ProdutoModel?>(
-                  disable: form.isEdit,
-                  label: 'Produto',
-                  item: form.produto,
-                  itens: FirestoreClient.produtos.data,
-                  itemLabel: (e) => e!.descricao,
-                  onSelect: (e) {
-                    form.produto = e;
-                    form.produtos.clear();
-                    ordemCtrl.formStream.update();
-                  },
+                child: Column(
+                  children: [
+                    AppDropDown<ProdutoModel?>(
+                      disable: form.isEdit,
+                      label: 'Produto',
+                      item: form.produto,
+                      itens: FirestoreClient.produtos.data,
+                      itemLabel: (e) => e!.descricao,
+                      onSelect: (e) {
+                        form.produto = e;
+                        form.produtos.clear();
+                        ordemCtrl.formStream.update();
+                      },
+                    ),
+                    const H(16),
+                    AppDropDown<ClienteModel?>(
+                      label: 'Filtrar por cliente',
+                      required: false,
+                      item: form.cliente,
+                      itens: FirestoreClient.clientes.data,
+                      itemLabel: (e) => e!.nome,
+                      onSelect: (e) {
+                        form.cliente = e;
+                        ordemCtrl.formStream.update();
+                      },
+                    ),
+                  ],
                 ),
               ),
-              const H(16),
               if (form.isEdit)
-                for (var produto in widget.ordem!.produtos)
+                for (var produto in widget.ordem!.produtos
+                    .where((e) =>
+                        form.cliente == null ||
+                        form.cliente!.id == e.pedido.cliente.id)
+                    .toList())
                   _itemProduto(
                     produto: produto,
                     check: produto.selected,
@@ -165,8 +188,32 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          children: [
+                            Text(
+                              '${produto.cliente.nome} - ${produto.obra.descricao}',
+                              style: const TextStyle(),
+                            ),
+                            const W(8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                  color: produto.pedido.tipo.backgroundColor,
+                                  borderRadius: BorderRadius.circular(4)),
+                              child: Text(produto.pedido.tipo.label,
+                                  style: AppCss.minimumBold
+                                      .setColor(
+                                          produto.pedido.tipo.foregroundColor)
+                                      .setSize(11)),
+                            )
+                          ],
+                        ),
                         Text(
-                          '${produto.cliente.nome} - ${produto.obra.descricao}',
+                          'DATA ENTREGA: ${produto.pedido.deliveryAt.text()}',
+                          style: AppCss.minimumRegular
+                              .copyWith(fontSize: 12)
+                              .setColor(AppColors.neutralDark),
                         ),
                         Text(
                           '${produto.qtde}Kg',

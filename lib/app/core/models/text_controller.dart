@@ -36,4 +36,9 @@ class TextController<T> {
 
   String? get mask =>
       (controller is MaskedTextController) ? (controller as MaskedTextController).mask : null;
+
+  void updateMask(String mask){
+      (controller as MaskedTextController).updateMask(mask);
+  }
+
 }

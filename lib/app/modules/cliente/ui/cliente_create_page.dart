@@ -5,6 +5,7 @@ import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/done_button.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/enums/obra_status.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
@@ -14,6 +15,8 @@ import 'package:aco_plus/app/modules/cliente/cliente_controller.dart';
 import 'package:aco_plus/app/modules/cliente/cliente_view_model.dart';
 import 'package:aco_plus/app/modules/endereco/endereco_create_page.dart';
 import 'package:aco_plus/app/modules/obra/ui/obra_create_page.dart';
+import 'package:cpf_cnpj_validator/cnpj_validator.dart';
+import 'package:cpf_cnpj_validator/cpf_validator.dart';
 import 'package:flutter/material.dart';
 
 class ClienteCreatePage extends StatefulWidget {
@@ -38,20 +41,31 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
         resizeAvoid: true,
         appBar: AppBar(
           leading: IconButton(
-              onPressed: () => pop(context),
+              onPressed: () async {
+                if (await showConfirmDialog(
+                    'Deseja realmente sair?',
+                    widget.cliente != null
+                        ? 'A edição que realizou será perdida'
+                        : 'Os dados do cliente serão perdidos.')) {
+                  pop(context);
+                }
+              },
               icon: Icon(
                 Icons.arrow_back,
                 color: AppColors.white,
               )),
-          title: Text('${clienteCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Cliente',
+          title: Text(
+              '${clienteCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Cliente',
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
-            IconLoadingButton(() async =>
-                await clienteCtrl.onConfirm(context, widget.cliente, widget.isFromOrder))
+            IconLoadingButton(() async => await clienteCtrl.onConfirm(
+                context, widget.cliente, widget.isFromOrder))
           ],
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(stream: clienteCtrl.formStream.listen, builder: (_, form) => body(form)));
+        body: StreamOut(
+            stream: clienteCtrl.formStream.listen,
+            builder: (_, form) => body(form)));
   }
 
   Widget body(ClienteCreateModel form) {
@@ -72,16 +86,25 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
         ),
         const H(16),
         AppField(
-          label: 'CPF',
+          label: 'CPF/CNPJ',
           required: false,
           controller: form.cpf,
-          hint: '000.000.000-00',
-          onChanged: (_) => clienteCtrl.formStream.update(),
+          onChanged: (_) {
+            if (_.length == 11 && CPFValidator.isValid(form.cpf.text)) {
+              form.cpf.updateMask('000.000.000-00');
+            } else if (_.length == 14 && CNPJValidator.isValid(form.cpf.text)) {
+              form.cpf.updateMask('00.000.000/0000-00');
+            } else {
+              form.cpf.updateMask('00000000000000000');
+            }
+            clienteCtrl.formStream.update();
+          },
         ),
         const H(16),
         InkWell(
           onTap: () async {
-            final endereco = await push(context, EnderecoCreatePage(endereco: form.endereco));
+            final endereco = await push(
+                context, EnderecoCreatePage(endereco: form.endereco));
             if (endereco != null) {
               form.endereco = endereco;
               clienteCtrl.formStream.update();
@@ -93,7 +116,8 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
               required: false,
               suffixIconSize: 12,
               suffixIcon: Icons.arrow_forward_ios,
-              controller: TextController(text: form.endereco?.name.toString() ?? ''),
+              controller:
+                  TextController(text: form.endereco?.name.toString() ?? ''),
               onChanged: (_) => clienteCtrl.formStream.update(),
               hint: 'Clique para adicionar',
             ),
@@ -105,9 +129,11 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
           title: 'Obras ',
           createPage: ObraCreatePage(endereco: form.endereco),
           onEdit: (obraForm) async {
-            ObraModel? obra = await push(context, ObraCreatePage(obra: obraForm));
+            ObraModel? obra =
+                await push(context, ObraCreatePage(obra: obraForm));
             if (obra != null) {
-              final i = form.obras.map((e) => e.id).toList().indexOf(obraForm.id);
+              final i =
+                  form.obras.map((e) => e.id).toList().indexOf(obraForm.id);
               if (obra.id != 'delete') {
                 form.obras[i] = obra;
               } else {
@@ -131,7 +157,8 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                    color: e.status.color.withOpacity(0.5), borderRadius: AppCss.radius4),
+                    color: e.status.color.withOpacity(0.5),
+                    borderRadius: AppCss.radius4),
                 child: Text(
                   e.status.label,
                   style: AppCss.minimumBold.setSize(11),
@@ -144,11 +171,13 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
         if (form.isEdit)
           TextButton.icon(
               style: ButtonStyle(
-                fixedSize: const MaterialStatePropertyAll(Size.fromWidth(double.maxFinite)),
+                fixedSize: const MaterialStatePropertyAll(
+                    Size.fromWidth(double.maxFinite)),
                 foregroundColor: MaterialStatePropertyAll(AppColors.error),
                 backgroundColor: MaterialStatePropertyAll(AppColors.white),
                 shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                    borderRadius: AppCss.radius8, side: BorderSide(color: AppColors.error))),
+                    borderRadius: AppCss.radius8,
+                    side: BorderSide(color: AppColors.error))),
               ),
               onPressed: () => clienteCtrl.onDelete(context, widget.cliente!),
               label: const Text('Excluir'),

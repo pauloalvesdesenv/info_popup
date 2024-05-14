@@ -13,7 +13,8 @@ import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
-Future<ClienteModel?> showClienteCreateSimplifyBottom() async => showModalBottomSheet(
+Future<ClienteModel?> showClienteCreateSimplifyBottom() async =>
+    showModalBottomSheet(
       backgroundColor: AppColors.white,
       context: contextGlobal,
       isScrollControlled: true,
@@ -24,10 +25,12 @@ class ClienteCreateSimplifyBottom extends StatefulWidget {
   const ClienteCreateSimplifyBottom({super.key});
 
   @override
-  State<ClienteCreateSimplifyBottom> createState() => _ClienteCreateSimplifyBottomState();
+  State<ClienteCreateSimplifyBottom> createState() =>
+      _ClienteCreateSimplifyBottomState();
 }
 
-class _ClienteCreateSimplifyBottomState extends State<ClienteCreateSimplifyBottom> {
+class _ClienteCreateSimplifyBottomState
+    extends State<ClienteCreateSimplifyBottom> {
   final TextController cliente = TextController();
   final TextController obra = TextController();
 
@@ -41,13 +44,15 @@ class _ClienteCreateSimplifyBottomState extends State<ClienteCreateSimplifyBotto
   Widget build(BuildContext context) {
     return BottomSheet(
         onClosing: () {},
-        builder: (context) => KeyboardVisibilityBuilder(builder: (context, isVisible) {
+        builder: (context) =>
+            KeyboardVisibilityBuilder(builder: (context, isVisible) {
               return Container(
                 height: isVisible ? 700 : 400,
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24)),
                 ),
                 child: ListView(
                   children: [
@@ -58,9 +63,12 @@ class _ClienteCreateSimplifyBottomState extends State<ClienteCreateSimplifyBotto
                         padding: const EdgeInsets.only(left: 8),
                         child: IconButton(
                           style: ButtonStyle(
-                              padding: const MaterialStatePropertyAll(EdgeInsets.all(16)),
-                              backgroundColor: MaterialStatePropertyAll(AppColors.white),
-                              foregroundColor: MaterialStatePropertyAll(AppColors.black)),
+                              padding: const MaterialStatePropertyAll(
+                                  EdgeInsets.all(16)),
+                              backgroundColor:
+                                  MaterialStatePropertyAll(AppColors.white),
+                              foregroundColor:
+                                  MaterialStatePropertyAll(AppColors.black)),
                           onPressed: () => Navigator.pop(context),
                           icon: const Icon(Icons.keyboard_backspace),
                         ),
@@ -89,31 +97,20 @@ class _ClienteCreateSimplifyBottomState extends State<ClienteCreateSimplifyBotto
                                 label: 'Obra',
                                 controller: obra,
                                 onChanged: (_) => setState(() {}),
+                                onEditingComplete: () {
+                                  if (cliente.text.isNotEmpty &&
+                                      obra.text.isNotEmpty) {
+                                    onConfirm(context);
+                                  }
+                                },
                               ),
                               const H(16),
                               const H(16),
                               AppTextButton(
                                 label: 'Confirmar',
-                                isEnable: cliente.text.isNotEmpty && obra.text.isNotEmpty,
-                                onPressed: () async {
-                                  final ClienteModel clienteModel = ClienteModel(
-                                      id: HashService.get,
-                                      telefone: '',
-                                      cpf: '',
-                                      endereco: EnderecoModel.empty(),
-                                      nome: cliente.text,
-                                      obras: [
-                                        ObraModel(
-                                            id: HashService.get,
-                                            descricao: obra.text,
-                                            telefoneFixo: '',
-                                            endereco: EnderecoModel.empty(),
-                                            status: ObraStatus.emAndamento)
-                                      ]);
-                                  await FirestoreClient.clientes.add(clienteModel);
-                                  FirestoreClient.clientes.dataStream.update();
-                                  Navigator.pop(context, clienteModel);
-                                },
+                                isEnable: cliente.text.isNotEmpty &&
+                                    obra.text.isNotEmpty,
+                                onPressed: () async => await onConfirm(context),
                               )
                             ],
                           )
@@ -124,5 +121,25 @@ class _ClienteCreateSimplifyBottomState extends State<ClienteCreateSimplifyBotto
                 ),
               );
             }));
+  }
+
+  Future<void> onConfirm(BuildContext context) async {
+    final ClienteModel clienteModel = ClienteModel(
+        id: HashService.get,
+        telefone: '',
+        cpf: '',
+        endereco: EnderecoModel.empty(),
+        nome: cliente.text,
+        obras: [
+          ObraModel(
+              id: HashService.get,
+              descricao: obra.text,
+              telefoneFixo: '',
+              endereco: EnderecoModel.empty(),
+              status: ObraStatus.emAndamento)
+        ]);
+    await FirestoreClient.clientes.add(clienteModel);
+    FirestoreClient.clientes.dataStream.update();
+    Navigator.pop(context, clienteModel);
   }
 }

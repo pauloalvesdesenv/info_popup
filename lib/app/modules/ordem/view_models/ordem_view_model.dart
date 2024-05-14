@@ -1,3 +1,4 @@
+import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
@@ -11,6 +12,7 @@ class OrdemUtils {
 class OrdemCreateModel {
   String id;
   ProdutoModel? produto;
+  ClienteModel? cliente;
   List<PedidoProdutoModel> produtos = [];
 
   late bool isEdit;
@@ -34,7 +36,9 @@ class OrdemCreateModel {
       produtos: [
         ...produtos.where((e) => e.selected).toList(),
         if (ordem != null)
-          ...ordem.produtos.where((e) => e.status.status.index >= 2 || e.selected).toList()
+          ...ordem.produtos
+              .where((e) => e.status.status.index >= 2 || e.selected)
+              .toList()
       ],
     );
   }

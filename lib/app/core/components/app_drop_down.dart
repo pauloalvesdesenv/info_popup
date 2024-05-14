@@ -11,6 +11,8 @@ class AppDropDown<T> extends StatefulWidget {
   final void Function(T) onSelect;
   final bool required;
   final bool disable;
+  final FocusNode? focus;
+  final GlobalKey? dropdownKey;
 
   const AppDropDown({
     required this.label,
@@ -18,8 +20,10 @@ class AppDropDown<T> extends StatefulWidget {
     required this.itens,
     required this.itemLabel,
     required this.onSelect,
+    this.focus,
     this.required = true,
     this.disable = false,
+    this.dropdownKey,
     super.key,
   });
 
@@ -44,9 +48,14 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.neutralMedium),
               borderRadius: AppCss.radius8,
-              color: widget.disable ? AppColors.neutralMedium.withOpacity(0.4) : null,
+              color: widget.disable
+                  ? AppColors.neutralMedium.withOpacity(0.4)
+                  : null,
             ),
             child: DropdownButton<T>(
+              key: widget.dropdownKey,
+              focusNode: widget.focus,
+              enableFeedback: true,
               padding: const EdgeInsets.only(left: 8),
               value: widget.item,
               isExpanded: true,
@@ -65,7 +74,9 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(10),
-                          child: Icon(widget.item != null ? Icons.close : Icons.arrow_drop_down),
+                          child: Icon(widget.item != null
+                              ? Icons.close
+                              : Icons.arrow_drop_down),
                         ),
                       ),
                     ),
@@ -77,10 +88,53 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
                   .toList(),
             ),
           ),
+          // DropdownButtonFormField2<T>(
+          //   isExpanded: true,
+          //   focusNode: widget.focus,
+          //   decoration: const InputDecoration(
+          //     contentPadding: EdgeInsets.symmetric(vertical: 12),
+          //   ),
+          //   hint: const Text(
+          //     'Selecione',
+          //     style: TextStyle(fontSize: 16),
+          //   ),
+          //   value: widget.item,
+          //   items: widget.itens
+          //       .map((item) => DropdownMenuItem<T>(
+          //             value: item,
+          //             child: Text(
+          //               widget.itemLabel.call(item),
+          //               style: const TextStyle(
+          //                 fontSize: 16,
+          //               ),
+          //             ),
+          //           ))
+          //       .toList(),
+          //   onChanged: (value) => widget.onSelect.call(value as T),
+          //   buttonStyleData: const ButtonStyleData(
+          //     padding: EdgeInsets.only(right: 8),
+          //   ),
+          //   iconStyleData: const IconStyleData(
+          //     icon: Icon(
+          //       Icons.arrow_drop_down,
+          //       color: Colors.black45,
+          //     ),
+          //     iconSize: 24,
+          //   ),
+          //   dropdownStyleData: DropdownStyleData(
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.circular(15),
+          //     ),
+          //   ),
+          //   menuItemStyleData: const MenuItemStyleData(
+          //     padding: EdgeInsets.symmetric(horizontal: 16),
+          //   ),
+          // ),
         ],
       ),
     );
   }
 
-  String label(_) => (_ != null ? (_.label as String) : 'all').replaceAll('\n', ' ');
+  String label(_) =>
+      (_ != null ? (_.label as String) : 'all').replaceAll('\n', ' ');
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -14,6 +15,8 @@ class PedidoProdutoModel {
   final List<PedidoProdutoStatusModel> statusess;
   final double qtde;
   bool selected = true;
+
+  PedidoModel get pedido => FirestoreClient.pedidos.getById(pedidoId);
 
   ClienteModel get cliente => FirestoreClient.clientes.getById(clienteId);
   ObraModel get obra => cliente.obras.firstWhere((e) => e.id == obraId);
