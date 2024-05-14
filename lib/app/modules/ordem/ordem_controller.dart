@@ -40,7 +40,7 @@ class OrdemController {
   List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
     for (var pedido in FirestoreClient.pedidos.data
-        .where((e) => form.cliente == null || form.cliente!.id! == e.cliente.id)
+        .where((e) => form.cliente == null || form.cliente!.id == e.cliente.id)
         .toList()) {
       for (var pedidoProduto in pedido.produtos
           .where((e) =>
