@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
@@ -13,6 +14,8 @@ import 'package:flutter/material.dart';
 
 class PedidoUtils {
   final TextController search = TextController();
+  SortType sortType = SortType.alfabetic;
+  SortOrder sortOrder = SortOrder.asc;
 }
 
 class PedidoCreateModel {
@@ -20,6 +23,7 @@ class PedidoCreateModel {
   final TextController localizador = TextController();
   final TextController nome = TextController();
   final TextController descricao = TextController();
+  final TextController clienteEC = TextController();
   ClienteModel? cliente;
   ClienteModel? clienteAdd;
   ObraModel? obra;

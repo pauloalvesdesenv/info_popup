@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
@@ -107,10 +108,7 @@ class PedidoController {
     if (form.obra == null) {
       throw Exception('Selecione a obra do pedido');
     }
-
   }
-
-
 
   //PEDIDO
   final AppStream<PedidoModel> pedidoStream = AppStream<PedidoModel>();
@@ -133,28 +131,49 @@ class PedidoController {
     await FirestoreClient.pedidos.update(pedido);
   }
 
-  Future<void> onVerifyPedidoStatus()async {
+  Future<void> onVerifyPedidoStatus() async {
     final ordens = FirestoreClient.ordens.data;
     for (var pedido in FirestoreClient.pedidos.data) {
       for (var produtoPedido in pedido.produtos) {
-      bool hasInOrder = false;
-for (var ordem in ordens) {
-        for (var produtoOrdem in ordem.produtos) {
-          if(pedido.id == produtoOrdem.pedidoId && produtoPedido.id ==produtoOrdem.id){
-            hasInOrder = true;
-            break;
+        bool hasInOrder = false;
+        for (var ordem in ordens) {
+          for (var produtoOrdem in ordem.produtos) {
+            if (pedido.id == produtoOrdem.pedidoId &&
+                produtoPedido.id == produtoOrdem.id) {
+              hasInOrder = true;
+              break;
+            }
           }
         }
-      }    
-      if(!hasInOrder && produtoPedido.status.status == PedidoProdutoStatus.aguardandoProducao){
-        produtoPedido.statusess.clear();
-      produtoPedido.statusess.add(PedidoProdutoStatusModel(
-          id: HashService.get,
-          status: PedidoProdutoStatus.separado,
-          createdAt: DateTime.now()));
-      }    
+        if (!hasInOrder &&
+            produtoPedido.status.status ==
+                PedidoProdutoStatus.aguardandoProducao) {
+          produtoPedido.statusess.clear();
+          produtoPedido.statusess.add(PedidoProdutoStatusModel(
+              id: HashService.get,
+              status: PedidoProdutoStatus.separado,
+              createdAt: DateTime.now()));
+        }
       }
       await FirestoreClient.pedidos.update(pedido);
+    }
+  }
+
+  void onSortPedidos(List<PedidoModel> pedidos) {
+    bool isAsc = utils.sortOrder == SortOrder.asc;
+    switch (utils.sortType) {
+      case SortType.alfabetic:
+        pedidos.sort((a, b) => isAsc
+            ? a.cliente.nome.compareTo(b.cliente.nome)
+            : b.cliente.nome.compareTo(a.cliente.nome));
+        break;
+      case SortType.date:
+        pedidos.sort((a, b) => isAsc
+            ? (a.deliveryAt ?? DateTime.now())
+                .compareTo((b.deliveryAt ?? DateTime.now()))
+            : (b.deliveryAt ?? DateTime.now())
+                .compareTo((a.deliveryAt ?? DateTime.now())));
+        break;
     }
   }
 }

@@ -15,6 +15,7 @@ class PedidoProdutoModel {
   final List<PedidoProdutoStatusModel> statusess;
   final double qtde;
   bool selected = true;
+  
 
   PedidoModel get pedido => FirestoreClient.pedidos.getById(pedidoId);
 

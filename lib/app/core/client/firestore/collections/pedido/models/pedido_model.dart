@@ -133,10 +133,6 @@ class PedidoModel {
   factory PedidoModel.fromJson(String source) =>
       PedidoModel.fromMap(json.decode(source));
 
-  @override
-  String toString() {
-    return 'PedidoModel(id: $id, localizador: $localizador, createdAt: $createdAt, cliente: $cliente, obra: $obra, produtos: $produtos, tipo: $tipo, statusess: $statusess)';
-  }
 
   PedidoModel copyWith({
     String? id,
@@ -162,5 +158,10 @@ class PedidoModel {
       statusess: statusess ?? this.statusess,
       deliveryAt: deliveryAt ?? this.deliveryAt,
     );
+  }
+
+  @override
+  String toString() {
+    return 'PedidoModel(id: id, localizador: $localizador, descricao: $descricao, createdAt: $createdAt, deliveryAt: $deliveryAt, cliente: $cliente, obra: $obra, produtos: $produtos, tipo: $tipo, statusess: $statusess)';
   }
 }

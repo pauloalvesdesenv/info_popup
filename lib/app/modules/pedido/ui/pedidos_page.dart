@@ -2,12 +2,15 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
+import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/empty_data.dart';
+import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
@@ -59,15 +62,50 @@ class _PedidosPageState extends State<PedidosPage> {
           builder: (_, utils) {
             final pedidos =
                 pedidoCtrl.getPedidoesFiltered(utils.search.text, __).toList();
+                pedidoCtrl.onSortPedidos(pedidos);
             return Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: AppField(
-                    hint: 'Pesquisar',
-                    controller: utils.search,
-                    suffixIcon: Icons.search,
-                    onChanged: (_) => pedidoCtrl.utilsStream.update(),
+                  child: Column(
+                    children: [
+                      AppField(
+                        hint: 'Pesquisar',
+                        controller: utils.search,
+                        suffixIcon: Icons.search,
+                        onChanged: (_) => pedidoCtrl.utilsStream.update(),
+                      ),
+                      const H(16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppDropDown<SortType>(
+                            label: 'Ordernar por',
+                            item: utils.sortType,
+                            itens: SortType.values,
+                            itemLabel: (e) => e.name,
+                            onSelect: (e) {
+                              utils.sortType = e;
+                              pedidoCtrl.utilsStream.update();
+                            },
+                          ),
+                        ),
+                        const W(16),
+                        Expanded(
+                          child: AppDropDown<SortOrder>(
+                            label: 'Ordernar',
+                            item: utils.sortOrder,
+                            itens: SortOrder.values,
+                            itemLabel: (e) => e.name,
+                            onSelect: (e) {
+                              utils.sortOrder = e;
+                              pedidoCtrl.utilsStream.update();
+                            },
+                          ),
+                        ),
+                      ],
+                    )
+                    ],
                   ),
                 ),
                 Expanded(

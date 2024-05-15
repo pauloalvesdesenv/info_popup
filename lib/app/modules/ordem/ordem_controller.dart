@@ -271,6 +271,7 @@ class OrdemController {
     await FirestoreClient.ordens.update(ordem);
     await FirestoreClient.pedidos.update(pedido);
     await onSetStatusPedido(produto);
+    FirestoreClient.ordens.dataStream.update();
   }
 
   Future<void> onSetStatusPedido(PedidoProdutoModel produto) async {
