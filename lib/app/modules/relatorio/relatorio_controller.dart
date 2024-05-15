@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:html' as html;
-
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
@@ -11,6 +8,7 @@ import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
+import '';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_ordem_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_status_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/pedido/relatorio_pedido_pdf_page.dart';
@@ -19,6 +17,8 @@ import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_pedido_view
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_web.dart'
+    if (dart.library.io) 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_mobile.dart';
 
 final relatorioCtrl = PedidoController();
 
@@ -62,14 +62,10 @@ class PedidoController {
             RelatorioPedidoPdfPage(pedidoViewModel.relatorio!)
                 .build(imageBytes)));
 
-    var savedFile = await pdf.save();
-    List<int> fileInts = List.from(savedFile);
-    html.AnchorElement(
-        href:
-            "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}")
-      ..setAttribute("download",
-          "m2_relatorio_cliente_${pedidoViewModel.cliente?.nome.toLowerCase().replaceAll(' ', '_')}_status_${pedidoViewModel.status!.label.toLowerCase()}${DateTime.now().toFileName()}.pdf")
-      ..click();
+    await downloadPDF(
+        "m2_relatorio_cliente_${pedidoViewModel.cliente?.nome.toLowerCase().replaceAll(' ', '_')}_status_${pedidoViewModel.status!.label.toLowerCase()}${DateTime.now().toFileName()}.pdf",
+        '/relatorio/pedido/',
+        await pdf.save());
   }
 
   final AppStream<RelatorioOrdemViewModel> ordemViewModelStream =
@@ -85,7 +81,8 @@ class PedidoController {
   }
 
   void onCreateRelatorioOrdemStatus() {
-    List<OrdemModel> ordens = FirestoreClient.ordens.data.map((e) => e.copyWith()).toList();
+    List<OrdemModel> ordens =
+        FirestoreClient.ordens.data.map((e) => e.copyWith()).toList();
     for (final ordem in ordens) {
       ordem.produtos = ordem.produtos
           .where((e) => _whereProductStatus(e, ordemViewModel.status!))
@@ -199,23 +196,19 @@ class PedidoController {
                   .build(imageBytes));
         }));
 
-    var savedFile = await pdf.save();
-    List<int> fileInts = List.from(savedFile);
-    html.AnchorElement(
-        href:
-            "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}")
-      ..setAttribute(
-          "download",
-          isOrdemType
-              ? "m2_relatorio_ordem_${ordemViewModel.relatorio!.ordem.id.toLowerCase()}${DateTime.now().toFileName()}.pdf"
-              : "m2_relatorio_bitola_status_${ordemViewModel.status!.label.toLowerCase()}${DateTime.now().toFileName()}.pdf")
-      ..click();
+    final name = isOrdemType
+        ? "m2_relatorio_ordem_${ordemViewModel.relatorio!.ordem.id.toLowerCase()}${DateTime.now().toFileName()}.pdf"
+        : "m2_relatorio_bitola_status_${ordemViewModel.status!.label.toLowerCase()}${DateTime.now().toFileName()}.pdf";
+
+    await downloadPDF(name, '/relatorio/ordem/', await pdf.save());
   }
 
   Future<void> onSearchRelatorio() async {
     try {
-      final ordem = FirestoreClient.ordens.data.map((e) => e.copyWith()).firstWhere((e) =>
-          e.id.toCompare.contains(ordemViewModel.ordemEC.text.toCompare));
+      final ordem = FirestoreClient.ordens.data
+          .map((e) => e.copyWith())
+          .firstWhere((e) =>
+              e.id.toCompare.contains(ordemViewModel.ordemEC.text.toCompare));
       ordemViewModel.ordem = ordem;
       ordemViewModelStream.update();
       onCreateRelatorio();

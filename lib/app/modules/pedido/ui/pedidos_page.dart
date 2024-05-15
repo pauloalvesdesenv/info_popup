@@ -40,7 +40,8 @@ class _PedidosPageState extends State<PedidosPage> {
             color: AppColors.white,
           ),
         ),
-        title: Text('Pedidos', style: AppCss.largeBold.setColor(AppColors.white)),
+        title:
+            Text('Pedidos', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
           IconButton(
               onPressed: () => push(context, const PedidoCreatePage()),
@@ -56,7 +57,8 @@ class _PedidosPageState extends State<PedidosPage> {
         builder: (_, __) => StreamOut<PedidoUtils>(
           stream: pedidoCtrl.utilsStream.listen,
           builder: (_, utils) {
-            final pedidos = pedidoCtrl.getPedidoesFiltered(utils.search.text, __).toList();
+            final pedidos =
+                pedidoCtrl.getPedidoesFiltered(utils.search.text, __).toList();
             return Column(
               children: [
                 Padding(
@@ -114,22 +116,29 @@ class _PedidosPageState extends State<PedidosPage> {
                     pedido.produtos
                         .map((e) => '${'${e.produto.descricao} - ${e.qtde}'}Kg')
                         .join(', '),
-                    style: AppCss.minimumRegular.setSize(11).setColor(AppColors.black),
+                    style: AppCss.minimumRegular
+                        .setSize(11)
+                        .setColor(AppColors.black),
                   ),
                   Text(
-                    'Criada dia ${pedido.createdAt.text()}',
-                    style: AppCss.minimumRegular.setSize(11).setColor(AppColors.neutralMedium),
+                    'Data Entrega: ${pedido.deliveryAt.text()}',
+                    style: AppCss.minimumRegular
+                        .setSize(13)
+                        .setColor(AppColors.neutralDark)
+                        .copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
             const W(8),
+            _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
+                pedido.getPrcntgAguardandoProducao()),
+            const W(16),
             _progressChartWidget(
-                PedidoProdutoStatus.aguardandoProducao, pedido.getPrcntgAguardandoProducao()),
+                PedidoProdutoStatus.produzindo, pedido.getPrcntgProduzindo()),
             const W(16),
-            _progressChartWidget(PedidoProdutoStatus.produzindo, pedido.getPrcntgProduzindo()),
-            const W(16),
-            _progressChartWidget(PedidoProdutoStatus.pronto, pedido.getPrcntgPronto()),
+            _progressChartWidget(
+                PedidoProdutoStatus.pronto, pedido.getPrcntgPronto()),
             const W(16),
             Icon(
               Icons.arrow_forward_ios,

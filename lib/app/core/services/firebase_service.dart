@@ -21,15 +21,15 @@ class FirebaseService implements Service {
     }
   }
 
-  static Future<String?> onUploadPortariaPDF(
-      String name, Uint8List bytes) async {
-    try {
-      final folderRef = FirebaseStorage.instance.ref().child('recording');
-      final Reference fileRef = folderRef.child(name);
-      await fileRef.putData(bytes, SettableMetadata(contentType: 'video/mp4'));
-      return await fileRef.getDownloadURL();
-    } catch (e) {
-      return null;
-    }
+  static Future<String> uploadFile({
+    required String name,
+    required Uint8List bytes,
+    required String mimeType,
+    required String path,
+  }) async {
+    final folderRef = FirebaseStorage.instance.ref().child(path);
+    final Reference fileRef = folderRef.child(name);
+    await fileRef.putData(bytes, SettableMetadata(contentType: mimeType));
+    return await fileRef.getDownloadURL();
   }
 }

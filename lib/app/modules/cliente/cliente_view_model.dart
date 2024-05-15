@@ -2,6 +2,8 @@ import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_m
 import 'package:aco_plus/app/core/models/endereco_model.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
+import 'package:cpf_cnpj_validator/cnpj_validator.dart';
+import 'package:cpf_cnpj_validator/cpf_validator.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class ClienteUtils {
@@ -29,6 +31,12 @@ class ClienteCreateModel {
     cpf.text = cliente.cpf;
     endereco = cliente.endereco;
     obras = cliente.obras;
+    if (CPFValidator.isValid(cpf.text)) {
+      cpf.updateMask('000.000.000-00');
+    }
+    if (CNPJValidator.isValid(cpf.text)) {
+      cpf.updateMask('00.000.000/0000-00');
+    }
   }
 
   ClienteModel toClienteModel() => ClienteModel(

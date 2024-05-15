@@ -50,7 +50,7 @@ class ClienteController {
 
   Future<void> onConfirm(_, ClienteModel? cliente, bool isFromOrder) async {
     try {
-      onValid();
+      onValid(cliente);
       if (form.isEdit) {
         final edit = form.toClienteModel();
         await FirestoreClient.clientes.update(edit);
@@ -91,8 +91,21 @@ class ClienteController {
             FirestoreClient.pedidos.data.any((e) => e.cliente.id == cliente.id),
       );
 
-  void onValid() {
-    if (!form.isEdit) {
+  void onValid(ClienteModel? cliente) {
+    if (form.isEdit) {
+      if (cliente!.nome != form.nome.text) {
+        if (FirestoreClient.clientes.data
+            .any((e) => e.nome == form.nome.text)) {
+          throw Exception('Já existe um cliente com esse nome');
+        }
+      }
+      if (cliente.cpf != form.cpf.text) {
+        if (form.cpf.text.isNotEmpty &&
+            FirestoreClient.clientes.data.any((e) => e.cpf == form.cpf.text)) {
+          throw Exception('Já existe um cliente com esse CPF/CNPJ');
+        }
+      }
+    } else {
       if (FirestoreClient.clientes.data.any((e) => e.nome == form.nome.text)) {
         throw Exception('Já existe um cliente com esse nome');
       }
@@ -101,16 +114,9 @@ class ClienteController {
         throw Exception('Já existe um cliente com esse CPF/CNPJ');
       }
     }
-    if (FirestoreClient.clientes.data.any((e) => e.cpf == form.cpf.text)) {
-      throw Exception('Já existe um cliente com esse nome');
-    }
     if (form.nome.text.length < 2) {
       throw Exception('Nome deve conter no mínimo 3 caracteres');
     }
-    if (form.telefone.text.length < 15) {
-      throw Exception('Telefone inválido');
-    }
+ 
   }
 }
-
-
