@@ -1,11 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
-
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:flutter/widgets.dart';
 
 class OrdemModel {
   final String id;
@@ -91,6 +90,13 @@ class OrdemModel {
   }
 
   factory OrdemModel.fromMap(Map<String, dynamic> map) {
+    List<PedidoProdutoModel> list = [];
+    try {
+      list = List<PedidoProdutoModel>.from(
+        map['idPedidosProdutos']?.map((x) => FirestoreClient.pedidos
+            .getProdutoByPedidoId(x['pedidoId'], x['produtoId'])),
+      );
+    } catch (_) {}
     return OrdemModel(
         id: map['id'] ?? '',
         produto: ProdutoModel.fromMap(map['produto']),
@@ -98,10 +104,7 @@ class OrdemModel {
         endAt: map['endAt'] != null
             ? DateTime.fromMillisecondsSinceEpoch(map['endAt'])
             : null,
-        produtos: List<PedidoProdutoModel>.from(
-          map['idPedidosProdutos']?.map((x) => FirestoreClient.pedidos
-              .getProdutoByPedidoId(x['pedidoId'], x['produtoId'])),
-        ));
+        produtos: list);
   }
 
   String toJson() => json.encode(toMap());
