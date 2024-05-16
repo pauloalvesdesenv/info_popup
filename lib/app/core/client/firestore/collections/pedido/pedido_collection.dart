@@ -74,7 +74,7 @@ class PedidoCollection {
         .listen((e) {
       final countries =
           e.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-      countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      countries.sort((a, b) => a.localizador.compareTo(b.localizador));
       dataStream.add(countries);
     });
   }

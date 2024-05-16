@@ -56,6 +56,7 @@ class PedidoController {
         final update = await FirestoreClient.pedidos.update(edit);
         if (update != null) {
           pedidoStream.add(update);
+          pedidoStream.update();
         }
       } else {
         await FirestoreClient.pedidos.add(form.toPedidoModel(pedido));

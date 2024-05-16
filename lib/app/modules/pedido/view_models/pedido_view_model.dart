@@ -38,7 +38,7 @@ class PedidoCreateModel {
   late bool isEdit;
 
   PedidoCreateModel()
-      : id = (FirestoreClient.pedidos.data.length + 1).toString(),
+      : id = HashService.get,
         isEdit = false;
 
   String getDetails() {

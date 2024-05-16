@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AppField extends StatefulWidget {
-  final TextController controller;
+  final TextController? controller;
+  final TextEditingController? controllerObj;
+  final FocusNode? focusObj;
   final String? label;
   final String hint;
   final TextInputAction? action;
@@ -32,7 +34,7 @@ class AppField extends StatefulWidget {
   final TextCapitalization? capitalization;
 
   const AppField({
-    required this.controller,
+    this.controller,
     this.label,
     this.align = TextAlign.left,
     this.onChanged,
@@ -56,6 +58,8 @@ class AppField extends StatefulWidget {
     this.obscure = false,
     this.suffixText,
     this.capitalization,
+    this.controllerObj,
+    this.focusObj,
     super.key,
   });
 
@@ -81,13 +85,14 @@ class _AppFieldState extends State<AppField> {
             obscureText: widget.obscure,
             textAlign: widget.align,
             onTap: widget.onTap,
-            focusNode: widget.controller.focus,
+            focusNode: widget.focusObj ?? widget.controller!.focus,
             autofocus: widget.autoFocus,
-            controller: widget.controller.controller,
+            controller: widget.controllerObj ?? widget.controller!.controller,
             inputFormatters: widget.inputFormatters,
             keyboardType: widget.type,
             textInputAction: widget.action,
-            textCapitalization: widget.capitalization ?? TextCapitalization.sentences,
+            textCapitalization:
+                widget.capitalization ?? TextCapitalization.sentences,
             style: AppCss.smallRegular,
             cursorColor: AppColors.neutralDark,
             onEditingComplete: widget.onEditingComplete,
@@ -96,7 +101,8 @@ class _AppFieldState extends State<AppField> {
             minLines: widget.minLines,
             decoration: InputDecoration(
               filled: true,
-              fillColor: widget.isDisable ? Colors.grey[400]! : Colors.transparent,
+              fillColor:
+                  widget.isDisable ? Colors.grey[400]! : Colors.transparent,
               hintText: widget.hint,
               hintStyle: AppCss.smallRegular.setColor(AppColors.neutralDark),
               prefixIcon: widget.icon != null
@@ -133,7 +139,9 @@ class _AppFieldState extends State<AppField> {
         child: Padding(
           padding: const EdgeInsets.only(left: 20, right: 10),
           child: Icon(widget.suffixIcon,
-              weight: 800, size: widget.suffixIconSize, color: AppColors.neutralMedium),
+              weight: 800,
+              size: widget.suffixIconSize,
+              color: AppColors.neutralMedium),
         ),
       );
     }

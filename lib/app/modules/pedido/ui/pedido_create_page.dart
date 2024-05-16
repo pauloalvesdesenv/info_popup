@@ -133,7 +133,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
               //         border: OutlineInputBorder(
               //             borderRadius: BorderRadius.circular(8)))),
               builder: (_, __, ___) => AppField(
-                controller: TextController.create(__, ___),
+                controllerObj: __,
+                focusObj: ___,
                 label: 'Cliente',
               ),
               controller: form.clienteEC.controller,
@@ -171,6 +172,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                     pedidoCtrl.formStream.update();
                   }
                 } else {
+                  form.clienteEC.controller.text = e.nome;
                   form.cliente = e;
                 }
                 pedidoCtrl.formStream.update();

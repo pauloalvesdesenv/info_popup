@@ -4,7 +4,7 @@ class HashService {
   static List<String> createds = [];
 
   static String get get {
-    final hash = _getRandomString(20);
+    final hash = _getRandomString(25);
     if (createds.contains(hash)) {
       return HashService.get;
     } else {

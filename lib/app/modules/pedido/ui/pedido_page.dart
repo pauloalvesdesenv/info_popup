@@ -36,26 +36,28 @@ class _PedidoPageState extends State<PedidoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
+    return StreamOut(
+      stream: pedidoCtrl.pedidoStream.listen,
+      builder: (_, form) => AppScaffold(
         resizeAvoid: true,
         appBar: AppBar(
-          title: Text(widget.pedido.localizador,
+          title: Text(form.localizador,
               style: AppCss.largeBold.setColor(AppColors.white)),
           backgroundColor: AppColors.primaryMain,
           actions: [
             IconButton(
                 onPressed: () async =>
-                    push(context, PedidoCreatePage(pedido: widget.pedido)),
+                    push(context, PedidoCreatePage(pedido: form)),
                 icon: Icon(Icons.edit, color: AppColors.white)),
             IconButton(
                 onPressed: () async =>
-                    pedidoCtrl.onDelete(context, widget.pedido),
+                    pedidoCtrl.onDelete(context, form),
                 icon: Icon(Icons.delete, color: AppColors.white))
           ],
         ),
-        body: StreamOut(
-            stream: pedidoCtrl.pedidoStream.listen,
-            builder: (_, form) => body(form)));
+        body: body(form),
+      ),
+    );
   }
 
   Widget body(PedidoModel form) {
