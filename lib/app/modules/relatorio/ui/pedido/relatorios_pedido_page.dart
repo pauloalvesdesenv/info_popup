@@ -7,6 +7,9 @@ import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
+import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/relatorio/relatorio_controller.dart';
@@ -25,6 +28,8 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
   @override
   void initState() {
     relatorioCtrl.pedidoViewModelStream.add(RelatorioPedidoViewModel());
+    relatorioCtrl.onCreateRelatorioPedido();
+
     super.initState();
   }
 
@@ -33,14 +38,16 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
     return AppScaffold(
       resizeAvoid: true,
       appBar: AppBar(
-        title: Text('Relatórios de Pedido', style: AppCss.largeBold.setColor(AppColors.white)),
+        title: Text('Relatórios de Pedido',
+            style: AppCss.largeBold.setColor(AppColors.white)),
         backgroundColor: AppColors.primaryMain,
         actions: [
           StreamOut(
             stream: relatorioCtrl.pedidoViewModelStream.listen,
             builder: (_, model) => IconButton(
-              onPressed:
-                  model.relatorio != null ? () => relatorioCtrl.onExportRelatorioPedidoPDF() : null,
+              onPressed: model.relatorio != null
+                  ? () => relatorioCtrl.onExportRelatorioPedidoPDF()
+                  : null,
               icon: Icon(
                 Icons.picture_as_pdf_outlined,
                 color: model.relatorio != null ? null : Colors.grey[500],
@@ -60,33 +67,66 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
                   AppDropDown<ClienteModel?>(
                       label: 'Cliente',
                       item: model.cliente,
-                      itens: FirestoreClient.clientes.data,
-                      itemLabel: (e) => e?.nome ?? 'SELECIONE O CLIENTE',
+                      itens: [null, ...FirestoreClient.clientes.data],
+                      itemLabel: (e) => e?.nome ?? 'TODOS',
                       onSelect: (e) {
                         model.cliente = e;
                         model.status = null;
                         relatorioCtrl.pedidoViewModelStream.add(model);
+                        relatorioCtrl.onCreateRelatorioPedido();
                       }),
                   const H(16),
                   AppDropDown<RelatorioPedidoStatus?>(
                       label: 'Status',
                       item: model.status,
-                      disable: model.cliente == null,
-                      itens: RelatorioPedidoStatus.values,
-                      itemLabel: (e) => e?.label ?? 'SELECIONE O STATUS',
+                      itens: const [null, ...RelatorioPedidoStatus.values],
+                      itemLabel: (e) => e?.label ?? 'TODOS',
                       onSelect: (e) {
                         model.status = e;
                         relatorioCtrl.pedidoViewModelStream.add(model);
                         relatorioCtrl.onCreateRelatorioPedido();
                       }),
+                  const H(16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppDropDown<SortType>(
+                          label: 'Ordernar por',
+                          item: model.sortType,
+                          itens: model.sortTypes,
+                          itemLabel: (e) => e.name,
+                          onSelect: (e) {
+                            model.sortType = e;
+                            relatorioCtrl.pedidoViewModelStream.add(model);
+                            relatorioCtrl.onCreateRelatorioPedido();
+                          },
+                        ),
+                      ),
+                      const W(16),
+                      Expanded(
+                        child: AppDropDown<SortOrder>(
+                          label: 'Ordernar',
+                          item: model.sortOrder,
+                          itens: SortOrder.values,
+                          itemLabel: (e) => e.name,
+                          onSelect: (e) {
+                            model.sortOrder = e;
+                            relatorioCtrl.pedidoViewModelStream.add(model);
+                            relatorioCtrl.onCreateRelatorioPedido();
+                          },
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
             Divisor(color: Colors.grey[700]!, height: 1.5),
-            if (model.cliente != null && model.status != null)
-              Column(
-                children: model.relatorio!.pedidos.map((e) => itemRelatorio(e)).toList(),
-              ),
+            Column(
+              children: model.relatorio!.pedidos
+                  .map((e) => itemRelatorio(e))
+                  .toList(),
+            ),
           ],
         ),
       ),
@@ -108,22 +148,34 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: Text(pedido.localizador, style: AppCss.mediumBold)),
-              Text(DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm").format(pedido.createdAt),
+              Expanded(
+                  child: Text(pedido.localizador, style: AppCss.mediumBold)),
+              Text(
+                  DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm")
+                      .format(pedido.createdAt),
                   style: AppCss.minimumRegular.setSize(11)),
             ],
           ),
+          const Divisor(),
+          itemInfo('Cliente', pedido.cliente.nome),
+          const Divisor(),
           itemInfo('Descrição', pedido.obra.descricao),
+          const Divisor(),
+          itemInfo('Data de Entrega', pedido.deliveryAt != null ? pedido.deliveryAt.text() : 'Não definida'),
           const Divisor(),
           itemInfo('Tipo', pedido.tipo.label),
           const Divisor(),
           itemInfo(
-              'Bitolas (mm)', pedido.produtos.map((e) => e.produto.descricaoReplaced).join(', ')),
+              'Bitolas (mm)',
+              pedido.produtos
+                  .map((e) => e.produto.descricaoReplaced)
+                  .join(', ')),
           const Divisor(),
           for (final produto in pedido.produtos)
             Column(
               children: [
-                itemInfo('${produto.produto.descricaoReplaced}mm', '${produto.qtde}Kg'),
+                itemInfo('${produto.produto.descricaoReplaced}mm',
+                    '${produto.qtde}Kg'),
                 Divisor(
                   color: Colors.grey[200],
                 ),
@@ -141,8 +193,9 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child:
-                Text('$label:', style: AppCss.minimumRegular.copyWith(fontWeight: FontWeight.w500)),
+            child: Text('$label:',
+                style: AppCss.minimumRegular
+                    .copyWith(fontWeight: FontWeight.w500)),
           ),
           Expanded(
               flex: 2,

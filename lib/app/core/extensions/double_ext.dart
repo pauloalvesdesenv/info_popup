@@ -1,4 +1,5 @@
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
+import 'package:intl/intl.dart';
 
 extension DoubleExt on double {
   String get formatted {
@@ -26,5 +27,7 @@ extension DoubleExt on double {
   }
 
   String toMoney() =>
-      MoneyMaskedTextController(leftSymbol: 'R\$ ', initialValue: this).text;
+  MoneyMaskedTextController(leftSymbol: 'R\$ ', initialValue: this).text;
+
+  String toKg() => '${NumberFormat.decimalPattern('de_DE').format(this)} Kg';
 }

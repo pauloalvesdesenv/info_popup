@@ -55,7 +55,7 @@ extension StringExt on String {
       }
     }
     return name;
-  }
+  }   
 
   String toMoney() =>
       MoneyMaskedTextController(initialValue: double.parse(this)).text;

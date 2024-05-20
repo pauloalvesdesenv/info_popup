@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:flutter/material.dart';
 
 class EmptyData extends StatelessWidget {
   const EmptyData({super.key});
@@ -10,10 +10,10 @@ class EmptyData extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.network(
-          'https://www.shareicon.net/data/512x512/2017/04/28/885353_folder_512x512.png',
-          width: 120,
-          height: 120,
+        const Icon(
+          Icons.drafts,
+          color: Colors.black,
+          size: 48,
         ),
         const H(16),
         Text(

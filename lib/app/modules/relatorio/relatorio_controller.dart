@@ -1,24 +1,24 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
-import '';
+import 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_web.dart'
+    if (dart.library.io) 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_mobile.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_ordem_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_status_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/pedido/relatorio_pedido_pdf_page.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_ordem_view_model.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_pedido_view_model.dart';
 import 'package:flutter/services.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_web.dart'
-    if (dart.library.io) 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_mobile.dart';
 
 final relatorioCtrl = PedidoController();
 
@@ -34,20 +34,57 @@ class PedidoController {
   RelatorioPedidoViewModel get pedidoViewModel => pedidoViewModelStream.value;
 
   void onCreateRelatorioPedido() {
+    List<PedidoModel> pedidos =
+        FirestoreClient.pedidos.data.map((e) => e.copyWith()).toList();
+
+    pedidos = pedidos
+        .where((e) =>
+            pedidoViewModel.status == null ||
+            (pedidoViewModel.status == RelatorioPedidoStatus.produzindo
+                ? e.statusess.last.status != PedidoStatus.pronto
+                : e.statusess.last.status == PedidoStatus.pronto))
+        .toList();
+
+    pedidos = pedidos
+        .where((e) =>
+            pedidoViewModel.cliente == null ||
+            e.cliente.id == pedidoViewModel.cliente?.id)
+        .toList();
+
+    onSortPedidos(pedidos);
+
     final model = RelatorioPedidoModel(
-      pedidoViewModel.cliente!,
-      pedidoViewModel.status!,
-      FirestoreClient.pedidos.data
-          .map((e) => e.copyWith())
-          .toList()
-          .where((e) =>
-              pedidoViewModel.status == RelatorioPedidoStatus.produzindo
-                  ? e.statusess.last.status != PedidoStatus.pronto
-                  : e.statusess.last.status == PedidoStatus.pronto)
-          .toList(),
+      pedidoViewModel.cliente,
+      pedidoViewModel.status,
+      pedidos,
     );
+
     pedidoViewModel.relatorio = model;
     pedidoViewModelStream.update();
+  }
+
+  void onSortPedidos(List<PedidoModel> pedidos) {
+    bool isAsc = pedidoViewModel.sortOrder == SortOrder.asc;
+    switch (pedidoViewModel.sortType) {
+      case SortType.localizator:
+        pedidos.sort((a, b) => isAsc
+            ? a.localizador.compareTo(b.localizador)
+            : b.localizador.compareTo(a.localizador));
+        break;
+      case SortType.client:
+        pedidos.sort((a, b) => isAsc
+            ? a.cliente.nome.compareTo(b.cliente.nome)
+            : b.cliente.nome.compareTo(a.cliente.nome));
+        break;
+      case SortType.deliveryAt:
+        pedidos.sort((a, b) => isAsc
+            ? (a.deliveryAt ?? DateTime.now())
+                .compareTo((b.deliveryAt ?? DateTime.now()))
+            : (b.deliveryAt ?? DateTime.now())
+                .compareTo((a.deliveryAt ?? DateTime.now())));
+        break;
+      default:
+    }
   }
 
   Future<void> onExportRelatorioPedidoPDF() async {
@@ -56,17 +93,39 @@ class PedidoController {
     final img = await rootBundle.load('assets/images/logo.png');
     final imageBytes = img.buffer.asUint8List();
 
-    pdf.addPage(pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) =>
-            RelatorioPedidoPdfPage(pedidoViewModel.relatorio!)
-                .build(imageBytes)));
+    pdf.addPage(
+        RelatorioPedidoPdfPage(pedidoViewModel.relatorio!).build(imageBytes));
 
     await downloadPDF(
-        "m2_relatorio_cliente_${pedidoViewModel.cliente?.nome.toLowerCase().replaceAll(' ', '_')}_status_${pedidoViewModel.status!.label.toLowerCase()}${DateTime.now().toFileName()}.pdf",
+        "m2_relatorio_cliente_${(pedidoViewModel.cliente?.nome ?? 'todos').toLowerCase().replaceAll(' ', '_')}_status_${(pedidoViewModel.status?.label ?? 'todos').toLowerCase()}_${DateTime.now().toFileName()}.pdf",
         '/relatorio/pedido/',
         await pdf.save());
   }
+
+  //  Future<Uint8List> _mountPDF(RelatorioPedidoModel relatorio,
+  //     List<PedidoModel> pedidos) async {
+  //   final pdf = pw.Document();
+  //   final img = await rootBundle.load('assets/images/logo.png');
+  //   final imageBytes = img.buffer.asUint8List();
+  //   final pedidosQtde = pedidos.length;
+
+  //   pdf.addPage(pw.Page(
+  //       pageFormat: PdfPageFormat.a4,
+  //       build: (pw.Context context) => RelatorioPedidoPdfPage(
+  //               model: relatorio,
+  //               pedidos:
+  //                   pedidos.sublist(0, (pedidosQtde <= 1 ? 1 : 2)).toList())
+  //           .build(imageBytes)));
+
+  //   for (var chunk in pedidos.sublist(3).toList().slices(3)) {
+  //     pdf.addPage(pw.Page(
+  //         pageFormat: PdfPageFormat.a4,
+  //         build: (pw.Context context) =>
+  //             RelatorioPedidoPdfPage(pedidos: chunk).build(imageBytes)));
+  //   }
+
+  //   return await pdf.save();
+  // }
 
   final AppStream<RelatorioOrdemViewModel> ordemViewModelStream =
       AppStream<RelatorioOrdemViewModel>();
@@ -186,15 +245,11 @@ class PedidoController {
 
     var isOrdemType = ordemViewModel.type == RelatorioOrdemType.ORDEM;
 
-    pdf.addPage(pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          return (isOrdemType
-              ? RelatorioOrdemPdfOrdemPage(ordemViewModel.relatorio!)
-                  .build(imageBytes)
-              : RelatorioOrdemPdfStatusPage(ordemViewModel.relatorio!)
-                  .build(imageBytes));
-        }));
+    pdf.addPage((isOrdemType
+        ? RelatorioOrdemPdfOrdemPage(ordemViewModel.relatorio!)
+            .build(imageBytes)
+        : RelatorioOrdemPdfStatusPage(ordemViewModel.relatorio!)
+            .build(imageBytes)));
 
     final name = isOrdemType
         ? "m2_relatorio_ordem_${ordemViewModel.relatorio!.ordem.id.toLowerCase()}${DateTime.now().toFileName()}.pdf"

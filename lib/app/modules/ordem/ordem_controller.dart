@@ -92,9 +92,9 @@ class OrdemController {
             createdAt: DateTime.now()));
       }
       if (ordem != null) {
-        onEdit(_, ordem);
+        await onEdit(_, ordem);
       } else {
-        onCreate(_);
+        await onCreate(_);
       }
     } catch (_) {
       NotificationService.showNegative('Erro', _.toString(),
@@ -192,13 +192,14 @@ class OrdemController {
             ? a.cliente.nome.compareTo(b.cliente.nome)
             : b.cliente.nome.compareTo(a.cliente.nome));
         break;
-      case SortType.date:
+      case SortType.createdAt:
         pedidos.sort((a, b) => isAsc
             ? (a.pedido.deliveryAt ?? DateTime.now())
                 .compareTo((b.pedido.deliveryAt ?? DateTime.now()))
             : (b.pedido.deliveryAt ?? DateTime.now())
                 .compareTo((a.pedido.deliveryAt ?? DateTime.now())));
         break;
+      default:
     }
   }
 

@@ -1,12 +1,24 @@
-enum SortType { alfabetic, date }
+enum SortType {
+  alfabetic,
+  createdAt,
+  deliveryAt,
+  localizator,
+  client
+}
 
 extension SortTypeExt on SortType {
   String get name {
     switch (this) {
       case SortType.alfabetic:
         return 'Alfabética';
-      case SortType.date:
+      case SortType.createdAt:
+        return 'Data Criação';
+      case SortType.deliveryAt:
         return 'Data Entrega';
+      case SortType.localizator:
+        return 'Localizador';
+      case SortType.client:
+        return 'Cliente';
     }
   }
 }

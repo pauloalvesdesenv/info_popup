@@ -168,13 +168,14 @@ class PedidoController {
             ? a.cliente.nome.compareTo(b.cliente.nome)
             : b.cliente.nome.compareTo(a.cliente.nome));
         break;
-      case SortType.date:
+      case SortType.createdAt:
         pedidos.sort((a, b) => isAsc
             ? (a.deliveryAt ?? DateTime.now())
                 .compareTo((b.deliveryAt ?? DateTime.now()))
             : (b.deliveryAt ?? DateTime.now())
                 .compareTo((a.deliveryAt ?? DateTime.now())));
         break;
+        default:
     }
   }
 }

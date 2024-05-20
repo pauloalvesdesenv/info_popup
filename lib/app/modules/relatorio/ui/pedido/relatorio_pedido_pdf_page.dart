@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/components/pdf_divisor.dart';
+import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_pedido_view_model.dart';
 import 'package:flutter/material.dart';
@@ -10,12 +11,33 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+// class RelatorioPedidoPdfPage {
+//   final RelatorioPedidoModel? model;
+//   final List<PedidoModel> pedidos;
+//   RelatorioPedidoPdfPage({this.model, required this.pedidos});
+
+//   pw.Widget build(Uint8List bytes) => pw.Column(
+//         children: [
+//           if (model != null) ...[
+//             pw.Image(pw.MemoryImage(bytes), width: 60, height: 60),
+//             pw.SizedBox(height: 24),
+//             pw.Text('RELATÓRIO DE PEDIDOS POR CLIENTE E STATUS'),
+//             pw.SizedBox(height: 16),
+//             _itemHeader(model!),
+//             pw.SizedBox(height: 24),
+//           ],
+//           for (final pedido in pedidos) _itemRelatorio(pedido),
+//         ],
+//       );
+
 class RelatorioPedidoPdfPage {
   final RelatorioPedidoModel model;
   RelatorioPedidoPdfPage(this.model);
 
-  pw.Widget build(Uint8List bytes) => pw.Column(
-        children: [
+  pw.Page build(Uint8List bytes) => pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
+        build: (pw.Context context) => [
           pw.Image(pw.MemoryImage(bytes), width: 60, height: 60),
           pw.SizedBox(height: 24),
           pw.Text('RELATÓRIO DE PEDIDOS POR CLIENTE E STATUS'),
@@ -31,7 +53,8 @@ class RelatorioPedidoPdfPage {
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
         color: PdfColor.fromInt(Colors.white.value),
-        border: pw.Border.all(color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
+        border: pw.Border.all(
+            color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
       ),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -49,7 +72,9 @@ class RelatorioPedidoPdfPage {
                       color: PdfColor.fromInt(AppColors.black.value)),
                 ),
               ),
-              pw.Text(DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm").format(pedido.createdAt),
+              pw.Text(
+                  DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm")
+                      .format(pedido.createdAt),
                   style: pw.TextStyle(
                       fontSize: 11,
                       font: pw.Font.times(),
@@ -58,7 +83,19 @@ class RelatorioPedidoPdfPage {
             ],
           ),
           pw.SizedBox(height: 8),
+          _itemInfo('Cliente', pedido.cliente.nome),
+          PdfDivisor.build(
+            color: Colors.grey[200],
+          ),
           _itemInfo('Descrição', pedido.obra.descricao),
+          PdfDivisor.build(
+            color: Colors.grey[200],
+          ),
+          _itemInfo(
+              'Data de Entrega',
+              pedido.deliveryAt != null
+                  ? pedido.deliveryAt!.text()
+                  : 'Não definida'),
           PdfDivisor.build(
             color: Colors.grey[200],
           ),
@@ -74,7 +111,8 @@ class RelatorioPedidoPdfPage {
           for (final produto in pedido.produtos)
             pw.Column(
               children: [
-                _itemInfo(produto.produto.descricaoReplaced, '${produto.qtde} kg'),
+                _itemInfo(
+                    produto.produto.descricaoReplaced, '${produto.qtde} kg'),
                 PdfDivisor.build(
                   color: Colors.grey[200],
                 ),
@@ -94,7 +132,8 @@ class RelatorioPedidoPdfPage {
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
         color: PdfColor.fromInt(Colors.white.value),
-        border: pw.Border.all(color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
+        border: pw.Border.all(
+            color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
       ),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -104,7 +143,7 @@ class RelatorioPedidoPdfPage {
             children: [
               pw.Expanded(
                 child: pw.Text(
-                  relatorio.cliente.nome,
+                  relatorio.cliente?.nome ?? 'Todos os clientes',
                   style: pw.TextStyle(
                       fontSize: 14,
                       font: pw.Font.times(),
@@ -112,7 +151,7 @@ class RelatorioPedidoPdfPage {
                       color: PdfColor.fromInt(AppColors.black.value)),
                 ),
               ),
-              pw.Text(relatorio.status.label,
+              pw.Text(relatorio.status?.label ?? 'Todos os status',
                   style: pw.TextStyle(
                       fontSize: 11,
                       font: pw.Font.times(),
@@ -121,12 +160,16 @@ class RelatorioPedidoPdfPage {
             ],
           ),
           pw.SizedBox(height: 8),
-          _itemInfo('Data Criação Relatório',
-              DateFormat("dd/MM/yyyy' ás 'HH:mm").format(relatorio.createdAt).toString()),
+          _itemInfo(
+              'Data Criação Relatório',
+              DateFormat("dd/MM/yyyy' ás 'HH:mm")
+                  .format(relatorio.createdAt)
+                  .toString()),
           PdfDivisor.build(
             color: Colors.grey[200],
           ),
-          _itemInfo('Quantidade de Pedidos', relatorio.pedidos.length.toString()),
+          _itemInfo(
+              'Quantidade de Pedidos', relatorio.pedidos.length.toString()),
           PdfDivisor.build(
             color: Colors.grey[200],
           ),

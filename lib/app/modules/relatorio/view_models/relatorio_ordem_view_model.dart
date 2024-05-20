@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:flutter/material.dart';
 
@@ -44,6 +45,8 @@ class RelatorioOrdemViewModel {
   RelatorioOrdemModel? relatorio;
   TextController ordemEC = TextController();
   OrdemModel? ordem;
+  SortType sortType = SortType.alfabetic;
+  SortOrder sortOrder = SortOrder.asc;
 }
 
 class RelatorioOrdemModel {

@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/enums/sort_type.dart';
 
 enum RelatorioPedidoStatus { produzindo, pronto }
 
@@ -18,11 +19,23 @@ class RelatorioPedidoViewModel {
   ClienteModel? cliente;
   RelatorioPedidoStatus? status;
   RelatorioPedidoModel? relatorio;
+  late SortType sortType;
+  SortOrder sortOrder = SortOrder.asc;
+
+  List<SortType> sortTypes = [
+    SortType.localizator,
+    SortType.deliveryAt,
+    SortType.client
+  ];
+
+  RelatorioPedidoViewModel() {
+    sortType = sortTypes.first;
+  }
 }
 
 class RelatorioPedidoModel {
-  final ClienteModel cliente;
-  final RelatorioPedidoStatus status;
+  final ClienteModel? cliente;
+  final RelatorioPedidoStatus? status;
   final List<PedidoModel> pedidos;
   final DateTime createdAt = DateTime.now();
 

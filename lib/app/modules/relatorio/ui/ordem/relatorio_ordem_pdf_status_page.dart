@@ -15,8 +15,10 @@ class RelatorioOrdemPdfStatusPage {
   final RelatorioOrdemModel model;
   RelatorioOrdemPdfStatusPage(this.model);
 
-  pw.Widget build(Uint8List bytes) => pw.Column(
-        children: [
+  pw.Page build(Uint8List bytes) => pw.MultiPage(
+    crossAxisAlignment: pw.CrossAxisAlignment.center,
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) => [
           pw.Image(pw.MemoryImage(bytes), width: 60, height: 60),
           pw.SizedBox(height: 24),
           pw.Text(

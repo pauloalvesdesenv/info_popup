@@ -13,6 +13,7 @@ import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
+import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -49,8 +50,9 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
           title: Text('${ordemCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Ordem',
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
-            IconLoadingButton(
-                () async => await ordemCtrl.onConfirm(context, widget.ordem))
+            IconLoadingButton(() async {
+              await ordemCtrl.onConfirm(context, widget.ordem);
+            })
           ],
           backgroundColor: AppColors.primaryMain,
         ),
@@ -213,6 +215,15 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          produto.pedido.localizador,
+                          style: AppCss.mediumBold.setSize(16),
+                        ),
+                        Text(
+                          produto.qtde.toKg(),
+                          style: AppCss.mediumBold.setSize(14).setHeight(0.8),
+                        ),
+                        const H(2),
                         Row(
                           children: [
                             Text(
@@ -239,10 +250,6 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                           style: AppCss.minimumRegular
                               .copyWith(fontSize: 12)
                               .setColor(AppColors.neutralDark),
-                        ),
-                        Text(
-                          '${produto.qtde}Kg',
-                          style: AppCss.mediumBold.setSize(16),
                         ),
                       ],
                     ),

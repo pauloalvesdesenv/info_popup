@@ -24,7 +24,6 @@ class _IconLoadingButtonState extends State<IconLoadingButton> {
             onPressed: () async {
               setState(() => isLoading = true);
               try {
-                // FocusManager.instance.primaryFocus?.unfocus();
                 await widget.onPressed.call();
               } catch (_) {}
               setState(() => isLoading = false);

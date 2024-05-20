@@ -16,6 +16,7 @@ class OrdemCreateModel {
   List<PedidoProdutoModel> produtos = [];
   SortType sortType = SortType.alfabetic;
   SortOrder sortOrder = SortOrder.asc;
+  bool isCreate = false;
 
   late bool isEdit;
 
