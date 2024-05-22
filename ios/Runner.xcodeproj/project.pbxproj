@@ -209,7 +209,6 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				66E88FF09899680891C36517 /* [firebase_crashlytics] Crashlytics Upload Symbols */,
 				CE48718112661A82CE4B0C4B /* [CP] Embed Pods Frameworks */,
-				40B20E06C255996C89D1B106 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -322,23 +321,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
-		};
-		40B20E06C255996C89D1B106 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources.sh\"\n";
-			showEnvVarsInLog = 0;
 		};
 		66E88FF09899680891C36517 /* [firebase_crashlytics] Crashlytics Upload Symbols */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -544,11 +526,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				ain = com.m2.acoplus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+				ain = com.m2.acoplus;
 			};
 			name = Profile;
 		};
