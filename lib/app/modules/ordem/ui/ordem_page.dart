@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/h.dart';
@@ -38,134 +39,162 @@ class _OrdemPageState extends State<OrdemPage> {
         appBar: AppBar(
           actions: [
             IconButton(
-                onPressed: () async => push(context, OrdemCreatePage(ordem: widget.ordem)),
+                onPressed: () async =>
+                    push(context, OrdemCreatePage(ordem: widget.ordem)),
                 icon: Icon(Icons.edit, color: AppColors.white)),
             IconButton(
-                onPressed: () async => ordemCtrl.onDelete(context, widget.ordem),
+                onPressed: () async =>
+                    ordemCtrl.onDelete(context, widget.ordem),
                 icon: Icon(Icons.delete, color: AppColors.white))
           ],
-          title:
-              Text('Ordem ${widget.ordem.id}', style: AppCss.largeBold.setColor(AppColors.white)),
+          title: Text('Ordem ${widget.ordem.id}',
+              style: AppCss.largeBold.setColor(AppColors.white)),
           backgroundColor: AppColors.primaryMain,
         ),
-        body: StreamOut(stream: ordemCtrl.ordemStream.listen, builder: (_, form) => body(form)));
+        body: StreamOut(
+            stream: ordemCtrl.ordemStream.listen,
+            builder: (_, form) => body(form)));
   }
 
   Widget body(OrdemModel ordem) {
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: RowItensLabel([
-            ItemLabel('Produto', '${ordem.produto.nome} - ${ordem.produto.descricao}'),
-            ItemLabel('Iniciada', ordem.createdAt.text()),
-            if (ordem.endAt != null) ItemLabel('Finalizada', ordem.endAt.text()),
-          ]),
-        ),
-        const Divisor(),
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Status', style: AppCss.largeBold),
-              const H(8),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: Text('Aguardando Produção', style: AppCss.mediumRegular)),
-                      Text(
-                        '${ordem.qtdeAguardando().formatted}Kg (${(ordem.getPrcntgAguardando() * 100).percent}%)',
-                      )
-                    ],
-                  ),
-                  const H(8),
-                  LinearProgressIndicator(
-                    value: ordem.getPrcntgAguardando(),
-                    backgroundColor: PedidoProdutoStatus.aguardandoProducao.color.withOpacity(0.3),
-                    valueColor:
-                        AlwaysStoppedAnimation(PedidoProdutoStatus.aguardandoProducao.color),
-                  ),
-                ],
-              ),
-              const H(16),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: Text('Produzindo', style: AppCss.mediumRegular)),
-                      Text(
-                        '${ordem.qtdeProduzindo().formatted}Kg (${(ordem.getPrcntgProduzindo() * 100).percent}%)',
-                      )
-                    ],
-                  ),
-                  const H(8),
-                  LinearProgressIndicator(
-                    value: ordem.getPrcntgProduzindo(),
-                    backgroundColor: PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation(PedidoProdutoStatus.produzindo.color),
-                  ),
-                ],
-              ),
-              const H(16),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: Text('Pronto', style: AppCss.mediumRegular)),
-                      Text(
-                        '${ordem.qtdePronto().formatted}Kg (${(ordem.getPrcntgPronto() * 100).percent}%)',
-                      )
-                    ],
-                  ),
-                  const H(8),
-                  LinearProgressIndicator(
-                    value: ordem.getPrcntgPronto(),
-                    backgroundColor: PedidoProdutoStatus.pronto.color.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation(PedidoProdutoStatus.pronto.color),
-                  ),
-                ],
-              ),
-            ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        await FirestoreClient.ordens.fetch();
+        ordemCtrl.ordemStream
+            .add(FirestoreClient.ordens.getById(widget.ordem.id));
+      },
+      child: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: RowItensLabel([
+              ItemLabel('Produto',
+                  '${ordem.produto.nome} - ${ordem.produto.descricao}'),
+              ItemLabel('Iniciada', ordem.createdAt.text()),
+              if (ordem.endAt != null)
+                ItemLabel('Finalizada', ordem.endAt.text()),
+            ]),
           ),
-        ),
-        for (final produto in ordem.produtos)
-          ListTile(
-            title: Text(
-              '${produto.qtde}Kg',
-              style: AppCss.minimumBold,
-            ),
-            subtitle: Column(
+          const Divisor(),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const H(2),
-                Text(produto.cliente.nome, style: AppCss.minimumRegular.setSize(12)),
-                Text(produto.obra.descricao, style: AppCss.minimumRegular.setSize(12)),
+                Text('Status', style: AppCss.largeBold),
+                const H(8),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Text('Aguardando Produção',
+                                style: AppCss.mediumRegular)),
+                        Text(
+                          '${ordem.qtdeAguardando().toKg()} (${(ordem.getPrcntgAguardando() * 100).percent}%)',
+                        )
+                      ],
+                    ),
+                    const H(8),
+                    LinearProgressIndicator(
+                      value: ordem.getPrcntgAguardando(),
+                      backgroundColor: PedidoProdutoStatus
+                          .aguardandoProducao.color
+                          .withOpacity(0.3),
+                      valueColor: AlwaysStoppedAnimation(
+                          PedidoProdutoStatus.aguardandoProducao.color),
+                    ),
+                  ],
+                ),
+                const H(16),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Text('Produzindo',
+                                style: AppCss.mediumRegular)),
+                        Text(
+                          '${ordem.qtdeProduzindo().formatted}Kg (${(ordem.getPrcntgProduzindo() * 100).percent}%)',
+                        )
+                      ],
+                    ),
+                    const H(8),
+                    LinearProgressIndicator(
+                      value: ordem.getPrcntgProduzindo(),
+                      backgroundColor:
+                          PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
+                      valueColor: AlwaysStoppedAnimation(
+                          PedidoProdutoStatus.produzindo.color),
+                    ),
+                  ],
+                ),
+                const H(16),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Text('Pronto', style: AppCss.mediumRegular)),
+                        Text(
+                          '${ordem.qtdePronto().formatted}Kg (${(ordem.getPrcntgPronto() * 100).percent}%)',
+                        )
+                      ],
+                    ),
+                    const H(8),
+                    LinearProgressIndicator(
+                      value: ordem.getPrcntgPronto(),
+                      backgroundColor:
+                          PedidoProdutoStatus.pronto.color.withOpacity(0.3),
+                      valueColor: AlwaysStoppedAnimation(
+                          PedidoProdutoStatus.pronto.color),
+                    ),
+                  ],
+                ),
               ],
             ),
-            trailing: InkWell(
-              onTap: () => ordemCtrl.onChangeProdutoStatus(produto),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                decoration: BoxDecoration(
-                    color: produto.statusView.status.color.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(4)),
-                child: IntrinsicWidth(
-                  child: Row(
-                    children: [
-                      Text(produto.statusView.status.label,
-                          style: AppCss.mediumRegular.setSize(12)),
-                      const W(2),
-                      Icon(Icons.keyboard_arrow_down,
-                          size: 16, color: AppColors.black.withOpacity(0.6))
-                    ],
+          ),
+          for (final produto in ordem.produtos)
+            ListTile(
+              title: Text(
+                '${produto.qtde}Kg',
+                style: AppCss.minimumBold,
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const H(2),
+                  Text(
+                      '${produto.pedido.localizador} - ${produto.cliente.nome}',
+                      style: AppCss.minimumRegular.setSize(12)),
+                  Text(produto.obra.descricao,
+                      style: AppCss.minimumRegular.setSize(12)),
+                ],
+              ),
+              trailing: InkWell(
+                onTap: () => ordemCtrl.onChangeProdutoStatus(produto),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                      color: produto.statusView.status.color.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(4)),
+                  child: IntrinsicWidth(
+                    child: Row(
+                      children: [
+                        Text(produto.statusView.status.label,
+                            style: AppCss.mediumRegular.setSize(12)),
+                        const W(2),
+                        Icon(Icons.keyboard_arrow_down,
+                            size: 16, color: AppColors.black.withOpacity(0.6))
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -28,6 +28,13 @@ class OrdensPage extends StatefulWidget {
 }
 
 class _OrdensPageState extends State<OrdensPage> {
+
+  @override
+  void initState() {
+    FirestoreClient.ordens.fetch();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
@@ -73,11 +80,14 @@ class _OrdensPageState extends State<OrdensPage> {
                 Expanded(
                   child: ordens.isEmpty
                       ? const EmptyData()
-                      : ListView.separated(
-                          itemCount: ordens.length,
-                          separatorBuilder: (_, i) => const Divisor(),
-                          itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
-                        ),
+                      : RefreshIndicator(
+                          onRefresh: () async => FirestoreClient.ordens.fetch(),
+                        child: ListView.separated(
+                            itemCount: ordens.length,
+                            separatorBuilder: (_, i) => const Divisor(),
+                            itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
+                          ),
+                      ),
                 ),
               ],
             );
@@ -103,7 +113,7 @@ class _OrdensPageState extends State<OrdensPage> {
                     style: AppCss.mediumBold,
                   ),
                   Text(
-                    '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.fold(0.0, (previousValue, element) => previousValue + element.qtde)}Kg',
+                    '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.fold(0.0, (previousValue, element) => previousValue + element.qtde).toKg()}',
                     style: AppCss.minimumRegular
                         .setSize(11)
                         .setColor(AppColors.black),

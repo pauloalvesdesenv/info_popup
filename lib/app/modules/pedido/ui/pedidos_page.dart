@@ -32,6 +32,12 @@ class PedidosPage extends StatefulWidget {
 
 class _PedidosPageState extends State<PedidosPage> {
   @override
+  void initState() {
+    FirestoreClient.pedidos.fetch();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppScaffold(
       drawer: const AppDrawer(),
@@ -62,7 +68,7 @@ class _PedidosPageState extends State<PedidosPage> {
           builder: (_, utils) {
             final pedidos =
                 pedidoCtrl.getPedidoesFiltered(utils.search.text, __).toList();
-                pedidoCtrl.onSortPedidos(pedidos);
+            pedidoCtrl.onSortPedidos(pedidos);
             return Column(
               children: [
                 Padding(
@@ -76,45 +82,50 @@ class _PedidosPageState extends State<PedidosPage> {
                         onChanged: (_) => pedidoCtrl.utilsStream.update(),
                       ),
                       const H(16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AppDropDown<SortType>(
-                            label: 'Ordernar por',
-                            item: utils.sortType,
-                            itens: SortType.values,
-                            itemLabel: (e) => e.name,
-                            onSelect: (e) {
-                              utils.sortType = e;
-                              pedidoCtrl.utilsStream.update();
-                            },
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppDropDown<SortType>(
+                              label: 'Ordernar por',
+                              item: utils.sortType,
+                              itens: SortType.values,
+                              itemLabel: (e) => e.name,
+                              onSelect: (e) {
+                                utils.sortType = e;
+                                pedidoCtrl.utilsStream.update();
+                              },
+                            ),
                           ),
-                        ),
-                        const W(16),
-                        Expanded(
-                          child: AppDropDown<SortOrder>(
-                            label: 'Ordernar',
-                            item: utils.sortOrder,
-                            itens: SortOrder.values,
-                            itemLabel: (e) => e.name,
-                            onSelect: (e) {
-                              utils.sortOrder = e;
-                              pedidoCtrl.utilsStream.update();
-                            },
+                          const W(16),
+                          Expanded(
+                            child: AppDropDown<SortOrder>(
+                              label: 'Ordernar',
+                              item: utils.sortOrder,
+                              itens: SortOrder.values,
+                              itemLabel: (e) => e.name,
+                              onSelect: (e) {
+                                utils.sortOrder = e;
+                                pedidoCtrl.utilsStream.update();
+                              },
+                            ),
                           ),
-                        ),
-                      ],
-                    )
+                        ],
+                      )
                     ],
                   ),
                 ),
                 Expanded(
                   child: pedidos.isEmpty
                       ? const EmptyData()
-                      : ListView.separated(
-                          itemCount: pedidos.length,
-                          separatorBuilder: (_, i) => const Divisor(),
-                          itemBuilder: (_, i) => _itemPedidoWidget(pedidos[i]),
+                      : RefreshIndicator(
+                          onRefresh: () async =>
+                              await FirestoreClient.pedidos.fetch(),
+                          child: ListView.separated(
+                            itemCount: pedidos.length,
+                            separatorBuilder: (_, i) => const Divisor(),
+                            itemBuilder: (_, i) =>
+                                _itemPedidoWidget(pedidos[i]),
+                          ),
                         ),
                 ),
               ],

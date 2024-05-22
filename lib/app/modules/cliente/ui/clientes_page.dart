@@ -23,6 +23,13 @@ class ClientesPage extends StatefulWidget {
 }
 
 class _ClientesPageState extends State<ClientesPage> {
+
+  @override
+  void initState() {
+    FirestoreClient.clientes.fetch();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
@@ -35,7 +42,8 @@ class _ClientesPageState extends State<ClientesPage> {
             color: AppColors.white,
           ),
         ),
-        title: Text('Clientes', style: AppCss.largeBold.setColor(AppColors.white)),
+        title:
+            Text('Clientes', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
           IconButton(
               onPressed: () => push(context, const ClienteCreatePage()),
@@ -51,7 +59,9 @@ class _ClientesPageState extends State<ClientesPage> {
         builder: (_, __) => StreamOut<ClienteUtils>(
           stream: clienteCtrl.utilsStream.listen,
           builder: (_, utils) {
-            final clientes = clienteCtrl.getClienteesFiltered(utils.search.text, __).toList();
+            final clientes = clienteCtrl
+                .getClienteesFiltered(utils.search.text, __)
+                .toList();
             return Column(
               children: [
                 Padding(
@@ -66,10 +76,15 @@ class _ClientesPageState extends State<ClientesPage> {
                 Expanded(
                   child: clientes.isEmpty
                       ? const EmptyData()
-                      : ListView.separated(
-                          itemCount: clientes.length,
-                          separatorBuilder: (_, i) => const Divisor(),
-                          itemBuilder: (_, i) => _itemClienteWidget(clientes[i]),
+                      : RefreshIndicator(
+                          onRefresh: () async =>
+                              FirestoreClient.clientes.fetch(),
+                          child: ListView.separated(
+                            itemCount: clientes.length,
+                            separatorBuilder: (_, i) => const Divisor(),
+                            itemBuilder: (_, i) =>
+                                _itemClienteWidget(clientes[i]),
+                          ),
                         ),
                 ),
               ],
@@ -96,7 +111,9 @@ class _ClientesPageState extends State<ClientesPage> {
           ),
           Text(
             usuario.endereco.name,
-            style: AppCss.minimumRegular.setSize(12).setColor(AppColors.neutralMedium),
+            style: AppCss.minimumRegular
+                .setSize(12)
+                .setColor(AppColors.neutralMedium),
           ),
         ],
       ),
