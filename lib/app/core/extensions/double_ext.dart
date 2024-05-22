@@ -27,7 +27,7 @@ extension DoubleExt on double {
   }
 
   String toMoney() =>
-  MoneyMaskedTextController(leftSymbol: 'R\$ ', initialValue: this).text;
+      MoneyMaskedTextController(leftSymbol: 'R\$ ', initialValue: this).text;
 
   String toKg() => '${NumberFormat.decimalPattern('de_DE').format(this)} Kg';
 }
