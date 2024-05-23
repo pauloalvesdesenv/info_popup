@@ -102,6 +102,28 @@ class PedidoController {
         await pdf.save());
   }
 
+  double getPedidosTotal() {
+    double qtde = 0;
+    for (var pedido in pedidoViewModel.relatorio!.pedidos) {
+      for (var produto in pedido.produtos) {
+        qtde = qtde + produto.qtde;
+      }
+    }
+    return double.parse(qtde.toStringAsFixed(2));
+  }
+
+  double getPedidosTotalPorStatus(PedidoProdutoStatus status) {
+    double qtde = 0;
+    for (var pedido in pedidoViewModel.relatorio!.pedidos) {
+      for (var produto in pedido.produtos) {
+        if (produto.statusess.last.status == status) {
+          qtde = qtde + produto.qtde;
+        }
+      }
+    }
+    return double.parse(qtde.toStringAsFixed(2));
+  }
+
   //  Future<Uint8List> _mountPDF(RelatorioPedidoModel relatorio,
   //     List<PedidoModel> pedidos) async {
   //   final pdf = pw.Document();

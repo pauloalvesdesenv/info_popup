@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/components/pdf_divisor.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
@@ -103,16 +104,17 @@ class RelatorioPedidoPdfPage {
           PdfDivisor.build(
             color: Colors.grey[200],
           ),
-          _itemInfo('Bitolas (mm)',
-              '${pedido.produtos.map((e) => e.produto.descricaoReplaced).join(', ')}.'),
-          PdfDivisor.build(
-            color: Colors.grey[200],
-          ),
           for (final produto in pedido.produtos)
             pw.Column(
               children: [
-                _itemInfo(
-                    produto.produto.descricaoReplaced, '${produto.qtde} kg'),
+                _itemInfo('${produto.produto.descricaoReplaced}mm',
+                    '(${produto.status.status.label}) ${produto.qtde}Kg',
+                    color: produto.status.status == PedidoProdutoStatus.separado
+                        ? null
+                        : PdfColor.fromInt(produto.status.status.color
+                                .withOpacity(0.06)
+                                .hashCode)
+                            .shade(0.03)),
                 PdfDivisor.build(
                   color: Colors.grey[200],
                 ),
@@ -183,33 +185,35 @@ class RelatorioPedidoPdfPage {
     );
   }
 
-  pw.Widget _itemInfo(String label, String value) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(vertical: 8),
-      child: pw.Row(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Expanded(
-            child: pw.Text(label,
-                style: pw.TextStyle(
-                    font: pw.Font.times(),
-                    fontSize: 12,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColor.fromInt(Colors.grey[800]!.value))),
+  pw.Widget _itemInfo(String label, String value, {PdfColor? color}) {
+    return pw.Container(
+        color: color,
+        child: pw.Padding(
+          padding: const pw.EdgeInsets.symmetric(vertical: 8),
+          child: pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Expanded(
+                child: pw.Text(label,
+                    style: pw.TextStyle(
+                        font: pw.Font.times(),
+                        fontSize: 12,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromInt(Colors.grey[800]!.value))),
+              ),
+              pw.Expanded(
+                  flex: 2,
+                  child: pw.Text(
+                    value,
+                    style: pw.TextStyle(
+                        font: pw.Font.times(),
+                        fontSize: 12,
+                        fontWeight: pw.FontWeight.normal,
+                        color: PdfColor.fromInt(Colors.grey[800]!.value)),
+                    textAlign: pw.TextAlign.end,
+                  ))
+            ],
           ),
-          pw.Expanded(
-              flex: 2,
-              child: pw.Text(
-                value,
-                style: pw.TextStyle(
-                    font: pw.Font.times(),
-                    fontSize: 12,
-                    fontWeight: pw.FontWeight.normal,
-                    color: PdfColor.fromInt(Colors.grey[800]!.value)),
-                textAlign: pw.TextAlign.end,
-              ))
-        ],
-      ),
-    );
+        ));
   }
 }

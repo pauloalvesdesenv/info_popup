@@ -1,6 +1,7 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -10,6 +11,7 @@ import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
+import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/relatorio/relatorio_controller.dart';
@@ -127,6 +129,29 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
                   .map((e) => itemRelatorio(e))
                   .toList(),
             ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Totais',
+                style: AppCss.mediumBold,
+              ),
+            ),
+            for (final status in PedidoProdutoStatus.values)
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: itemInfo(status.label,
+                        relatorioCtrl.getPedidosTotalPorStatus(status).toKg(), color: status.color.withOpacity(0.06)),
+                  ),
+                  const Divisor(),
+                ],
+              ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: itemInfo(
+                  'Total Geral', relatorioCtrl.getPedidosTotal().toKg()),
+            ),
           ],
         ),
       ),
@@ -161,23 +186,24 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
           const Divisor(),
           itemInfo('Descrição', pedido.obra.descricao),
           const Divisor(),
-          itemInfo('Data de Entrega', pedido.deliveryAt != null ? pedido.deliveryAt.text() : 'Não definida'),
+          itemInfo(
+              'Data de Entrega',
+              pedido.deliveryAt != null
+                  ? pedido.deliveryAt.text()
+                  : 'Não definida'),
           const Divisor(),
           itemInfo('Tipo', pedido.tipo.label),
-          const Divisor(),
-          itemInfo(
-              'Bitolas (mm)',
-              pedido.produtos
-                  .map((e) => e.produto.descricaoReplaced)
-                  .join(', ')),
           const Divisor(),
           for (final produto in pedido.produtos)
             Column(
               children: [
                 itemInfo('${produto.produto.descricaoReplaced}mm',
-                    '${produto.qtde}Kg'),
+                    '(${produto.status.status.label}) ${produto.qtde}Kg',
+                    color: produto.status.status == PedidoProdutoStatus.separado
+                        ? null
+                        : produto.status.status.color.withOpacity(0.06)),
                 Divisor(
-                  color: Colors.grey[200],
+                  color: Colors.grey[300],
                 ),
               ],
             ),
@@ -186,25 +212,28 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
     );
   }
 
-  Widget itemInfo(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Text('$label:',
-                style: AppCss.minimumRegular
-                    .copyWith(fontWeight: FontWeight.w500)),
-          ),
-          Expanded(
-              flex: 2,
-              child: Text(
-                value,
-                style: AppCss.minimumRegular.copyWith(),
-                textAlign: TextAlign.end,
-              ))
-        ],
+  Widget itemInfo(String label, String value, {Color? color}) {
+    return Container(
+      color: color,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text('$label:',
+                  style: AppCss.minimumRegular
+                      .copyWith(fontWeight: FontWeight.w500)),
+            ),
+            Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: AppCss.minimumRegular.copyWith(),
+                  textAlign: TextAlign.end,
+                ))
+          ],
+        ),
       ),
     );
   }
