@@ -1,23 +1,26 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 
-enum RelatorioPedidoStatus { produzindo, pronto }
+enum RelatorioPedidoTipo { pedidos, totais, pedidosTotais }
 
-extension RelatorioPedidoStatusExt on RelatorioPedidoStatus {
+extension RelatorioTipoStatusExtension on RelatorioPedidoTipo {
   String get label {
     switch (this) {
-      case RelatorioPedidoStatus.produzindo:
-        return 'Produzindo';
-      case RelatorioPedidoStatus.pronto:
-        return 'Pronto';
+      case RelatorioPedidoTipo.pedidos:
+        return 'Pedidos';
+      case RelatorioPedidoTipo.totais:
+        return 'Totais';
+      case RelatorioPedidoTipo.pedidosTotais:
+        return 'Pedidos e Totais';
     }
   }
 }
 
 class RelatorioPedidoViewModel {
   ClienteModel? cliente;
-  RelatorioPedidoStatus? status;
+  List<PedidoProdutoStatus> status = PedidoProdutoStatus.values;
   RelatorioPedidoModel? relatorio;
   late SortType sortType;
   SortOrder sortOrder = SortOrder.asc;
@@ -35,9 +38,10 @@ class RelatorioPedidoViewModel {
 
 class RelatorioPedidoModel {
   final ClienteModel? cliente;
-  final RelatorioPedidoStatus? status;
+  final List<PedidoProdutoStatus> status;
   final List<PedidoModel> pedidos;
   final DateTime createdAt = DateTime.now();
+  RelatorioPedidoTipo tipo = RelatorioPedidoTipo.pedidos;
 
   RelatorioPedidoModel(this.cliente, this.status, this.pedidos);
 }

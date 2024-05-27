@@ -1,8 +1,10 @@
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/enums/app_module.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/base/base_controller.dart';
+import 'package:aco_plus/app/modules/config/config_page.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 
@@ -45,11 +47,23 @@ class AppDrawer extends StatelessWidget {
                           children: [
                             Text(
                               'v',
-                              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 10),
+                              style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 10),
                             ),
                             Text(
                               '1.0.0',
-                              style: TextStyle(color: Colors.white.withOpacity(0.8)),
+                              style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8)),
+                            ),
+                            const W(8),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                                push(context, const ConfigPage());
+                              },
+                              child: const Icon(Icons.settings,
+                                  color: Colors.white),
                             ),
                           ],
                         ),
@@ -62,11 +76,13 @@ class AppDrawer extends StatelessWidget {
                         pop(context);
                         baseCtrl.moduleStream.add(item);
                       },
-                      leading:
-                          Icon(item.icon, color: item == module ? AppColors.primaryMain : null),
+                      leading: Icon(item.icon,
+                          color: item == module ? AppColors.primaryMain : null),
                       title: Text(
                         item.label,
-                        style: TextStyle(color: item == module ? AppColors.primaryMain : null),
+                        style: TextStyle(
+                            color:
+                                item == module ? AppColors.primaryMain : null),
                       ),
                     )
                 ],

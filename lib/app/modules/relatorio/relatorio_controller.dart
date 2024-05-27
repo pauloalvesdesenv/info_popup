@@ -1,5 +1,4 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
@@ -15,6 +14,7 @@ import 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_ser
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_ordem_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_status_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/pedido/relatorio_pedido_pdf_page.dart';
+import 'package:aco_plus/app/modules/relatorio/ui/pedido/relatorio_pedido_tipo_bottom.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_ordem_view_model.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_pedido_view_model.dart';
 import 'package:flutter/services.dart';
@@ -34,16 +34,22 @@ class PedidoController {
   RelatorioPedidoViewModel get pedidoViewModel => pedidoViewModelStream.value;
 
   void onCreateRelatorioPedido() {
-    List<PedidoModel> pedidos =
-        FirestoreClient.pedidos.data.map((e) => e.copyWith()).toList();
-
-    pedidos = pedidos
-        .where((e) =>
-            pedidoViewModel.status == null ||
-            (pedidoViewModel.status == RelatorioPedidoStatus.produzindo
-                ? e.statusess.last.status != PedidoStatus.pronto
-                : e.statusess.last.status == PedidoStatus.pronto))
+    List<PedidoModel> pedidos = FirestoreClient.pedidos.data
+        .map((e) =>
+            e.copyWith(produtos: e.produtos.map((e) => e.copyWith()).toList()))
         .toList();
+
+    for (PedidoModel pedido in pedidos) {
+      List<PedidoProdutoModel> produtos =
+          pedido.produtos.map((e) => e.copyWith()).toList();
+      pedido.produtos.clear();
+
+      for (PedidoProdutoModel produto in produtos) {
+        if (pedidoViewModel.status.contains(produto.statusess.last.status)) {
+          pedido.produtos.add(produto);
+        }
+      }
+    }
 
     pedidos = pedidos
         .where((e) =>
@@ -88,6 +94,9 @@ class PedidoController {
   }
 
   Future<void> onExportRelatorioPedidoPDF() async {
+    final pedidoTipo = await showRelatorioPedidoTipoBottom();
+    if(pedidoTipo == null) return;
+    pedidoViewModel.relatorio!.tipo = pedidoTipo;
     final pdf = pw.Document();
 
     final img = await rootBundle.load('assets/images/logo.png');
@@ -97,7 +106,7 @@ class PedidoController {
         RelatorioPedidoPdfPage(pedidoViewModel.relatorio!).build(imageBytes));
 
     await downloadPDF(
-        "m2_relatorio_cliente_${(pedidoViewModel.cliente?.nome ?? 'todos').toLowerCase().replaceAll(' ', '_')}_status_${(pedidoViewModel.status?.label ?? 'todos').toLowerCase()}_${DateTime.now().toFileName()}.pdf",
+        "m2_relatorio_cliente_${(pedidoViewModel.cliente?.nome ?? 'todos').toLowerCase().replaceAll(' ', '_')}_status_${(pedidoViewModel.status.map((e) => e.name).join('_')).toLowerCase()}_${DateTime.now().toFileName()}.pdf",
         '/relatorio/pedido/',
         await pdf.save());
   }
@@ -124,30 +133,20 @@ class PedidoController {
     return double.parse(qtde.toStringAsFixed(2));
   }
 
-  //  Future<Uint8List> _mountPDF(RelatorioPedidoModel relatorio,
-  //     List<PedidoModel> pedidos) async {
-  //   final pdf = pw.Document();
-  //   final img = await rootBundle.load('assets/images/logo.png');
-  //   final imageBytes = img.buffer.asUint8List();
-  //   final pedidosQtde = pedidos.length;
-
-  //   pdf.addPage(pw.Page(
-  //       pageFormat: PdfPageFormat.a4,
-  //       build: (pw.Context context) => RelatorioPedidoPdfPage(
-  //               model: relatorio,
-  //               pedidos:
-  //                   pedidos.sublist(0, (pedidosQtde <= 1 ? 1 : 2)).toList())
-  //           .build(imageBytes)));
-
-  //   for (var chunk in pedidos.sublist(3).toList().slices(3)) {
-  //     pdf.addPage(pw.Page(
-  //         pageFormat: PdfPageFormat.a4,
-  //         build: (pw.Context context) =>
-  //             RelatorioPedidoPdfPage(pedidos: chunk).build(imageBytes)));
-  //   }
-
-  //   return await pdf.save();
-  // }
+  double getPedidosTotalPorBitolaStatus(
+      ProdutoModel produto, PedidoProdutoStatus status) {
+    double qtde = 0;
+    for (var pedido in pedidoViewModel.relatorio!.pedidos) {
+      for (var produto in pedido.produtos
+          .where((e) => e.produto.id == produto.id)
+          .toList()) {
+        if (produto.statusess.last.status == status) {
+          qtde = qtde + produto.qtde;
+        }
+      }
+    }
+    return double.parse(qtde.toStringAsFixed(2));
+  }
 
   final AppStream<RelatorioOrdemViewModel> ordemViewModelStream =
       AppStream<RelatorioOrdemViewModel>();

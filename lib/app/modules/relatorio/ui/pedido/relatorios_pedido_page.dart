@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
+import 'package:aco_plus/app/core/components/app_drop_down_list.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/h.dart';
@@ -73,18 +74,17 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
                       itemLabel: (e) => e?.nome ?? 'TODOS',
                       onSelect: (e) {
                         model.cliente = e;
-                        model.status = null;
+                        model.status.clear();
                         relatorioCtrl.pedidoViewModelStream.add(model);
                         relatorioCtrl.onCreateRelatorioPedido();
                       }),
                   const H(16),
-                  AppDropDown<RelatorioPedidoStatus?>(
+                  AppDropDownList<PedidoProdutoStatus>(
                       label: 'Status',
-                      item: model.status,
-                      itens: const [null, ...RelatorioPedidoStatus.values],
-                      itemLabel: (e) => e?.label ?? 'TODOS',
-                      onSelect: (e) {
-                        model.status = e;
+                      addeds: model.status,
+                      itens: PedidoProdutoStatus.values,
+                      itemLabel: (e) => e.label ?? 'Selecione',
+                      onChanged: () {
                         relatorioCtrl.pedidoViewModelStream.add(model);
                         relatorioCtrl.onCreateRelatorioPedido();
                       }),
@@ -132,21 +132,67 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                'Totais',
+                'Totais por status',
                 style: AppCss.mediumBold,
               ),
             ),
             for (final status in PedidoProdutoStatus.values)
+              Builder(builder: (context) {
+                double qtde = relatorioCtrl.getPedidosTotalPorStatus(status);
+                return qtde <= 0
+                    ? const SizedBox()
+                    : Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: itemInfo(status.label, qtde.toKg(),
+                                color: status.color.withOpacity(0.06)),
+                          ),
+                          const Divisor(),
+                        ],
+                      );
+              }),
+            Divisor(color: Colors.grey[700]!, height: 1.5),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Totais por bitola',
+                style: AppCss.mediumBold,
+              ),
+            ),
+            const Divisor(),
+            for (final produto in FirestoreClient.produtos.data)
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: itemInfo(status.label,
-                        relatorioCtrl.getPedidosTotalPorStatus(status).toKg(), color: status.color.withOpacity(0.06)),
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'Bitola ${produto.descricaoReplaced}mm',
+                      style: AppCss.minimumBold,
+                    ),
                   ),
-                  const Divisor(),
+                  for (final status in PedidoProdutoStatus.values)
+                    Builder(builder: (context) {
+                      double qtde = relatorioCtrl
+                          .getPedidosTotalPorBitolaStatus(produto, status);
+                      return qtde <= 0
+                          ? const SizedBox()
+                          : Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  child: itemInfo(status.label, qtde.toKg(),
+                                      color: status.color.withOpacity(0.06)),
+                                ),
+                                const Divisor(),
+                              ],
+                            );
+                    }),
                 ],
               ),
+            const Divisor(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: itemInfo(
@@ -159,6 +205,7 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
   }
 
   Widget itemRelatorio(PedidoModel pedido) {
+    if (pedido.produtos.isEmpty) return const SizedBox();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -199,9 +246,7 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
               children: [
                 itemInfo('${produto.produto.descricaoReplaced}mm',
                     '(${produto.status.status.label}) ${produto.qtde}Kg',
-                    color: produto.status.status == PedidoProdutoStatus.separado
-                        ? null
-                        : produto.status.status.color.withOpacity(0.06)),
+                    color: produto.status.status.color.withOpacity(0.06)),
                 Divisor(
                   color: Colors.grey[300],
                 ),

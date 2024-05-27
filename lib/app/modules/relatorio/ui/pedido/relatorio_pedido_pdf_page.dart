@@ -3,33 +3,17 @@ import 'dart:typed_data';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/pdf_divisor.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
+import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/modules/relatorio/relatorio_controller.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_pedido_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-
-// class RelatorioPedidoPdfPage {
-//   final RelatorioPedidoModel? model;
-//   final List<PedidoModel> pedidos;
-//   RelatorioPedidoPdfPage({this.model, required this.pedidos});
-
-//   pw.Widget build(Uint8List bytes) => pw.Column(
-//         children: [
-//           if (model != null) ...[
-//             pw.Image(pw.MemoryImage(bytes), width: 60, height: 60),
-//             pw.SizedBox(height: 24),
-//             pw.Text('RELATÓRIO DE PEDIDOS POR CLIENTE E STATUS'),
-//             pw.SizedBox(height: 16),
-//             _itemHeader(model!),
-//             pw.SizedBox(height: 24),
-//           ],
-//           for (final pedido in pedidos) _itemRelatorio(pedido),
-//         ],
-//       );
 
 class RelatorioPedidoPdfPage {
   final RelatorioPedidoModel model;
@@ -44,8 +28,19 @@ class RelatorioPedidoPdfPage {
           pw.Text('RELATÓRIO DE PEDIDOS POR CLIENTE E STATUS'),
           pw.SizedBox(height: 16),
           _itemHeader(model),
-          pw.SizedBox(height: 24),
-          for (final pedido in model.pedidos) _itemRelatorio(pedido),
+          if ([RelatorioPedidoTipo.totais, RelatorioPedidoTipo.pedidosTotais]
+              .contains(model.tipo)) ...[
+            pw.SizedBox(height: 24),
+            _itemTotalStatus(model),
+            pw.SizedBox(height: 24),
+            _itemTotalBitolasStatus(model),
+          ],
+          if ([RelatorioPedidoTipo.pedidos, RelatorioPedidoTipo.pedidosTotais]
+              .contains(model.tipo)) ...[
+            pw.SizedBox(height: 24),
+            for (final pedido in model.pedidos)
+              pedido.produtos.isEmpty ? pw.SizedBox() : _itemRelatorio(pedido),
+          ]
         ],
       );
 
@@ -105,25 +100,28 @@ class RelatorioPedidoPdfPage {
             color: Colors.grey[200],
           ),
           for (final produto in pedido.produtos)
-            pw.Column(
-              children: [
-                _itemInfo('${produto.produto.descricaoReplaced}mm',
-                    '(${produto.status.status.label}) ${produto.qtde}Kg',
-                    color: produto.status.status == PedidoProdutoStatus.separado
-                        ? null
-                        : PdfColor.fromInt(produto.status.status.color
-                                .withOpacity(0.06)
-                                .hashCode)
-                            .shade(0.03)),
-                PdfDivisor.build(
-                  color: Colors.grey[200],
-                ),
-                if (produto.produto.id != pedido.produtos.last.produto.id)
-                  PdfDivisor.build(
-                    color: Colors.grey[200],
-                  ),
-              ],
-            ),
+            pw.Builder(builder: (context) {
+              return produto.qtde <= 0
+                  ? pw.SizedBox()
+                  : pw.Column(
+                      children: [
+                        _itemInfo('${produto.produto.descricaoReplaced}mm',
+                            '(${produto.status.status.label}) ${produto.qtde}Kg',
+                            color: PdfColor.fromInt(produto.status.status.color
+                                    .withOpacity(0.06)
+                                    .hashCode)
+                                .shade(0.03)),
+                        PdfDivisor.build(
+                          color: Colors.grey[200],
+                        ),
+                        if (produto.produto.id !=
+                            pedido.produtos.last.produto.id)
+                          PdfDivisor.build(
+                            color: Colors.grey[200],
+                          ),
+                      ],
+                    );
+            }),
         ],
       ),
     );
@@ -153,7 +151,7 @@ class RelatorioPedidoPdfPage {
                       color: PdfColor.fromInt(AppColors.black.value)),
                 ),
               ),
-              pw.Text(relatorio.status?.label ?? 'Todos os status',
+              pw.Text(relatorio.status.map((e) => e.label).join(', '),
                   style: pw.TextStyle(
                       fontSize: 11,
                       font: pw.Font.times(),
@@ -180,6 +178,105 @@ class RelatorioPedidoPdfPage {
           PdfDivisor.build(
             color: Colors.grey[200],
           ),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _itemTotalStatus(RelatorioPedidoModel relatorio) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(16),
+      decoration: pw.BoxDecoration(
+        color: PdfColor.fromInt(Colors.white.value),
+        border: pw.Border.all(
+            color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            'Totais por status',
+            style: pw.TextStyle(
+                fontSize: 14,
+                font: pw.Font.times(),
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColor.fromInt(AppColors.black.value)),
+          ),
+          pw.SizedBox(height: 16),
+          for (final status in PedidoProdutoStatus.values)
+            pw.Builder(builder: (context) {
+              final qtde = relatorioCtrl.getPedidosTotalPorStatus(status);
+              return qtde <= 0
+                  ? pw.SizedBox()
+                  : pw.Column(
+                      children: [
+                        _itemInfo(status.label, qtde.toKg(),
+                            color: PdfColor.fromInt(
+                                    status.color.withOpacity(0.06).hashCode)
+                                .shade(0.03)),
+                        PdfDivisor.build(),
+                      ],
+                    );
+            }),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _itemTotalBitolasStatus(RelatorioPedidoModel relatorio) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(16),
+      decoration: pw.BoxDecoration(
+        color: PdfColor.fromInt(Colors.white.value),
+        border: pw.Border.all(
+            color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            'Totais por bitola',
+            style: pw.TextStyle(
+                fontSize: 14,
+                font: pw.Font.times(),
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColor.fromInt(AppColors.black.value)),
+          ),
+          pw.SizedBox(height: 16),
+          for (final produto in FirestoreClient.produtos.data)
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Padding(
+                  padding: const pw.EdgeInsets.all(16),
+                  child: pw.Text(
+                    'Bitola ${produto.descricaoReplaced}mm',
+                    style: pw.TextStyle(
+                        fontSize: 12,
+                        font: pw.Font.times(),
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromInt(AppColors.black.value)),
+                  ),
+                ),
+                for (final status in PedidoProdutoStatus.values)
+                  pw.Builder(builder: (context) {
+                    final qtde = relatorioCtrl.getPedidosTotalPorBitolaStatus(
+                        produto, status);
+                    return qtde <= 0
+                        ? pw.SizedBox()
+                        : pw.Column(
+                            children: [
+                              _itemInfo(status.label, qtde.toKg(),
+                                  color: PdfColor.fromInt(status.color
+                                          .withOpacity(0.06)
+                                          .hashCode)
+                                      .shade(0.03)),
+                              PdfDivisor.build(),
+                            ],
+                          );
+                  }),
+              ],
+            ),
         ],
       ),
     );
