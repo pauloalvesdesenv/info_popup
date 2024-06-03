@@ -175,7 +175,12 @@ class PedidoController {
             : (b.deliveryAt ?? DateTime.now())
                 .compareTo((a.deliveryAt ?? DateTime.now())));
         break;
-        default:
+      default:
     }
+  }
+
+  void updatePedidoFirestore() {
+    pedidoStream.update();
+    FirestoreClient.pedidos.update(pedido);
   }
 }

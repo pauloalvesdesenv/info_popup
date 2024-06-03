@@ -31,24 +31,31 @@ class BackupController {
   }
 
   Future<void> onFetch() async {
-    final result =
-        await FirebaseStorage.instance.ref().child('backups').listAll();
-    final backups = result.items.map((e) => BackupModel.fromRef(e)).toList();
+    final backups = <BackupModel>[];
+    for (var item in (await FirebaseStorage.instance.ref().child('backups').listAll()).items) {
+      final backup = BackupModel.fromRef(item);
+      backup.url = await item.getDownloadURL();
+      backups.add(backup);
+    }
     backupsStream.add(backups);
   }
 
   Future<void> onCreateBackup() async {
     Map<String, dynamic> backup = {};
-    onAddCollection(backup, 'clientes',
-        FirestoreClient.clientes.data.map((e) => e.toMap()).toList());
-    onAddCollection(backup, 'ordens',
-        FirestoreClient.ordens.data.map((e) => e.toMap()).toList());
-    onAddCollection(backup, 'pedidos',
-        FirestoreClient.pedidos.data.map((e) => e.toMap()).toList());
-    onAddCollection(backup, 'produtos',
-        FirestoreClient.produtos.data.map((e) => e.toMap()).toList());
     onAddCollection(backup, 'usuarios',
         FirestoreClient.usuarios.data.map((e) => e.toMap()).toList());
+    onAddCollection(backup, 'clientes',
+        FirestoreClient.clientes.data.map((e) => e.toMap()).toList());
+    onAddCollection(backup, 'produtos',
+        FirestoreClient.produtos.data.map((e) => e.toMap()).toList());
+    onAddCollection(backup, 'steps',
+        FirestoreClient.steps.data.map((e) => e.toMap()).toList());
+    onAddCollection(backup, 'tags',
+        FirestoreClient.tags.data.map((e) => e.toMap()).toList());
+    onAddCollection(backup, 'pedidos',
+        FirestoreClient.pedidos.data.map((e) => e.toMap()).toList());
+    onAddCollection(backup, 'ordens',
+        FirestoreClient.ordens.data.map((e) => e.toMap()).toList());
     final bytes = utf8.encode(json.encode(backup));
     final name =
         'backup_${DateFormat('dd_MM_yyyy_hh_mm_ss').format(DateTime.now())}.json';
@@ -69,9 +76,13 @@ class BackupController {
       await onRestoreCollection(
           FirestoreClient.usuarios.collection, backup['usuarios']);
       await onRestoreCollection(
+          FirestoreClient.clientes.collection, backup['clientes']);
+      await onRestoreCollection(
           FirestoreClient.produtos.collection, backup['produtos']);
       await onRestoreCollection(
-          FirestoreClient.clientes.collection, backup['clientes']);
+          FirestoreClient.steps.collection, backup['steps']);
+      await onRestoreCollection(
+          FirestoreClient.tags.collection, backup['tags']);
       await onRestoreCollection(
           FirestoreClient.pedidos.collection, backup['pedidos']);
       await onRestoreCollection(

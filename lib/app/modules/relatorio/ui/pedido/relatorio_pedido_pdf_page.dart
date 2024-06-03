@@ -28,14 +28,14 @@ class RelatorioPedidoPdfPage {
           pw.Text('RELATÓRIO DE PEDIDOS POR CLIENTE E STATUS'),
           pw.SizedBox(height: 16),
           _itemHeader(model),
-          if ([RelatorioPedidoTipo.totais, RelatorioPedidoTipo.pedidosTotais]
+          if ([RelatorioPedidoTipo.totais, RelatorioPedidoTipo.totaisPedidos]
               .contains(model.tipo)) ...[
             pw.SizedBox(height: 24),
             _itemTotalStatus(model),
             pw.SizedBox(height: 24),
             _itemTotalBitolasStatus(model),
           ],
-          if ([RelatorioPedidoTipo.pedidos, RelatorioPedidoTipo.pedidosTotais]
+          if ([RelatorioPedidoTipo.pedidos, RelatorioPedidoTipo.totaisPedidos]
               .contains(model.tipo)) ...[
             pw.SizedBox(height: 24),
             for (final pedido in model.pedidos)
@@ -244,39 +244,53 @@ class RelatorioPedidoPdfPage {
           ),
           pw.SizedBox(height: 16),
           for (final produto in FirestoreClient.produtos.data)
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(16),
-                  child: pw.Text(
-                    'Bitola ${produto.descricaoReplaced}mm',
-                    style: pw.TextStyle(
-                        fontSize: 12,
-                        font: pw.Font.times(),
-                        fontWeight: pw.FontWeight.bold,
-                        color: PdfColor.fromInt(AppColors.black.value)),
-                  ),
-                ),
-                for (final status in PedidoProdutoStatus.values)
-                  pw.Builder(builder: (context) {
-                    final qtde = relatorioCtrl.getPedidosTotalPorBitolaStatus(
-                        produto, status);
-                    return qtde <= 0
-                        ? pw.SizedBox()
-                        : pw.Column(
-                            children: [
-                              _itemInfo(status.label, qtde.toKg(),
-                                  color: PdfColor.fromInt(status.color
-                                          .withOpacity(0.06)
-                                          .hashCode)
-                                      .shade(0.03)),
-                              PdfDivisor.build(),
-                            ],
-                          );
-                  }),
-              ],
-            ),
+            pw.Builder(
+              builder: (context) {
+                bool hasQtde = PedidoProdutoStatus.values
+                    .map((e) => relatorioCtrl.getPedidosTotalPorBitolaStatus(
+                        produto, e))
+                    .toList()
+                    .any((e) => e > 0);
+                return !hasQtde
+                    ? pw.SizedBox()
+                    : pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(16),
+                            child: pw.Text(
+                              'Bitola ${produto.descricaoReplaced}mm',
+                              style: pw.TextStyle(
+                                  fontSize: 12,
+                                  font: pw.Font.times(),
+                                  fontWeight: pw.FontWeight.bold,
+                                  color:
+                                      PdfColor.fromInt(AppColors.black.value)),
+                            ),
+                          ),
+                          for (final status in PedidoProdutoStatus.values)
+                            pw.Builder(builder: (context) {
+                              final qtde =
+                                  relatorioCtrl.getPedidosTotalPorBitolaStatus(
+                                      produto, status);
+                              return qtde <= 0
+                                  ? pw.SizedBox()
+                                  : pw.Column(
+                                      children: [
+                                        _itemInfo(status.label, qtde.toKg(),
+                                            color: PdfColor.fromInt(status.color
+                                                    .withOpacity(0.06)
+                                                    .hashCode)
+                                                .shade(0.03)),
+                                        PdfDivisor.build(),
+                                      ],
+                                    );
+                            }),
+                          PdfDivisor.build(color: Colors.grey[600]!),
+                        ],
+                      );
+              },
+            )
         ],
       ),
     );

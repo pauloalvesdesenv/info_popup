@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/components/comment/comment_quill_model.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
@@ -16,6 +17,7 @@ class PedidoUtils {
   final TextController search = TextController();
   SortType sortType = SortType.alfabetic;
   SortOrder sortOrder = SortOrder.asc;
+  CommentQuillModel quill = CommentQuillModel();
 }
 
 class PedidoCreateModel {
@@ -88,5 +90,9 @@ class PedidoCreateModel {
             .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
             .toList(),
         deliveryAt: deliveryAt,
+        steps: [],
+        tags: [],
+        checks: [],
+        comments: [],
       );
 }

@@ -32,7 +32,6 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
   void initState() {
     relatorioCtrl.pedidoViewModelStream.add(RelatorioPedidoViewModel());
     relatorioCtrl.onCreateRelatorioPedido();
-
     super.initState();
   }
 
@@ -63,144 +62,204 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
         stream: relatorioCtrl.pedidoViewModelStream.listen,
         builder: (_, model) => ListView(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  AppDropDown<ClienteModel?>(
-                      label: 'Cliente',
-                      item: model.cliente,
-                      itens: [null, ...FirestoreClient.clientes.data],
-                      itemLabel: (e) => e?.nome ?? 'TODOS',
-                      onSelect: (e) {
-                        model.cliente = e;
-                        model.status.clear();
-                        relatorioCtrl.pedidoViewModelStream.add(model);
-                        relatorioCtrl.onCreateRelatorioPedido();
-                      }),
-                  const H(16),
-                  AppDropDownList<PedidoProdutoStatus>(
-                      label: 'Status',
-                      addeds: model.status,
-                      itens: PedidoProdutoStatus.values,
-                      itemLabel: (e) => e.label ?? 'Selecione',
-                      onChanged: () {
-                        relatorioCtrl.pedidoViewModelStream.add(model);
-                        relatorioCtrl.onCreateRelatorioPedido();
-                      }),
-                  const H(16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppDropDown<SortType>(
-                          label: 'Ordernar por',
-                          item: model.sortType,
-                          itens: model.sortTypes,
-                          itemLabel: (e) => e.name,
-                          onSelect: (e) {
-                            model.sortType = e;
-                            relatorioCtrl.pedidoViewModelStream.add(model);
-                            relatorioCtrl.onCreateRelatorioPedido();
-                          },
-                        ),
-                      ),
-                      const W(16),
-                      Expanded(
-                        child: AppDropDown<SortOrder>(
-                          label: 'Ordernar',
-                          item: model.sortOrder,
-                          itens: SortOrder.values,
-                          itemLabel: (e) => e.name,
-                          onSelect: (e) {
-                            model.sortOrder = e;
-                            relatorioCtrl.pedidoViewModelStream.add(model);
-                            relatorioCtrl.onCreateRelatorioPedido();
-                          },
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
+            _filterWidget(model),
             Divisor(color: Colors.grey[700]!, height: 1.5),
-            Column(
-              children: model.relatorio!.pedidos
-                  .map((e) => itemRelatorio(e))
-                  .toList(),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Totais por status',
-                style: AppCss.mediumBold,
-              ),
-            ),
-            for (final status in PedidoProdutoStatus.values)
-              Builder(builder: (context) {
-                double qtde = relatorioCtrl.getPedidosTotalPorStatus(status);
-                return qtde <= 0
-                    ? const SizedBox()
-                    : Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: itemInfo(status.label, qtde.toKg(),
-                                color: status.color.withOpacity(0.06)),
-                          ),
-                          const Divisor(),
-                        ],
-                      );
-              }),
-            Divisor(color: Colors.grey[700]!, height: 1.5),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Totais por bitola',
-                style: AppCss.mediumBold,
-              ),
-            ),
-            const Divisor(),
-            for (final produto in FirestoreClient.produtos.data)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      'Bitola ${produto.descricaoReplaced}mm',
-                      style: AppCss.minimumBold,
-                    ),
-                  ),
-                  for (final status in PedidoProdutoStatus.values)
-                    Builder(builder: (context) {
-                      double qtde = relatorioCtrl
-                          .getPedidosTotalPorBitolaStatus(produto, status);
-                      return qtde <= 0
-                          ? const SizedBox()
-                          : Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  child: itemInfo(status.label, qtde.toKg(),
-                                      color: status.color.withOpacity(0.06)),
-                                ),
-                                const Divisor(),
-                              ],
-                            );
-                    }),
-                ],
-              ),
-            const Divisor(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: itemInfo(
-                  'Total Geral', relatorioCtrl.getPedidosTotal().toKg()),
-            ),
+            if ([RelatorioPedidoTipo.totaisPedidos, RelatorioPedidoTipo.totais]
+                .contains(model.tipo)) ...[
+              _totaisWidget(),
+              Divisor(color: Colors.grey[700]!, height: 1.5),
+            ],
+            if ([RelatorioPedidoTipo.totaisPedidos, RelatorioPedidoTipo.pedidos]
+                .contains(model.tipo)) ...[
+              _pedidosWidget(model),
+              Divisor(color: Colors.grey[700]!, height: 1.5),
+            ]
           ],
         ),
       ),
+    );
+  }
+
+  Column _pedidosWidget(RelatorioPedidoViewModel model) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            'Pedidos:',
+            style: AppCss.mediumBold,
+          ),
+        ),
+        const Divisor(),
+        ...model.relatorio!.pedidos.map((e) => itemRelatorio(e)).toList()
+      ],
+    );
+  }
+
+  Padding _filterWidget(RelatorioPedidoViewModel model) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppDropDown<ClienteModel?>(
+              label: 'Cliente',
+              hasFilter: true,
+              item: model.cliente,
+              itens: [null, ...FirestoreClient.clientes.data],
+              itemLabel: (e) => e?.nome ?? 'TODOS',
+              onSelect: (e) {
+                model.cliente = e;
+                model.status.clear();
+                relatorioCtrl.pedidoViewModelStream.add(model);
+                relatorioCtrl.onCreateRelatorioPedido();
+              }),
+          const H(16),
+          AppDropDownList<PedidoProdutoStatus>(
+              label: 'Status',
+              addeds: model.status,
+              itens: PedidoProdutoStatus.values,
+              itemLabel: (e) => e.label ?? 'Selecione',
+              itemColor: (e) => e.color.withOpacity(0.4),
+              onChanged: () {
+                relatorioCtrl.pedidoViewModelStream.add(model);
+                relatorioCtrl.onCreateRelatorioPedido();
+              }),
+          const H(16),
+          Row(
+            children: [
+              Expanded(
+                child: AppDropDown<SortType>(
+                  label: 'Ordernar por',
+                  item: model.sortType,
+                  itens: model.sortTypes,
+                  itemLabel: (e) => e.name,
+                  onSelect: (e) {
+                    model.sortType = e ?? SortType.alfabetic;
+                    relatorioCtrl.pedidoViewModelStream.add(model);
+                    relatorioCtrl.onCreateRelatorioPedido();
+                  },
+                ),
+              ),
+              const W(16),
+              Expanded(
+                child: AppDropDown<SortOrder>(
+                  label: 'Ordernar',
+                  item: model.sortOrder,
+                  itens: SortOrder.values,
+                  itemLabel: (e) => e.name,
+                  onSelect: (e) {
+                    model.sortOrder = e ?? SortOrder.asc;
+                    relatorioCtrl.pedidoViewModelStream.add(model);
+                    relatorioCtrl.onCreateRelatorioPedido();
+                  },
+                ),
+              ),
+            ],
+          ),
+          const H(16),
+          AppDropDown<RelatorioPedidoTipo>(
+            label: 'Tipo de Relatório',
+            item: model.tipo,
+            itens: RelatorioPedidoTipo.values,
+            itemLabel: (e) => e.label,
+            onSelect: (e) {
+              model.tipo = e!;
+              relatorioCtrl.pedidoViewModelStream.add(model);
+              relatorioCtrl.onCreateRelatorioPedido();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Column _totaisWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            'Totais por status:',
+            style: AppCss.mediumBold,
+          ),
+        ),
+        for (final status in PedidoProdutoStatus.values)
+          Builder(builder: (context) {
+            double qtde = relatorioCtrl.getPedidosTotalPorStatus(status);
+            return qtde <= 0
+                ? const SizedBox()
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: itemInfo(status.label, qtde.toKg(),
+                            color: status.color.withOpacity(0.06)),
+                      ),
+                      const Divisor(),
+                    ],
+                  );
+          }),
+        Divisor(color: Colors.grey[700]!, height: 1.5),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            'Totais por bitola:',
+            style: AppCss.mediumBold,
+          ),
+        ),
+        const Divisor(),
+        for (final produto in FirestoreClient.produtos.data)
+          Builder(builder: (context) {
+            bool hasQtde = PedidoProdutoStatus.values
+                .map((e) =>
+                    relatorioCtrl.getPedidosTotalPorBitolaStatus(produto, e))
+                .toList()
+                .any((e) => e > 0);
+            return !hasQtde
+                ? const SizedBox()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          'Bitola ${produto.descricaoReplaced}mm:',
+                          style: AppCss.minimumBold,
+                        ),
+                      ),
+                      for (final status in PedidoProdutoStatus.values)
+                        Builder(builder: (context) {
+                          double qtde = relatorioCtrl
+                              .getPedidosTotalPorBitolaStatus(produto, status);
+                          return qtde <= 0
+                              ? const SizedBox()
+                              : Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      child: itemInfo(status.label, qtde.toKg(),
+                                          color:
+                                              status.color.withOpacity(0.06)),
+                                    ),
+                                    const Divisor(),
+                                  ],
+                                );
+                        }),
+                      Divisor(color: Colors.grey[600]!),
+                    ],
+                  );
+          }),
+        const Divisor(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: itemInfo('Total Geral', relatorioCtrl.getPedidosTotal().toKg(),
+              labelStyle: AppCss.minimumBold),
+        ),
+      ],
     );
   }
 
@@ -257,7 +316,8 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
     );
   }
 
-  Widget itemInfo(String label, String value, {Color? color}) {
+  Widget itemInfo(String label, String value,
+      {Color? color, TextStyle? labelStyle}) {
     return Container(
       color: color,
       child: Padding(
@@ -267,8 +327,9 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
           children: [
             Expanded(
               child: Text('$label:',
-                  style: AppCss.minimumRegular
-                      .copyWith(fontWeight: FontWeight.w500)),
+                  style: labelStyle ??
+                      AppCss.minimumRegular
+                          .copyWith(fontWeight: FontWeight.w500)),
             ),
             Expanded(
                 flex: 2,

@@ -91,7 +91,7 @@ class _PedidosPageState extends State<PedidosPage> {
                               itens: SortType.values,
                               itemLabel: (e) => e.name,
                               onSelect: (e) {
-                                utils.sortType = e;
+                                utils.sortType = e  ?? SortType.alfabetic;
                                 pedidoCtrl.utilsStream.update();
                               },
                             ),
@@ -104,7 +104,7 @@ class _PedidosPageState extends State<PedidosPage> {
                               itens: SortOrder.values,
                               itemLabel: (e) => e.name,
                               onSelect: (e) {
-                                utils.sortOrder = e;
+                                utils.sortOrder = e  ?? SortOrder.asc;
                                 pedidoCtrl.utilsStream.update();
                               },
                             ),

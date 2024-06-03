@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/backup/ui/backups_page.dart';
+import 'package:aco_plus/app/modules/usuario/ui/usuarios_page.dart';
 import 'package:flutter/material.dart';
 
 class ConfigPage extends StatelessWidget {
@@ -17,6 +18,7 @@ class ConfigPage extends StatelessWidget {
       body: Column(
         children: [
           ListTile(
+            onTap: () => push(context, const UsuariosPage()),
             title: const Text('Usuários'),
             trailing: Icon(
               Icons.arrow_forward_ios,

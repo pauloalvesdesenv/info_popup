@@ -1,3 +1,4 @@
+import 'package:aco_plus/app/core/components/loading.dart';
 import 'package:flutter/material.dart';
 
 class StreamOut<T> extends StatelessWidget {
@@ -15,7 +16,7 @@ class StreamOut<T> extends StatelessWidget {
     this.preFunction,
     this.condition = true,
     this.request,
-    this.loading = const SizedBox(),
+    this.loading = const LoadingStreamOut(),
   }) : super(key: key);
 
   @override
@@ -24,7 +25,8 @@ class StreamOut<T> extends StatelessWidget {
     return StreamBuilder<T>(
       stream: stream,
       builder: (_, snapshot) {
-        if (snapshot.connectionState == ConnectionState.active || snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.active ||
+            snapshot.hasData) {
           if (snapshot.data != null) {
             return builder(_, snapshot.requireData);
           } else {
@@ -62,7 +64,8 @@ class StreamOutNull<T> extends StatelessWidget {
     return StreamBuilder<T?>(
       stream: stream,
       builder: (BuildContext _, AsyncSnapshot<T?> snapshot) {
-        if (snapshot.connectionState == ConnectionState.active || snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.active ||
+            snapshot.hasData) {
           return child(_, snapshot.data);
         } else {
           return loading;
@@ -105,7 +108,8 @@ class StreamOutResponse<ApiResponse, T> extends StatelessWidget {
         if (snapshot.connectionState != ConnectionState.active) {
           return emptyLoading ?? loading ?? Container();
         }
-        if (snapshot.connectionState == ConnectionState.active || snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.active ||
+            snapshot.hasData) {
           dynamic response = snapshot.requireData;
           if (response.hasData) {
             return child(_, response.data);

@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/usuario_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -54,55 +55,58 @@ class _UsuarioCreatePageState extends State<UsuarioCreatePage> {
   }
 
   Widget body(UsuarioCreateModel form) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        AppField(
-          label: 'Nome',
-          controller: form.nome,
-          onChanged: (_) => usuarioCtrl.formStream.update(),
-        ),
-        const H(16),
-        AppField(
-          label: 'E-mail',
-          controller: form.email,
-          onChanged: (_) => usuarioCtrl.formStream.update(),
-        ),
-        const H(16),
-        AppField(
-          label: 'Senha',
-          controller: form.senha,
-          onChanged: (_) => usuarioCtrl.formStream.update(),
-        ),
-        const H(16),
-        AppDropDown<UsuarioRole?>(
-          label: 'Tipo',
-          item: form.role,
-          itens: UsuarioRole.values,
-          itemLabel: (e) => e?.label ?? 'Selecione',
-          onSelect: (e) {
-            form.role = e;
-            usuarioCtrl.formStream.update();
-          },
-        ),
-        const H(24),
-        if (form.isEdit)
-          TextButton.icon(
-              style: ButtonStyle(
-                fixedSize: const MaterialStatePropertyAll(
-                    Size.fromWidth(double.maxFinite)),
-                foregroundColor: MaterialStatePropertyAll(AppColors.error),
-                backgroundColor: MaterialStatePropertyAll(AppColors.white),
-                shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                    borderRadius: AppCss.radius8,
-                    side: BorderSide(color: AppColors.error))),
-              ),
-              onPressed: () => usuarioCtrl.onDelete(context, widget.usuario!),
-              label: const Text('Excluir'),
-              icon: const Icon(
-                Icons.delete_outline,
-              )),
-      ],
+    return RefreshIndicator(
+      onRefresh: () async => await FirestoreClient.usuarios.fetch(),
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          AppField(
+            label: 'Nome',
+            controller: form.nome,
+            onChanged: (_) => usuarioCtrl.formStream.update(),
+          ),
+          const H(16),
+          AppField(
+            label: 'E-mail',
+            controller: form.email,
+            onChanged: (_) => usuarioCtrl.formStream.update(),
+          ),
+          const H(16),
+          AppField(
+            label: 'Senha',
+            controller: form.senha,
+            onChanged: (_) => usuarioCtrl.formStream.update(),
+          ),
+          const H(16),
+          AppDropDown<UsuarioRole?>(
+            label: 'Tipo',
+            item: form.role,
+            itens: UsuarioRole.values,
+            itemLabel: (e) => e?.label ?? 'Selecione',
+            onSelect: (e) {
+              form.role = e;
+              usuarioCtrl.formStream.update();
+            },
+          ),
+          const H(24),
+          if (form.isEdit)
+            TextButton.icon(
+                style: ButtonStyle(
+                  fixedSize: const WidgetStatePropertyAll(
+                      Size.fromWidth(double.maxFinite)),
+                  foregroundColor: WidgetStatePropertyAll(AppColors.error),
+                  backgroundColor: WidgetStatePropertyAll(AppColors.white),
+                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                      borderRadius: AppCss.radius8,
+                      side: BorderSide(color: AppColors.error))),
+                ),
+                onPressed: () => usuarioCtrl.onDelete(context, widget.usuario!),
+                label: const Text('Excluir'),
+                icon: const Icon(
+                  Icons.delete_outline,
+                )),
+        ],
+      ),
     );
   }
 }

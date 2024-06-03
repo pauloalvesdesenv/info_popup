@@ -62,6 +62,7 @@ class UsuarioController {
           'Usuário ${form.isEdit ? 'Editado' : 'Adicionado'}',
           'Operação realizada com sucesso',
           position: NotificationPosition.bottom);
+      await FirestoreClient.usuarios.fetch();
     } catch (e) {
       NotificationService.showNegative(
           'Erro ao realizar operação', e.toString(),
@@ -81,7 +82,6 @@ class UsuarioController {
     if (form.nome.text.length < 2) {
       throw Exception('Nome deve conter no mínimo 3 caracteres');
     }
-    
   }
 
   Future<void> getCurrentUser() async {

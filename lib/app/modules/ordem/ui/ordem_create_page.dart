@@ -103,7 +103,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                             itens: SortType.values,
                             itemLabel: (e) => e.name,
                             onSelect: (e) {
-                              form.sortType = e;
+                              form.sortType = e ?? SortType.alfabetic;
                               ordemCtrl.formStream.update();
                             },
                           ),
@@ -116,7 +116,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                             itens: SortOrder.values,
                             itemLabel: (e) => e.name,
                             onSelect: (e) {
-                              form.sortOrder = e;
+                              form.sortOrder = e  ?? SortOrder.asc;
                               ordemCtrl.formStream.update();
                             },
                           ),

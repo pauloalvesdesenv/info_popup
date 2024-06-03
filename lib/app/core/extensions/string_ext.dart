@@ -1,8 +1,14 @@
+import 'dart:developer';
+
+import 'package:aco_plus/app/core/components/archive/archive_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 extension StringExt on String {
-  String get toCompare => replaceAll(' ', '').toLowerCase();
+  String get toCompare => replaceAll(' ', '')
+      .toLowerCase()
+      .removeSpecialCharacters()
+      .toNonDiacritics();
 
   String getInitials() {
     List<String> nameParts = split(' ');
@@ -55,10 +61,33 @@ extension StringExt on String {
       }
     }
     return name;
-  }   
+  }
 
   String toMoney() =>
       MoneyMaskedTextController(initialValue: double.parse(this)).text;
 
-      String removeDecimal() => endsWith('.0') ? split('.').first : this;
+  String removeDecimal() => endsWith('.0') ? split('.').first : this;
+
+  ArchiveType getArchiveTypeMimeType() {
+    switch (this) {
+      case 'application/pdf':
+        return ArchiveType.pdf;
+      case 'image/png':
+        return ArchiveType.image;
+      case 'image/jpg':
+        return ArchiveType.image;
+      case 'image/jpeg':
+        return ArchiveType.image;
+      case 'image/gif':
+        return ArchiveType.image;
+      case 'video/mp4':
+        return ArchiveType.video;
+      case 'video/mov':
+        return ArchiveType.video;
+      default:
+        throw Exception();
+    }
+  }
+
+  String getExtFromFirebaseURL() => split('?')[0].split('.').last;
 }

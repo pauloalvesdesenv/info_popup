@@ -14,9 +14,7 @@ import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/enums/obra_status.dart';
-import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/formatters/uper_case_formatter.dart';
-import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
@@ -26,7 +24,6 @@ import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class PedidoCreatePage extends StatefulWidget {
@@ -123,61 +120,70 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
               onChanged: (_) => pedidoCtrl.formStream.update(),
             ),
             const H(16),
-            TypeAheadField(
-              // textFieldConfiguration: TextFieldConfiguration(
-              //     controller: TextEditingController(
-              //         text: viewModel.controlador?.descricao ??
-              //             'Todos os controladores'),
-              //     autofocus: false,
-              //     decoration: InputDecoration(
-              //         border: OutlineInputBorder(
-              //             borderRadius: BorderRadius.circular(8)))),
-              builder: (_, __, ___) => AppField(
-                controllerObj: __,
-                focusObj: ___,
-                label: 'Cliente',
-              ),
-              controller: form.clienteEC.controller,
-              focusNode: form.clienteEC.focus,
-              suggestionsCallback: (pattern) async {
-                if (pattern.length < 2) return [];
-                final list = FirestoreClient.clientes.data
-                    .where((e) =>
-                        e.toString().toCompare.contains(pattern.toCompare))
-                    .toList();
-                return [null, ...list];
+            AppDropDown<ClienteModel?>(
+              label: 'Cliente',
+              hasFilter: true,
+              item: form.cliente,
+              itens: FirestoreClient.clientes.data,
+              onCreated: () async {
+                ClienteModel? cliente = await showClienteCreateSimplifyBottom();
+                assert(cliente != null);
+                form.cliente = cliente;
+                form.obra = form.cliente!.obras.first;
+                pedidoCtrl.formStream.update();
               },
-              hideOnEmpty: true,
-
-              // noItemsFoundBuilder: (context) => const Padding(
-              //   padding: EdgeInsets.all(16),
-              //   child: Text('Nenhum controlador encontrado'),
-              // ),
-              itemBuilder: (context, cliente) => Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(8),
-                child: Text(
-                  cliente?.nome ?? 'ADICIONAR CLIENTE',
-                  style: AppCss.mediumRegular,
-                ),
-              ),
-
-              onSelected: (e) async {
-                if (e?.id == 'add') {
-                  final created = await showClienteCreateSimplifyBottom();
-                  if (created != null) {
-                    form.clienteAdd = created;
-                    form.cliente = created;
-                    form.obra = form.cliente!.obras.first;
-                    pedidoCtrl.formStream.update();
-                  }
-                } else {
-                  form.clienteEC.controller.text = e.nome;
-                  form.cliente = e;
-                }
+              itemLabel: (e) => e!.nome,
+              onSelect: (e) async {
+                form.cliente = e;
                 pedidoCtrl.formStream.update();
               },
             ),
+            // TypeAheadField(
+            //   builder: (_, __, ___) => AppField(
+            //     controllerObj: __,
+            //     focusObj: ___,
+            //     label: 'Cliente',
+            //   ),
+            //   controller: form.clienteEC.controller,
+            //   focusNode: form.clienteEC.focus,
+            //   suggestionsCallback: (pattern) async {
+            //     if (pattern.length < 2) return [];
+            //     final list = FirestoreClient.clientes.data
+            //         .where((e) =>
+            //             e.toString().toCompare.contains(pattern.toCompare))
+            //         .toList();
+            //     return [null, ...list];
+            //   },
+            //   hideOnEmpty: true,
+
+            //   // noItemsFoundBuilder: (context) => const Padding(
+            //   //   padding: EdgeInsets.all(16),
+            //   //   child: Text('Nenhum controlador encontrado'),
+            //   // ),
+            //   itemBuilder: (context, cliente) => Container(
+            //     color: Colors.white,
+            //     padding: const EdgeInsets.all(8),
+            //     child: Text(
+            //       cliente?.nome ?? 'ADICIONAR CLIENTE',
+            //       style: AppCss.mediumRegular,
+            //     ),
+            //   ),
+            //   onSelected: (e) async {
+            //     if (e?.id == 'add') {
+            //       final created = await showClienteCreateSimplifyBottom();
+            //       if (created != null) {
+            //         form.clienteAdd = created;
+            //         form.cliente = created;
+            //         form.obra = form.cliente!.obras.first;
+            //         pedidoCtrl.formStream.update();
+            //       }
+            //     } else {
+            //       form.clienteEC.controller.text = e.nome;
+            //       form.cliente = e;
+            //     }
+            //     pedidoCtrl.formStream.update();
+            //   },
+            // ),
             // AppDropDown<ClienteModel?>(
             //   label: 'Cliente',
             //   disable: form.isEdit,
@@ -243,7 +249,6 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                 child: Column(
                   children: [
                     AppDropDown<ProdutoModel?>(
-                      dropdownKey: form.produtoKey,
                       label: 'Produto',
                       focus: form.produtoFocus,
                       item: form.produto.produtoModel,
@@ -294,7 +299,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                           pedidoCtrl.formStream.update();
                         },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
+                    backgroundColor: WidgetStateProperty.all(
                         form.produto.isEnable
                             ? AppColors.primaryMain
                             : AppColors.black.withOpacity(0.3)),

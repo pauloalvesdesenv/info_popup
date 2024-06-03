@@ -1,18 +1,21 @@
-import 'package:aco_plus/app/core/components/h.dart';
-import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/core/components/app_field.dart';
+import 'package:aco_plus/app/core/extensions/string_ext.dart';
+import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class AppDropDown<T> extends StatefulWidget {
   final String label;
   final T item;
   final List<T> itens;
   final String Function(T) itemLabel;
-  final void Function(T) onSelect;
+  final void Function(T?) onSelect;
+  final Future<T> Function()? onCreated;
   final bool required;
   final bool disable;
   final FocusNode? focus;
-  final GlobalKey? dropdownKey;
+  final bool hasFilter;
 
   const AppDropDown({
     required this.label,
@@ -20,10 +23,11 @@ class AppDropDown<T> extends StatefulWidget {
     required this.itens,
     required this.itemLabel,
     required this.onSelect,
+    this.onCreated,
     this.focus,
     this.required = true,
     this.disable = false,
-    this.dropdownKey,
+    this.hasFilter = false,
     super.key,
   });
 
@@ -32,106 +36,58 @@ class AppDropDown<T> extends StatefulWidget {
 }
 
 class _AppDropDown<T> extends State<AppDropDown<T>> {
+  final TextController _controller = TextController();
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      ignoring: widget.disable,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${widget.label}:${widget.required ? '*' : ''}',
-            style: AppCss.smallBold,
-          ),
-          const H(4),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.neutralMedium),
-              borderRadius: AppCss.radius8,
-              color: widget.disable
-                  ? AppColors.neutralMedium.withOpacity(0.4)
-                  : null,
-            ),
-            child: DropdownButton<T>(
-              key: widget.dropdownKey,
-              focusNode: widget.focus,
-              enableFeedback: true,
-              padding: const EdgeInsets.only(left: 8),
-              value: widget.item,
-              isExpanded: true,
-              underline: const SizedBox(),
-              onChanged: (_) => widget.onSelect.call(_ as T),
-              hint: const Text('Selecione'),
-              icon: widget.disable
-                  ? const SizedBox()
-                  : IgnorePointer(
-                      ignoring: widget.item == null,
-                      child: InkWell(
-                        onTap: () {
-                          if (widget.item != null) {
-                            widget.onSelect.call(null as T);
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Icon(widget.item != null
-                              ? Icons.close
-                              : Icons.arrow_drop_down),
-                        ),
-                      ),
-                    ),
-              items: widget.itens
-                  .map((e) => DropdownMenuItem<T>(
-                        value: e,
-                        child: Text(widget.itemLabel.call(e)),
-                      ))
-                  .toList(),
-            ),
-          ),
-          // DropdownButtonFormField2<T>(
-          //   isExpanded: true,
-          //   focusNode: widget.focus,
-          //   decoration: const InputDecoration(
-          //     contentPadding: EdgeInsets.symmetric(vertical: 12),
-          //   ),
-          //   hint: const Text(
-          //     'Selecione',
-          //     style: TextStyle(fontSize: 16),
-          //   ),
-          //   value: widget.item,
-          //   items: widget.itens
-          //       .map((item) => DropdownMenuItem<T>(
-          //             value: item,
-          //             child: Text(
-          //               widget.itemLabel.call(item),
-          //               style: const TextStyle(
-          //                 fontSize: 16,
-          //               ),
-          //             ),
-          //           ))
-          //       .toList(),
-          //   onChanged: (value) => widget.onSelect.call(value as T),
-          //   buttonStyleData: const ButtonStyleData(
-          //     padding: EdgeInsets.only(right: 8),
-          //   ),
-          //   iconStyleData: const IconStyleData(
-          //     icon: Icon(
-          //       Icons.arrow_drop_down,
-          //       color: Colors.black45,
-          //     ),
-          //     iconSize: 24,
-          //   ),
-          //   dropdownStyleData: DropdownStyleData(
-          //     decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.circular(15),
-          //     ),
-          //   ),
-          //   menuItemStyleData: const MenuItemStyleData(
-          //     padding: EdgeInsets.symmetric(horizontal: 16),
-          //   ),
-          // ),
-        ],
+    return TypeAheadField<T>(
+      offset: const Offset(0, 0),
+      builder: (_, __, ___) => AppField(
+        hint: 'Selecione',
+        controllerObj: __,
+        focusObj: ___,
+        label: widget.label,
+        isDisable: widget.disable,
+        onChanged: (e) {
+          setState(() {
+            if (e.isEmpty) widget.onSelect.call(null);
+          });
+        },
+        suffixIcon: widget.onCreated == null ? null : Icons.add,
+        onSuffix: widget.onCreated == null
+            ? null
+            : () async {
+                final created = await widget.onCreated!.call();
+                if (created == null) return;
+                widget.onSelect.call(created);
+              },
       ),
+      controller: _controller.controller,
+      focusNode: _controller.focus,
+      suggestionsCallback: (pattern) async => widget.itens
+          .where((e) =>
+              !widget.hasFilter ||
+              e.toString().toCompare.contains(pattern.toCompare))
+          .toList(),
+      hideOnEmpty: true,
+      emptyBuilder: (context) => const Padding(
+        padding: EdgeInsets.all(16),
+        child: Text('Nenhum item encontrado'),
+      ),
+      itemBuilder: (context, item) => Container(
+        color: Colors.white,
+        padding: const EdgeInsets.all(8),
+        child: Text(
+          widget.itemLabel.call(item),
+          style: AppCss.mediumRegular,
+        ),
+      ),
+      onSelected: (e) {
+        setState(() {
+          widget.onSelect.call(e);
+          _controller.focus.unfocus();
+          _controller.controller.text = widget.itemLabel.call(e);
+        });
+      },
     );
   }
 

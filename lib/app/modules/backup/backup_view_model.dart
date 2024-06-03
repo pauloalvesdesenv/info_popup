@@ -10,6 +10,7 @@ class BackupUtils {
 class BackupModel {
   final String nome;
   final DateTime createdAt;
+  late String url;
 
   BackupModel({
     required this.nome,

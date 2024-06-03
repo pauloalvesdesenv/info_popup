@@ -10,12 +10,42 @@ class Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: CircularProgressIndicator(
+          strokeWidth: width,
+          valueColor: AlwaysStoppedAnimation<Color>(color ?? AppColors.white),
+        ),
+      ),
+    );
+  }
+}
+
+class LoadingStreamOut extends StatelessWidget {
+  final double size;
+  final Color? color;
+  final double width;
+
+  const LoadingStreamOut(
+      {this.size = 24, this.width = 4, this.color, super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
-      width: size,
-      height: size,
-      child: CircularProgressIndicator(
-        strokeWidth: width,
-        valueColor: AlwaysStoppedAnimation<Color>(color ?? AppColors.white),
+      width: double.maxFinite,
+      height: double.maxFinite,
+      child: Center(
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: CircularProgressIndicator(
+            strokeWidth: width,
+            valueColor:
+                AlwaysStoppedAnimation<Color>(color ?? AppColors.primaryMain),
+          ),
+        ),
       ),
     );
   }

@@ -6,6 +6,14 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_step_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/tag/models/tag_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/components/archive/archive_model.dart';
+import 'package:aco_plus/app/core/components/checklist/check_item_model.dart';
+import 'package:aco_plus/app/core/components/comment/comment_model.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 
 class PedidoModel {
   final String id;
@@ -18,6 +26,13 @@ class PedidoModel {
   final List<PedidoProdutoModel> produtos;
   final PedidoTipo tipo;
   List<PedidoStatusModel> statusess;
+  List<PedidoStepModel> steps;
+  List<TagModel> tags;
+  final List<ArchiveModel> archives;
+  final List<CheckItemModel> checks;
+  final List<CommentModel> comments;
+
+  StepModel get step => steps.last.step;
 
   bool get isChangeStatusAvailable =>
       tipo == PedidoTipo.cda &&
@@ -38,6 +53,11 @@ class PedidoModel {
     required this.produtos,
     required this.tipo,
     required this.statusess,
+    required this.steps,
+    required this.tags,
+    required this.checks,
+    required this.comments,
+    this.archives = const [],
   });
 
   List<PedidoProdutoStatus> get getStatusess {
@@ -105,7 +125,12 @@ class PedidoModel {
       'produtos': produtos.map((x) => x.toMap()).toList(),
       'tipo': tipo.index,
       'status': statusess.map((x) => x.toMap()).toList(),
+      'steps': steps.map((x) => x.toMap()).toList(),
+      'tags': tags.map((x) => x.toMap()).toList(),
       'deliveryAt': deliveryAt?.millisecondsSinceEpoch,
+      'archives': archives.map((x) => x.toMap()).toList(),
+      'checks': checks.map((x) => x.toMap()).toList(),
+      'comments': comments.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -122,9 +147,25 @@ class PedidoModel {
       obra: ObraModel.fromMap(map['obra']),
       tipo: PedidoTipo.values[map['tipo']],
       statusess: List<PedidoStatusModel>.from(
-          map['status']?.map((x) => PedidoStatusModel.fromMap(x))),
+          map['status']?.map((x) => PedidoStatusModel.fromMap(x)) ?? []),
       produtos: List<PedidoProdutoModel>.from(
-          map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x))),
+          map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x)) ?? []),
+      archives: List<ArchiveModel>.from(
+          map['archives']?.map((x) => ArchiveModel.fromMap(x)) ?? []),
+      checks: List<CheckItemModel>.from(
+          map['checks']?.map((x) => CheckItemModel.fromMap(x)) ?? []),
+      comments: List<CommentModel>.from(
+          map['comments']?.map((x) => CommentModel.fromMap(x)) ?? []),
+      steps: map['steps'] != null && map['steps'].isNotEmpty
+          ? List<PedidoStepModel>.from(
+              map['steps']?.map((x) => PedidoStepModel.fromMap(x)))
+          : [PedidoStepModel(
+            id: HashService.get,
+            step: FirestoreClient.steps.data.first,
+            createdAt: DateTime.now()),],
+      tags: map['tags'] != null
+          ? List<TagModel>.from(map['tags']?.map((x) => TagModel.fromMap(x)))
+          : [],
     );
   }
 
@@ -132,7 +173,6 @@ class PedidoModel {
 
   factory PedidoModel.fromJson(String source) =>
       PedidoModel.fromMap(json.decode(source));
-
 
   PedidoModel copyWith({
     String? id,
@@ -145,9 +185,15 @@ class PedidoModel {
     PedidoTipo? tipo,
     List<PedidoStatusModel>? statusess,
     DateTime? deliveryAt,
+    List<PedidoStepModel>? steps,
+    List<TagModel>? tags,
+    List<CheckItemModel>? checks,
+    List<CommentModel>? comments,
   }) {
     return PedidoModel(
       id: id ?? this.id,
+      comments: comments ?? this.comments,
+      checks: checks ?? this.checks,
       localizador: localizador ?? this.localizador,
       descricao: descricao ?? this.descricao,
       createdAt: createdAt ?? this.createdAt,
@@ -157,11 +203,13 @@ class PedidoModel {
       tipo: tipo ?? this.tipo,
       statusess: statusess ?? this.statusess,
       deliveryAt: deliveryAt ?? this.deliveryAt,
+      steps: steps ?? this.steps,
+      tags: tags ?? this.tags,
     );
   }
 
   @override
   String toString() {
-    return 'PedidoModel(id: id, localizador: $localizador, descricao: $descricao, createdAt: $createdAt, deliveryAt: $deliveryAt, cliente: $cliente, obra: $obra, produtos: $produtos, tipo: $tipo, statusess: $statusess)';
+    return 'PedidoModel(id: id, localizador: $localizador, descricao: $descricao, createdAt: $createdAt, deliveryAt: $deliveryAt, cliente: $cliente, obra: $obra, produtos: $produtos, tipo: $tipo, statusess: $statusess, steps: $steps)';
   }
 }

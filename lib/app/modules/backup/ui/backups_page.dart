@@ -1,6 +1,8 @@
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
+import 'package:aco_plus/app/core/components/loading.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/services/download_file_url_service/download_file_url_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -69,7 +71,7 @@ class _BackupsPageState extends State<BackupsPage> {
 
   ListTile _itemWidget(BackupModel backup) {
     return ListTile(
-      onTap: () => push(Container()),
+      onTap: () => DownloadFileURLService.call(backup.url),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: Text(
         backup.nome,

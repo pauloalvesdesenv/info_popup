@@ -1,5 +1,4 @@
 import 'package:aco_plus/app/core/models/text_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 extension DateExt on DateTime {
@@ -8,7 +7,8 @@ extension DateExt on DateTime {
   bool isSameDay(DateTime date) =>
       DateTime(date.year, date.month, date.day) == DateTime(year, month, day);
 
-  DateTime onlyDate({bool preserveDay = true}) => DateTime(year, month, preserveDay ? day : 1);
+  DateTime onlyDate({bool preserveDay = true}) =>
+      DateTime(year, month, preserveDay ? day : 1);
 
   int get lastDay {
     switch (month) {
@@ -26,7 +26,9 @@ extension DateExt on DateTime {
       case 11:
         return 30;
       case 2:
-        return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
+        return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
+            ? 29
+            : 28;
       default:
         throw ArgumentError();
     }
@@ -35,7 +37,8 @@ extension DateExt on DateTime {
   DateTime get previousMonth =>
       month == 1 ? DateTime(year - 1, 12, 1) : DateTime(year, month - 1, 1);
 
-  DateTime get nextMonth => month == 12 ? DateTime(year + 1, 1, 1) : DateTime(year, (month + 1));
+  DateTime get nextMonth =>
+      month == 12 ? DateTime(year + 1, 1, 1) : DateTime(year, (month + 1));
 
   DateTime addMonths(int lenght) {
     DateTime now = this;
@@ -55,12 +58,32 @@ extension DateExt on DateTime {
     throw Exception();
   }
 
-  String toFileName() => DateFormat('dd_mm_yyyy_HH_mm').format(this).toLowerCase();
+  String toFileName() =>
+      DateFormat('dd_mm_yyyy_HH_mm').format(this).toLowerCase();
 
+  String toddMM() => DateFormat('d \'de\' MMM').format(this);
+
+  String timeAgo() {
+    final now = DateTime.now();
+    final difference = now.difference(this);
+
+    if (difference.inSeconds < 60) {
+      return 'Agora mesmo';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} minutes ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else if (difference.inDays <= 2) {
+      return '${difference.inDays} days ago';
+    } else {
+      return DateFormat('dd/MM/yyyy HH:mm').format(this);
+    }
+  }
 }
 
 extension DateNullExt on DateTime? {
   TextController textEC() => TextController(text: text());
   String text() => this?.ddMMyyyy() ?? '';
-  String textHour() => this != null ? DateFormat("dd/MM/yyyy 'ás' HH:mm").format(this!) : '-';
+  String textHour() =>
+      this != null ? DateFormat("dd/MM/yyyy 'ás' HH:mm").format(this!) : '-';
 }

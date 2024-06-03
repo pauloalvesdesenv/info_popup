@@ -1,3 +1,4 @@
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/enums/app_module.dart';
@@ -56,15 +57,17 @@ class AppDrawer extends StatelessWidget {
                               style: TextStyle(
                                   color: Colors.white.withOpacity(0.8)),
                             ),
-                            const W(8),
-                            InkWell(
-                              onTap: () {
-                                Navigator.pop(context);
-                                push(context, const ConfigPage());
-                              },
-                              child: const Icon(Icons.settings,
-                                  color: Colors.white),
-                            ),
+                            if (usuario.role == UsuarioRole.administrador) ...[
+                              const W(8),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  push(context, const ConfigPage());
+                                },
+                                child: const Icon(Icons.settings,
+                                    color: Colors.white),
+                              ),
+                            ]
                           ],
                         ),
                       )

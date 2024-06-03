@@ -1,14 +1,20 @@
 import 'package:aco_plus/app/modules/cliente/ui/clientes_page.dart';
+import 'package:aco_plus/app/modules/kanban/ui/kanban_page.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordens_page.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedidos_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/relatorios_page.dart';
+import 'package:aco_plus/app/modules/step/ui/steps_page.dart';
+import 'package:aco_plus/app/modules/tag/ui/tags_page.dart';
 import 'package:flutter/material.dart';
 
 enum AppModule {
-  cliente,
   pedidos,
+  cliente,
   ordens,
   relatorios,
+  kanban,
+  steps,
+  tags,
 }
 
 extension AppModuleExt on AppModule {
@@ -22,6 +28,12 @@ extension AppModuleExt on AppModule {
         return const OrdensPage();
       case AppModule.relatorios:
         return const RelatoriosPage();
+      case AppModule.steps:
+        return const StepsPage();
+      case AppModule.tags:
+        return const TagsPage();
+      case AppModule.kanban:
+        return const KanbanPage();
     }
   }
 
@@ -35,6 +47,12 @@ extension AppModuleExt on AppModule {
         return Icons.work_outline;
       case AppModule.relatorios:
         return Icons.analytics_outlined;
+      case AppModule.steps:
+        return Icons.list_alt_outlined;
+      case AppModule.tags:
+        return Icons.label_outlined;
+      case AppModule.kanban:
+        return Icons.view_agenda_outlined;
     }
   }
 
@@ -48,6 +66,12 @@ extension AppModuleExt on AppModule {
         return 'Ordens';
       case AppModule.relatorios:
         return 'Relatórios';
+      case AppModule.steps:
+        return 'Etapas';
+      case AppModule.kanban:
+        return 'Kanban';
+      case AppModule.tags:
+        return 'Etiquetas';
     }
   }
 }

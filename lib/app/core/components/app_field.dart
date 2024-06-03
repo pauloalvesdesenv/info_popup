@@ -16,8 +16,9 @@ class AppField extends StatefulWidget {
   final IconData? suffixIcon;
   final double? suffixIconSize;
   final String? suffixText;
-  final Function()? onSuffix;
+  final void Function()? onSuffix;
   final IconData? prefixIcon;
+
   final Function()? onPrefix;
   final List<TextInputFormatter>? inputFormatters;
   final void Function(String)? onChanged;
@@ -134,10 +135,10 @@ class _AppFieldState extends State<AppField> {
       );
     }
     if (widget.suffixIcon != null) {
-      InkWell(
+      return InkWell(
         onTap: widget.onSuffix,
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 10),
+          padding: const EdgeInsets.only(left: 10, right: 10),
           child: Icon(widget.suffixIcon,
               weight: 800,
               size: widget.suffixIconSize,

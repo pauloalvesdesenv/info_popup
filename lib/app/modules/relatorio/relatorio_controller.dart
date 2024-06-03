@@ -14,7 +14,6 @@ import 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_ser
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_ordem_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_status_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/pedido/relatorio_pedido_pdf_page.dart';
-import 'package:aco_plus/app/modules/relatorio/ui/pedido/relatorio_pedido_tipo_bottom.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_ordem_view_model.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_pedido_view_model.dart';
 import 'package:flutter/services.dart';
@@ -63,6 +62,7 @@ class PedidoController {
       pedidoViewModel.cliente,
       pedidoViewModel.status,
       pedidos,
+      pedidoViewModel.tipo,
     );
 
     pedidoViewModel.relatorio = model;
@@ -94,9 +94,6 @@ class PedidoController {
   }
 
   Future<void> onExportRelatorioPedidoPDF() async {
-    final pedidoTipo = await showRelatorioPedidoTipoBottom();
-    if(pedidoTipo == null) return;
-    pedidoViewModel.relatorio!.tipo = pedidoTipo;
     final pdf = pw.Document();
 
     final img = await rootBundle.load('assets/images/logo.png');

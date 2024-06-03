@@ -1,15 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:aco_plus/app/core/components/app_container.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:flutter/material.dart';
 
 class AppDropDownList<T> extends StatefulWidget {
   final String label;
   final List<T> itens;
   final List<T> addeds;
   final String Function(T) itemLabel;
+  final Color Function(T)? itemColor;
+  final Color Function(T)? titleColor;
   final void Function() onChanged;
   final bool required;
   final bool enable;
@@ -20,6 +22,8 @@ class AppDropDownList<T> extends StatefulWidget {
     required this.addeds,
     required this.onChanged,
     required this.itemLabel,
+    this.titleColor,
+    this.itemColor,
     this.required = true,
     this.enable = true,
     super.key,
@@ -80,7 +84,8 @@ class _AppDropDownList<T> extends State<AppDropDownList<T>> {
                     },
                     child: Container(
                       height: 30,
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 4),
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.neutralLight),
                         borderRadius: BorderRadius.circular(4),
@@ -102,12 +107,14 @@ class _AppDropDownList<T> extends State<AppDropDownList<T>> {
                                 child: AppContainer(
                                   padding: const [6, 4],
                                   radius: 4,
-                                  color: AppColors.primaryMedium,
+                                  color: widget.itemColor?.call(e) ??
+                                      AppColors.primaryMedium,
                                   child: Row(
                                     children: [
                                       Text(
                                         widget.itemLabel.call(e),
-                                        style: TextStyle(color: AppColors.white),
+                                        style: const TextStyle(
+                                            color: Color(0xFF000014)),
                                       ),
                                       const W(4),
                                       InkWell(
@@ -115,9 +122,9 @@ class _AppDropDownList<T> extends State<AppDropDownList<T>> {
                                           widget.addeds.remove(e);
                                           widget.onChanged.call();
                                         },
-                                        child: Icon(
+                                        child: const Icon(
                                           Icons.close,
-                                          color: AppColors.white,
+                                          color: Color(0xFF000014),
                                           size: 20,
                                         ),
                                       )
