@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/tag/models/tag_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -8,6 +11,7 @@ import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/base/base_controller.dart';
@@ -77,6 +81,7 @@ class _KanbanPageState extends State<KanbanPage> {
   }
 
   Widget _stepWidget(StepModel step, List<PedidoModel> pedidos) {
+    pedidos.sort((a, b) => a.index.compareTo(b.index));
     return Container(
       width: 300,
       // padding: const EdgeInsets.all(16),
@@ -95,14 +100,106 @@ class _KanbanPageState extends State<KanbanPage> {
             ),
           ),
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              separatorBuilder: (_, __) => const H(8),
-              itemCount: pedidos.length,
-              itemBuilder: (_, e) => _pedidoWidget(context, pedidos[e]),
+            child: DragTarget<PedidoModel>(
+              onAcceptWithDetails: (details) {
+                final pedido = FirestoreClient.pedidos.data
+                    .firstWhere((e) => e.id == details.data.id);
+                pedido.steps.add(PedidoStepModel(
+                    id: HashService.get,
+                    step: step,
+                    createdAt: DateTime.now()));
+                FirestoreClient.pedidos.update(pedido);
+              },
+              builder: (_, __, ___) => Scrollbar(
+                controller: step.scrollController,
+                interactive: true,
+                radius: const Radius.circular(4),
+                thickness: 8,
+                child: ListView(
+                  children: [
+                    DragTarget<PedidoModel>(
+                      onAcceptWithDetails: (details) =>
+                          onAccept(details, step, pedidos, index: 0),
+                      builder: (_, __, ___) => const H(8),
+                    ),
+                    ListView.separated(
+                      controller: step.scrollController,
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 8),
+                      separatorBuilder: (_, i) => DragTarget<PedidoModel>(
+                        onAcceptWithDetails: (details) =>
+                            onAccept(details, step, pedidos),
+                        builder: (_, __, ___) => const H(8),
+                      ),
+                      itemCount: pedidos.length,
+                      itemBuilder: (_, e) => _itemListViewWidget(pedidos, e),
+                    ),
+                    DragTarget<PedidoModel>(
+                      onAcceptWithDetails: (details) => onAccept(
+                          details, step, pedidos,
+                          index: pedidos.length),
+                      builder: (_, __, ___) => const H(8),
+                    ),
+                  ], 
+                ),
+              ),
             ),
           )
         ],
+      ),
+    );
+  }
+
+  void onAccept(DragTargetDetails<PedidoModel> details, StepModel step,
+      List<PedidoModel> pedidos,
+      {int? index}) {
+    PedidoModel pedido =
+        FirestoreClient.pedidos.data.firstWhere((e) => e.id == details.data.id);
+    if (pedido.step.id != step.id) {
+      pedido.steps.add(PedidoStepModel(
+          id: HashService.get, step: step, createdAt: DateTime.now()));
+      FirestoreClient.pedidos.dataStream.update();
+      FirestoreClient.pedidos.update(pedido);
+    }
+    pedido =
+        FirestoreClient.pedidos.data.firstWhere((e) => e.id == details.data.id);
+    final pedidosByStep = pedidos.where((e) => e.step.id == step.id).toList();
+    final i = index ?? pedidosByStep.indexOf(pedido);
+    pedidosByStep.removeAt(i);
+    pedidosByStep.insert(i, pedido);
+    pedido.index = i;
+    FirestoreClient.pedidos.dataStream.update();
+  }
+
+  LongPressDraggable<PedidoModel> _itemListViewWidget(
+      List<PedidoModel> pedidos, int e) {
+    return LongPressDraggable<PedidoModel>(
+        onDragCompleted: () {
+          // FirestoreClient.pedidos.update(
+          //     pedidos[e].copyWith(step: step));
+        },
+        delay: const Duration(milliseconds: 100),
+        data: pedidos[e],
+        childWhenDragging: SizedBox(
+          width: 290,
+          child:
+              Opacity(opacity: 0.2, child: _pedidoWidget(context, pedidos[e])),
+        ),
+        feedback: _feedbackPedidoWidget(pedidos, e),
+        child: _pedidoWidget(context, pedidos[e]));
+  }
+
+  Widget _feedbackPedidoWidget(List<PedidoModel> pedidos, int e) {
+    return Transform.rotate(
+      angle: -pi / 200 * -5,
+      child: Opacity(
+        opacity: 0.8,
+        child: Material(
+            child: IntrinsicHeight(
+          child:
+              SizedBox(width: 290, child: _pedidoWidget(context, pedidos[e])),
+        )),
       ),
     );
   }
@@ -125,8 +222,10 @@ class _KanbanPageState extends State<KanbanPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _tagsWidget(pedido),
-          const H(8),
+          if (pedido.tags.isNotEmpty) ...[
+            _tagsWidget(pedido),
+            const H(8),
+          ],
           Text(pedido.localizador),
           const H(8),
           _detailsWidget(pedido)

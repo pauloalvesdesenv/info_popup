@@ -12,6 +12,7 @@ class StepModel {
   final List<StepModel> toSteps;
   final List<UsuarioRole> moveRoles;
   final DateTime createdAt;
+  final ScrollController scrollController = ScrollController();
 
   StepModel({
     required this.id,

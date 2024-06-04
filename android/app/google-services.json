@@ -1,32 +1,13 @@
 {
   "project_info": {
-    "project_number": "210867609065",
-    "project_id": "aco-plus-fa455",
-    "storage_bucket": "aco-plus-fa455.appspot.com"
+    "project_number": "281518070753",
+    "project_id": "pcp-m2",
+    "storage_bucket": "pcp-m2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:210867609065:android:31b0ec1b0b3f0693bc3f78",
-        "android_client_info": {
-          "package_name": "com.aco_plus.app"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCU47wXoaBO8eabFmKUiXIhPe-Xo7sbhaw"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:210867609065:android:91662436a9e9a893bc3f78",
+        "mobilesdk_app_id": "1:281518070753:android:1c1c1c9d085957179e50a0",
         "android_client_info": {
           "package_name": "com.m2.acoplus"
         }
@@ -34,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCU47wXoaBO8eabFmKUiXIhPe-Xo7sbhaw"
+          "current_key": "AIzaSyAyJ1MXIGf9LjuInMA7nqo3RK-owEsSrI0"
         }
       ],
       "services": {

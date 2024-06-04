@@ -134,7 +134,10 @@ class _ArchiveAddBottomState extends State<ArchiveAddBottom> {
     return Stack(
       alignment: Alignment.topRight,
       children: [
-        ArchiveWidget(archive!, inList: false),
+        ArchiveWidget(
+          archive!,
+          inList: false,
+        ),
         Align(
           alignment: Alignment.topRight,
           child: InkWell(

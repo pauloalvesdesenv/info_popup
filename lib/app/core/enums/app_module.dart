@@ -8,11 +8,11 @@ import 'package:aco_plus/app/modules/tag/ui/tags_page.dart';
 import 'package:flutter/material.dart';
 
 enum AppModule {
+  kanban,
   pedidos,
   cliente,
   ordens,
   relatorios,
-  kanban,
   steps,
   tags,
 }

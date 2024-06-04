@@ -1,4 +1,6 @@
 import 'package:aco_plus/app/core/components/archive/archive_model.dart';
+import 'package:aco_plus/app/core/components/archive/ui/archive_type_widgets/archive_error_widget.dart';
+import 'package:aco_plus/app/core/components/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 
@@ -17,7 +19,9 @@ class _ArchivePDFWidgetState extends State<ArchivePDFWidget> {
 
   @override
   void initState() {
-    initController().then((value) => setState(() {}));
+    initController()
+        .then((value) => setState(() {}))
+        .catchError((e) => setState(() => hasError = true));
     super.initState();
   }
 
@@ -31,15 +35,7 @@ class _ArchivePDFWidgetState extends State<ArchivePDFWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (hasError) {
-      return const SizedBox(
-        width: 150,
-        height: 180,
-        child: Center(
-          child: Icon(Icons.error_outline),
-        ),
-      );
-    }
+    if (hasError) return ArchiveErrorWidget(widget.archive);
     return Container(
       width: 150,
       height: 180,
@@ -47,12 +43,11 @@ class _ArchivePDFWidgetState extends State<ArchivePDFWidget> {
         color: Colors.grey[200],
         borderRadius: BorderRadius.circular(4),
       ),
-      child: const Icon(Icons.picture_as_pdf),
-      // child: controller != null
-      //     ? PdfView(
-      //         controller: controller!,
-      //       )
-      //     : const SizedBox(width: 20, height: 20, child: Loading()),
+      child: controller != null
+          ? PdfView(
+              controller: controller!,
+            )
+          : const SizedBox(width: 20, height: 20, child: Loading()),
     );
   }
 }

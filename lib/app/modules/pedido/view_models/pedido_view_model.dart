@@ -94,5 +94,6 @@ class PedidoCreateModel {
         tags: [],
         checks: [],
         comments: [],
+        index: FirestoreClient.pedidos.data.length
       );
 }

@@ -47,7 +47,7 @@ class _TagCreatePageState extends State<TagCreatePage> {
                 Icons.arrow_back,
                 color: AppColors.white,
               )),
-          title: Text('${tagCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Etapa',
+          title: Text('${tagCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Etiqueta',
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
             IconLoadingButton(

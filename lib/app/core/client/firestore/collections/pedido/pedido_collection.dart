@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/components/archive/archive_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -31,10 +32,10 @@ class PedidoCollection {
     if (_isStarted && lock) return;
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
-    final countries =
+    final pedidos =
         data.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-    countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    dataStream.add(countries);
+    dataStream.add(pedidos);
+  
   }
 
   bool _isListen = false;
@@ -72,10 +73,12 @@ class PedidoCollection {
             : collection)
         .snapshots()
         .listen((e) {
-      final countries =
+      final data =
           e.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-      countries.sort((a, b) => a.localizador.compareTo(b.localizador));
-      dataStream.add(countries);
+
+      data.sort((a, b) => a.localizador.compareTo(b.localizador));
+      dataStream.add(data);
+
     });
   }
 

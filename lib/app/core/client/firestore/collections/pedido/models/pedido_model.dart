@@ -31,6 +31,7 @@ class PedidoModel {
   final List<ArchiveModel> archives;
   final List<CheckItemModel> checks;
   final List<CommentModel> comments;
+  int index;
 
   StepModel get step => steps.last.step;
 
@@ -57,6 +58,7 @@ class PedidoModel {
     required this.tags,
     required this.checks,
     required this.comments,
+    required this.index,
     this.archives = const [],
   });
 
@@ -131,6 +133,7 @@ class PedidoModel {
       'archives': archives.map((x) => x.toMap()).toList(),
       'checks': checks.map((x) => x.toMap()).toList(),
       'comments': comments.map((x) => x.toMap()).toList(),
+      'index': index,
     };
   }
 
@@ -159,13 +162,16 @@ class PedidoModel {
       steps: map['steps'] != null && map['steps'].isNotEmpty
           ? List<PedidoStepModel>.from(
               map['steps']?.map((x) => PedidoStepModel.fromMap(x)))
-          : [PedidoStepModel(
-            id: HashService.get,
-            step: FirestoreClient.steps.data.first,
-            createdAt: DateTime.now()),],
+          : [
+              PedidoStepModel(
+                  id: HashService.get,
+                  step: FirestoreClient.steps.data.first,
+                  createdAt: DateTime.now()),
+            ],
       tags: map['tags'] != null
           ? List<TagModel>.from(map['tags']?.map((x) => TagModel.fromMap(x)))
           : [],
+      index: map['index'] ?? 0,
     );
   }
 
@@ -189,6 +195,7 @@ class PedidoModel {
     List<TagModel>? tags,
     List<CheckItemModel>? checks,
     List<CommentModel>? comments,
+    int? index,
   }) {
     return PedidoModel(
       id: id ?? this.id,
@@ -205,6 +212,7 @@ class PedidoModel {
       deliveryAt: deliveryAt ?? this.deliveryAt,
       steps: steps ?? this.steps,
       tags: tags ?? this.tags,
+      index: index ?? this.index,
     );
   }
 

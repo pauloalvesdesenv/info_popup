@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:aco_plus/app/core/components/archive/archive_type.dart';
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
 
 class ArchiveModel {
   String? name;
@@ -24,29 +24,9 @@ class ArchiveModel {
   });
 
   Future<Uint8List> fetchBytes() async {
-    try {
-      // final response = await Dio().get(url!,
-      //     options: Options(responseType: ResponseType.bytes, headers: {
-      //       'Access-Control-Allow-Origin': '*',
-      //       'Accept': '*/*',
-      //     }));
-      final response = await get(
-        Uri.parse(url!),
-        headers: {
-          "Access-Control-Allow-Origin":
-              "*", 
-          "Access-Control-Allow-Credentials":
-              "true",
-          "Access-Control-Allow-Headers":
-              "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
-          "Access-Control-Allow-Methods": "POST, OPTIONS"
-        },
-      );
-      if (response.statusCode != 200) throw Exception('Failed to load file');
-      return Uint8List.fromList(response.bodyBytes);
-    } catch (e) {
-      return Uint8List(0);
-    }
+    final response = await Dio()
+        .get(url!, options: Options(responseType: ResponseType.bytes));
+    return Uint8List.fromList(response.data);
   }
 
   ArchiveModel({
