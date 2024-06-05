@@ -24,13 +24,13 @@ class FirestoreClient {
     await pedidos.start();
     await ordens.start();
 
-    await usuarios.listen();
-    await clientes.listen();
-    await produtos.listen();
-    await steps.listen();
-    await tags.listen();
-    await pedidos.listen();
-    await ordens.listen();
+    // await usuarios.listen();
+    // await clientes.listen();
+    // await produtos.listen();
+    // await steps.listen();
+    // await tags.listen();
+    // await pedidos.listen();
+    // await ordens.listen();
 
   }
 }

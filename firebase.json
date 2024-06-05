@@ -3,18 +3,18 @@
     "platforms": {
       "android": {
         "default": {
-          "projectId": "pcp-m2",
-          "appId": "1:281518070753:android:1c1c1c9d085957179e50a0",
+          "projectId": "aco-plus-fa455",
+          "appId": "1:210867609065:android:91662436a9e9a893bc3f78",
           "fileOutput": "android/app/google-services.json"
         }
       },
       "dart": {
         "lib/firebase_options.dart": {
-          "projectId": "pcp-m2",
+          "projectId": "aco-plus-fa455",
           "configurations": {
-            "android": "1:281518070753:android:1c1c1c9d085957179e50a0",
-            "ios": "1:281518070753:ios:5e3990534ec9eb399e50a0",
-            "web": "1:281518070753:web:46e48842ade008e79e50a0"
+            "android": "1:210867609065:android:91662436a9e9a893bc3f78",
+            "ios": "1:210867609065:ios:deae8ede003e8115bc3f78",
+            "web": "1:210867609065:web:9f428880737f7af2bc3f78"
           }
         }
       }
@@ -26,6 +26,12 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }
