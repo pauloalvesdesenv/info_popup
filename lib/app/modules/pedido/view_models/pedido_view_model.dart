@@ -1,3 +1,4 @@
+import 'package:aco_plus/app/core/client/firestore/collections/checklist/models/checklist_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
@@ -36,6 +37,7 @@ class PedidoCreateModel {
   List<PedidoProdutoCreateModel> produtos = [];
   DateTime? deliveryAt;
   ExpansionTileController tileController = ExpansionTileController();
+  ChecklistModel? checklist;
 
   late bool isEdit;
 
@@ -73,27 +75,26 @@ class PedidoCreateModel {
   }
 
   PedidoModel toPedidoModel(PedidoModel? pedido) => PedidoModel(
-        id: id,
-        tipo: tipo!,
-        descricao: descricao.text,
-        statusess: [
-          PedidoStatusModel(
-              id: HashService.get,
-              status: PedidoStatus.produzindoCD,
-              createdAt: pedido?.statusess.first.createdAt ?? DateTime.now())
-        ],
-        localizador: localizador.text,
-        createdAt: pedido?.createdAt ?? DateTime.now(),
-        cliente: cliente!,
-        obra: obra!,
-        produtos: produtos
-            .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
-            .toList(),
-        deliveryAt: deliveryAt,
-        steps: [],
-        tags: [],
-        checks: [],
-        comments: [],
-        index: FirestoreClient.pedidos.data.length
-      );
+      id: id,
+      tipo: tipo!,
+      descricao: descricao.text,
+      statusess: [
+        PedidoStatusModel(
+            id: HashService.get,
+            status: PedidoStatus.produzindoCD,
+            createdAt: pedido?.statusess.first.createdAt ?? DateTime.now())
+      ],
+      localizador: localizador.text,
+      createdAt: pedido?.createdAt ?? DateTime.now(),
+      cliente: cliente!,
+      obra: obra!,
+      produtos: produtos
+          .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
+          .toList(),
+      deliveryAt: deliveryAt,
+      steps: [],
+      tags: [],
+      checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
+      comments: [],
+      index: FirestoreClient.pedidos.data.length);
 }

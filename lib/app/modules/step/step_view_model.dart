@@ -14,7 +14,6 @@ class StepCreateModel {
   TextController name = TextController();
   Color color = AppColors.primaryMain;
   List<StepModel> fromSteps = [];
-  List<StepModel> toSteps = [];
   List<UsuarioRole> moveRoles = [];
   DateTime createdAt = DateTime.now();
 
@@ -30,7 +29,6 @@ class StepCreateModel {
     name.text = etapa.name;
     color = etapa.color;
     fromSteps = etapa.fromSteps;
-    toSteps = etapa.toSteps;
     moveRoles = etapa.moveRoles;
     createdAt = etapa.createdAt;
   }
@@ -39,8 +37,7 @@ class StepCreateModel {
         id: id,
         name: name.text,
         color: color,
-        fromSteps: fromSteps,
-        toSteps: toSteps,
+        fromStepsIds: fromSteps.map((e) => e.id).toList(),
         moveRoles: moveRoles,
         createdAt: createdAt,
       );

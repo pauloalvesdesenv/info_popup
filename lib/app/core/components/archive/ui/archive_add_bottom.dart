@@ -13,6 +13,7 @@ import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:mime/mime.dart';
 
@@ -36,6 +37,8 @@ class _ArchiveAddBottomState extends State<ArchiveAddBottom> {
   ArchiveModel? archive;
   final TextController _nameEC = TextController();
   final TextController _descEC = TextController();
+  final FocusNode _focusNode = FocusNode();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -52,82 +55,99 @@ class _ArchiveAddBottomState extends State<ArchiveAddBottom> {
   Widget build(BuildContext context) {
     return BottomSheet(
         onClosing: () {},
-        builder: (context) =>
-            KeyboardVisibilityBuilder(builder: (context, isVisible) {
-              return Container(
-                height: 390,
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24)),
-                ),
-                child: ListView(
-                  children: [
-                    const H(16),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: IconButton(
-                          style: ButtonStyle(
-                              padding: const WidgetStatePropertyAll(
-                                  EdgeInsets.all(16)),
-                              backgroundColor:
-                                  WidgetStatePropertyAll(AppColors.white),
-                              foregroundColor:
-                                  WidgetStatePropertyAll(AppColors.black)),
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.keyboard_backspace),
-                        ),
-                      ),
+        builder: (context) => KeyboardVisibilityBuilder(
+            builder: (context, isVisible) => KeyboardListener(
+                  focusNode: _focusNode,
+                  onKeyEvent: (e) {
+                    if (e is KeyDownEvent &&
+                        e.logicalKey == LogicalKeyboardKey.enter) {
+                      if (archive != null) {
+                        onConfirm();
+                      }
+                    }
+                  },
+                  child: Container(
+                    height: 390,
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24)),
                     ),
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Adicionar Arquivo',
-                            style: AppCss.largeBold,
+                    child: ListView(
+                      children: [
+                        const H(16),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: IconButton(
+                              style: ButtonStyle(
+                                  padding: const WidgetStatePropertyAll(
+                                      EdgeInsets.all(16)),
+                                  backgroundColor:
+                                      WidgetStatePropertyAll(AppColors.white),
+                                  foregroundColor:
+                                      WidgetStatePropertyAll(AppColors.black)),
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(Icons.keyboard_backspace),
+                            ),
                           ),
-                          const H(16),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              archive != null ? _addedWidget() : _addWidget(),
-                              const W(16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    AppField(
-                                      label: 'Nome',
-                                      isDisable: true,
-                                      controller: _nameEC,
-                                    ),
-                                    const H(16),
-                                    AppField(
-                                      label: 'Descrição',
-                                      controller: _descEC,
-                                    ),
-                                  ],
-                                ),
+                              Text(
+                                'Adicionar Arquivo',
+                                style: AppCss.largeBold,
                               ),
+                              const H(16),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  archive != null
+                                      ? _addedWidget()
+                                      : _addWidget(),
+                                  const W(16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        AppField(
+                                          label: 'Nome',
+                                          isDisable: true,
+                                          controller: _nameEC,
+                                        ),
+                                        const H(16),
+                                        AppField(
+                                          label: 'Descrição',
+                                          controller: _descEC,
+                                          onEditingComplete: () {
+                                            if (archive != null) {
+                                              onConfirm();
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const H(16),
+                              AppTextButton(
+                                  isEnable: archive != null,
+                                  label: 'Confirmar',
+                                  onPressed: () => onConfirm()),
                             ],
                           ),
-                          const H(16),
-                          AppTextButton(
-                              isEnable: archive != null,
-                              label: 'Confirmar',
-                              onPressed: () => onConfirm()),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            }));
+                  ),
+                )));
   }
 
   Stack _addedWidget() {
@@ -201,11 +221,15 @@ class _ArchiveAddBottomState extends State<ArchiveAddBottom> {
         type: mime.getArchiveTypeMimeType(),
       );
       _nameEC.text = xFile.name;
+      _focusNode.requestFocus();
       setState(() {});
     }
   }
 
   Future<void> onConfirm() async {
+    setState(() {
+      isLoading = true;
+    });
     final url = await FirebaseService.uploadFile(
       name: archive!.name!,
       bytes: archive!.bytes!,
@@ -220,6 +244,9 @@ class _ArchiveAddBottomState extends State<ArchiveAddBottom> {
       type: archive!.type,
       mime: archive!.mime,
     );
+    setState(() {
+      isLoading = false;
+    });
     Navigator.pop(context, archiveModel);
   }
 }

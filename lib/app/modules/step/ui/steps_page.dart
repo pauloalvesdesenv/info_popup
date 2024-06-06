@@ -27,7 +27,7 @@ class StepsPage extends StatefulWidget {
 class _StepsPageState extends State<StepsPage> {
   @override
   void initState() {
-    FirestoreClient.steps.fetch();
+    stepCtrl.onInit();
     super.initState();
   }
 

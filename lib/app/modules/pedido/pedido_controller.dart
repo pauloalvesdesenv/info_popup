@@ -27,6 +27,11 @@ class PedidoController {
       AppStream<PedidoUtils>.seed(PedidoUtils());
   PedidoUtils get utils => utilsStream.value;
 
+  void onInit() {
+    utilsStream.add(PedidoUtils());
+    FirestoreClient.pedidos.fetch();
+  }
+
   final AppStream<PedidoCreateModel> formStream =
       AppStream<PedidoCreateModel>();
   PedidoCreateModel get form => formStream.value;

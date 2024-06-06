@@ -4,7 +4,6 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
-import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/archive/ui/archives_widget.dart';
 import 'package:aco_plus/app/core/components/checklist/check_list_widget.dart';
 import 'package:aco_plus/app/core/components/comment/ui/comments_widget.dart';
@@ -18,20 +17,19 @@ import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
-import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
-import 'package:aco_plus/app/modules/pedido/ui/pedido_create_page.dart';
 import 'package:flutter/material.dart';
 
-class PedidoPage extends StatefulWidget {
+class PedidoMinifyPage extends StatefulWidget {
   final PedidoModel pedido;
-  const PedidoPage(this.pedido, {super.key});
+  final Function() onDelete;
+  const PedidoMinifyPage(this.pedido, this.onDelete, {super.key});
 
   @override
-  State<PedidoPage> createState() => _PedidoPageState();
+  State<PedidoMinifyPage> createState() => _PedidoMinifyPageState();
 }
 
-class _PedidoPageState extends State<PedidoPage> {
+class _PedidoMinifyPageState extends State<PedidoMinifyPage> {
   @override
   void initState() {
     pedidoCtrl.onInitPage(widget.pedido);
@@ -42,50 +40,58 @@ class _PedidoPageState extends State<PedidoPage> {
   Widget build(BuildContext context) {
     return StreamOut(
       stream: pedidoCtrl.pedidoStream.listen,
-      builder: (_, form) => AppScaffold(
-        resizeAvoid: true,
-        appBar: AppBar(
-          title: Text(form.localizador,
-              style: AppCss.largeBold.setColor(AppColors.white)),
-          backgroundColor: AppColors.primaryMain,
-          actions: [
-            IconButton(
-                onPressed: () async =>
-                    push(context, PedidoCreatePage(pedido: form)),
-                icon: Icon(Icons.edit, color: AppColors.white)),
-            IconButton(
-                onPressed: () async => pedidoCtrl.onDelete(context, form),
-                icon: Icon(Icons.delete, color: AppColors.white))
-          ],
-        ),
-        body: body(form),
+      builder: (_, form) => Material(
+        child: body(form),
       ),
     );
   }
 
   Widget body(PedidoModel form) {
-    return ListView(
-      children: [
-        _descWidget(form),
-        const Divisor(),
-        _stepWidget(),
-        const Divisor(),
-        _statusWidget(),
-        const Divisor(),
-        _corteDobraWidget(form),
-        const Divisor(),
-        _produtosWidget(form),
-        const Divisor(),
-        if (pedido.tipo == PedidoTipo.cda) ...[
-          _armacaoWidget(),
-          const Divisor()
+    return SizedBox(
+      height: double.maxFinite,
+      child: ListView(
+        children: [
+          Container(
+              width: double.maxFinite,
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(color: AppColors.primaryMain),
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () => widget.onDelete(),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const W(16),
+                  Text(
+                    pedido.localizador,
+                    style: AppCss.largeBold.setColor(Colors.white).setSize(18),
+                  ),
+                ],
+              )),
+          _descWidget(form),
+          const Divisor(),
+          _stepWidget(),
+          const Divisor(),
+          _statusWidget(),
+          const Divisor(),
+          _corteDobraWidget(form),
+          const Divisor(),
+          _produtosWidget(form),
+          const Divisor(),
+          if (pedido.tipo == PedidoTipo.cda) ...[
+            _armacaoWidget(),
+            const Divisor()
+          ],
+          _anexosWidget(form),
+          const Divisor(),
+          _checksWidget(form),
+          const Divisor(),
+          _commentsWidget(form)
         ],
-        _anexosWidget(form),
-        const Divisor(),
-        _checksWidget(form),
-        const Divisor(),
-        _commentsWidget(form)
-      ],
+      ),
     );
   }
 

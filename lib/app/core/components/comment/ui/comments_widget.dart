@@ -44,7 +44,7 @@ class CommentsWidget extends StatelessWidget {
                 onChanged();
               },
             ),
-            ...items.map(
+            ...items.reversed.map(
               (e) => CommentWidget(
                 comment: e,
               ),

@@ -1,7 +1,9 @@
+import 'package:aco_plus/app/core/client/firestore/collections/checklist/models/checklist_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
@@ -23,6 +25,7 @@ import 'package:aco_plus/app/modules/cliente/ui/cliente_create_simplify_bottom.d
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -61,7 +64,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
         title: Text('${pedidoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Pedido',
             style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          IconLoadingButton(() async =>
+          if(widget.pedido != null && usuario.permission.pedido.contains(UserPermissionType.update))  IconLoadingButton(() async =>
               await pedidoCtrl.onConfirm(context, widget.pedido, false))
         ],
         backgroundColor: AppColors.primaryMain,
@@ -131,6 +134,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                 form.cliente = cliente;
                 form.obra = form.cliente!.obras.first;
                 pedidoCtrl.formStream.update();
+                return null;
               },
               itemLabel: (e) => e!.nome,
               onSelect: (e) async {
@@ -221,6 +225,18 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
               itemLabel: (e) => e!.descricao,
               onSelect: (e) {
                 form.obra = e;
+                pedidoCtrl.formStream.update();
+              },
+            ),
+            const H(16),
+            AppDropDown<ChecklistModel?>(
+              label: 'Modelo de checklist',
+              hasFilter: true,
+              item: form.checklist,
+              itens: FirestoreClient.checklists.data,
+              itemLabel: (e) => e!.nome,
+              onSelect: (e) async {
+                form.checklist = e;
                 pedidoCtrl.formStream.update();
               },
             ),

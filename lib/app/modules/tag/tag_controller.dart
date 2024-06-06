@@ -20,16 +20,19 @@ class TagController {
   final AppStream<TagModel?> tagStream = AppStream<TagModel?>.seed(null);
   TagModel? get tag => tagStream.value;
 
-  final AppStream<TagUtils> utilsStream =
-      AppStream<TagUtils>.seed(TagUtils());
+  final AppStream<TagUtils> utilsStream = AppStream<TagUtils>.seed(TagUtils());
   TagUtils get utils => utilsStream.value;
+
+  void onInit() {
+    utilsStream.add(TagUtils());
+    FirestoreClient.tags.fetch();
+  }
 
   final AppStream<TagCreateModel> formStream = AppStream<TagCreateModel>();
   TagCreateModel get form => formStream.value;
 
   void init(TagModel? tag) {
-    formStream
-        .add(tag != null ? TagCreateModel.edit(tag) : TagCreateModel());
+    formStream.add(tag != null ? TagCreateModel.edit(tag) : TagCreateModel());
   }
 
   List<TagModel> getTagsFiltered(String search, List<TagModel> tags) {

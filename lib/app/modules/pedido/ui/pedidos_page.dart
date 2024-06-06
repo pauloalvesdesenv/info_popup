@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
@@ -21,6 +22,7 @@ import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_create_page.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_page.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 
 class PedidosPage extends StatefulWidget {
@@ -33,7 +35,7 @@ class PedidosPage extends StatefulWidget {
 class _PedidosPageState extends State<PedidosPage> {
   @override
   void initState() {
-    FirestoreClient.pedidos.fetch();
+    pedidoCtrl.onInit();
     super.initState();
   }
 
@@ -52,7 +54,7 @@ class _PedidosPageState extends State<PedidosPage> {
         title:
             Text('Pedidos', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          IconButton(
+          if(usuario.permission.pedido.contains(UserPermissionType.create)) IconButton(
               onPressed: () => push(context, const PedidoCreatePage()),
               icon: Icon(
                 Icons.add,
@@ -91,7 +93,7 @@ class _PedidosPageState extends State<PedidosPage> {
                               itens: SortType.values,
                               itemLabel: (e) => e.name,
                               onSelect: (e) {
-                                utils.sortType = e  ?? SortType.alfabetic;
+                                utils.sortType = e ?? SortType.alfabetic;
                                 pedidoCtrl.utilsStream.update();
                               },
                             ),
@@ -104,7 +106,7 @@ class _PedidosPageState extends State<PedidosPage> {
                               itens: SortOrder.values,
                               itemLabel: (e) => e.name,
                               onSelect: (e) {
-                                utils.sortOrder = e  ?? SortOrder.asc;
+                                utils.sortOrder = e ?? SortOrder.asc;
                                 pedidoCtrl.utilsStream.update();
                               },
                             ),

@@ -26,7 +26,7 @@ class TagsPage extends StatefulWidget {
 class _TagsPageState extends State<TagsPage> {
   @override
   void initState() {
-    FirestoreClient.tags.fetch();
+    tagCtrl.onInit();
     super.initState();
   }
 

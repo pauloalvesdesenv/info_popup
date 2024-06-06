@@ -24,6 +24,11 @@ class StepController {
       AppStream<StepUtils>.seed(StepUtils());
   StepUtils get utils => utilsStream.value;
 
+  void onInit() {
+    utilsStream.add(StepUtils());
+    FirestoreClient.steps.fetch();
+  }
+
   final AppStream<StepCreateModel> formStream = AppStream<StepCreateModel>();
   StepCreateModel get form => formStream.value;
 

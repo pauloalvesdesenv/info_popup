@@ -1,3 +1,4 @@
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
@@ -74,20 +75,44 @@ class AppDrawer extends StatelessWidget {
                     ],
                   ),
                   for (var item in AppModule.values)
-                    ListTile(
-                      onTap: () {
-                        pop(context);
-                        baseCtrl.moduleStream.add(item);
-                      },
-                      leading: Icon(item.icon,
-                          color: item == module ? AppColors.primaryMain : null),
-                      title: Text(
-                        item.label,
-                        style: TextStyle(
+                    Builder(builder: (context) {
+                      bool isEnabled = true;
+                      switch (item) {
+                        case AppModule.cliente:
+                          isEnabled = usuario.permission.cliente
+                              .contains(UserPermissionType.read);
+
+                          break;
+                        case AppModule.pedidos:
+                          isEnabled = usuario.permission.pedido
+                              .contains(UserPermissionType.read);
+
+                          break;
+                        case AppModule.ordens:
+                          isEnabled = usuario.permission.ordem
+                              .contains(UserPermissionType.read);
+
+                          break;
+                        default:
+                      }
+                      if (!isEnabled) return const SizedBox();
+                      return ListTile(
+                        onTap: () {
+                          pop(context);
+                          baseCtrl.moduleStream.add(item);
+                        },
+                        leading: Icon(item.icon,
                             color:
                                 item == module ? AppColors.primaryMain : null),
-                      ),
-                    )
+                        title: Text(
+                          item.label,
+                          style: TextStyle(
+                              color: item == module
+                                  ? AppColors.primaryMain
+                                  : null),
+                        ),
+                      );
+                    })
                 ],
               ),
             ),

@@ -22,10 +22,6 @@ class CommentAddWidget extends StatefulWidget {
 }
 
 class _CommentAddWidgetState extends State<CommentAddWidget> {
-  final GlobalKey _quillKey = GlobalKey();
-  final QuillController _quillControllerViewer = QuillController.basic();
-  final QuillController _quillControllerEditor = QuillController.basic();
-
   bool _isEditing = false;
 
   @override
@@ -68,7 +64,7 @@ class _CommentAddWidgetState extends State<CommentAddWidget> {
                     width: double.maxFinite,
                     child: QuillToolbar.simple(
                       configurations: QuillSimpleToolbarConfigurations(
-                        controller: _quillControllerViewer,
+                        controller: widget.quill.quillControllerViewer,
                         toolbarIconAlignment: WrapAlignment.start,
                         toolbarIconCrossAlignment: WrapCrossAlignment.start,
                         showFontFamily: false,
@@ -102,8 +98,8 @@ class _CommentAddWidgetState extends State<CommentAddWidget> {
                 ),
                 Expanded(
                   child: CustomQuillEditor(
-                    controller: _quillControllerEditor,
-                    keyForPosition: _quillKey,
+                    controller: widget.quill.quillControllerEditor,
+                    keyForPosition: widget.quill.quillKey,
                   ),
                 ),
               ],
@@ -114,12 +110,14 @@ class _CommentAddWidgetState extends State<CommentAddWidget> {
         SizedBox(
           width: 100,
           child: AppTextButton(
-            isEnable:
-                _quillControllerViewer.plainTextEditingValue.text.isNotEmpty,
+            isEnable: widget.quill.quillControllerViewer.plainTextEditingValue
+                .text.isNotEmpty,
             onPressed: () {
               setState(() {
-                widget.onSave(json.encode(
-                    _quillControllerEditor.document.toDelta().toJson()));
+                widget.onSave(json.encode(widget
+                    .quill.quillControllerEditor.document
+                    .toDelta()
+                    .toJson()));
                 _isEditing = false;
               });
             },

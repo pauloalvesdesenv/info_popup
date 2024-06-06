@@ -26,6 +26,11 @@ class ClienteController {
       AppStream<ClienteUtils>.seed(ClienteUtils());
   ClienteUtils get utils => utilsStream.value;
 
+    void onInit() {
+    utilsStream.add(ClienteUtils());
+    FirestoreClient.clientes.fetch();
+  }
+
   final AppStream<ClienteCreateModel> formStream =
       AppStream<ClienteCreateModel>();
   ClienteCreateModel get form => formStream.value;
@@ -117,6 +122,6 @@ class ClienteController {
     if (form.nome.text.length < 2) {
       throw Exception('Nome deve conter no mínimo 3 caracteres');
     }
- 
+
   }
 }

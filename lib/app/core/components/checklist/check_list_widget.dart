@@ -154,17 +154,15 @@ class _CheckListWidgetState extends State<CheckListWidget> {
             hint: 'Adicione um item',
             controller: _titleEC,
             onChanged: (_) => setState(() {}),
+            onEditingComplete: () {
+              _onAdd();
+            },
           ),
         ),
         const W(8),
         InkWell(
           onTap: () {
-            setState(() {
-              final item = CheckItemModel(title: _titleEC.text, isCheck: false);
-              widget.items.add(item);
-              _titleEC.controller.clear();
-              widget.onChanged();
-            });
+            _onAdd();
           },
           child: Container(
             width: 48,
@@ -182,5 +180,15 @@ class _CheckListWidgetState extends State<CheckListWidget> {
         ),
       ],
     );
+  }
+
+  void _onAdd() {
+    setState(() {
+      if (_titleEC.text.isEmpty) return;
+      final item = CheckItemModel(title: _titleEC.text, isCheck: false);
+      widget.items.add(item);
+      _titleEC.controller.clear();
+      widget.onChanged();
+    });
   }
 }

@@ -12,9 +12,11 @@ import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
+import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/base/base_controller.dart';
+import 'package:aco_plus/app/modules/pedido/ui/pedido_minify_page.dart';
 import 'package:flutter/material.dart';
 
 class KanbanPage extends StatefulWidget {
@@ -25,9 +27,11 @@ class KanbanPage extends StatefulWidget {
 }
 
 class _KanbanPageState extends State<KanbanPage> {
+  final ScrollController scrollKanban = ScrollController();
+  PedidoModel? pedido;
   @override
   void initState() {
-    FirestoreClient.steps.fetch();
+    FirestoreClient.pedidos.fetch();
     super.initState();
   }
 
@@ -56,27 +60,71 @@ class _KanbanPageState extends State<KanbanPage> {
               image: AssetImage('assets/images/kanban_background.png'),
               fit: BoxFit.cover,
             )),
-            child: Column(
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                const H(16),
-                Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: steps.length,
-                    scrollDirection: Axis.horizontal,
-                    separatorBuilder: (_, i) => const W(16),
-                    itemBuilder: (_, i) => _stepWidget(
-                        steps[i],
-                        pedidos
-                            .where((e) => steps[i].id == e.step.id)
-                            .toList()),
+                _kanbanWidget(steps, pedidos),
+                if (pedido != null) ...[
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 500),
+                    opacity: pedido != null ? 1 : 0,
+                    child: InkWell(
+                      onTap: () => setState(() => pedido = null),
+                      child: Container(
+                        height: double.maxFinite,
+                        width: double.maxFinite,
+                        color: Colors.black.withOpacity(0.8),
+                      ),
+                    ),
                   ),
-                ),
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 500),
+                    opacity: pedido != null ? 1 : 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      width: 800,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: PedidoMinifyPage(
+                            pedido!, () => setState(() => pedido = null)),
+                      ),
+                    ),
+                  ),
+                ]
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Column _kanbanWidget(List<StepModel> steps, List<PedidoModel> pedidos) {
+    return Column(
+      children: [
+        Expanded(
+          child: RawScrollbar(
+            trackColor: Colors.grey[700],
+            trackRadius: const Radius.circular(8),
+            thumbColor: Colors.grey[400],
+            interactive: true,
+            radius: const Radius.circular(4),
+            thickness: 8,
+            controller: scrollKanban,
+            trackVisibility: true,
+            thumbVisibility: true,
+            child: ListView.separated(
+              controller: scrollKanban,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              itemCount: steps.length,
+              scrollDirection: Axis.horizontal,
+              separatorBuilder: (_, i) => const W(16),
+              itemBuilder: (_, i) => _stepWidget(steps[i],
+                  pedidos.where((e) => steps[i].id == e.step.id).toList()),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -129,7 +177,7 @@ class _KanbanPageState extends State<KanbanPage> {
                           horizontal: 8, vertical: 8),
                       separatorBuilder: (_, i) => DragTarget<PedidoModel>(
                         onAcceptWithDetails: (details) =>
-                            onAccept(details, step, pedidos),
+                            onAccept(details, step, pedidos, index: i),
                         builder: (_, __, ___) => const H(8),
                       ),
                       itemCount: pedidos.length,
@@ -141,7 +189,7 @@ class _KanbanPageState extends State<KanbanPage> {
                           index: pedidos.length),
                       builder: (_, __, ___) => const H(8),
                     ),
-                  ], 
+                  ],
                 ),
               ),
             ),
@@ -154,6 +202,13 @@ class _KanbanPageState extends State<KanbanPage> {
   void onAccept(DragTargetDetails<PedidoModel> details, StepModel step,
       List<PedidoModel> pedidos,
       {int? index}) {
+    final accept =
+        step.fromSteps.map((e) => e.id).contains(details.data.step.id);
+    if (!accept) {
+      NotificationService.showNegative(
+          'Operação não permitida', 'Você não mover para esta etapa.');
+      return;
+    }
     PedidoModel pedido =
         FirestoreClient.pedidos.data.firstWhere((e) => e.id == details.data.id);
     if (pedido.step.id != step.id) {
@@ -179,7 +234,7 @@ class _KanbanPageState extends State<KanbanPage> {
           // FirestoreClient.pedidos.update(
           //     pedidos[e].copyWith(step: step));
         },
-        delay: const Duration(milliseconds: 100),
+        delay: const Duration(milliseconds: 180),
         data: pedidos[e],
         childWhenDragging: SizedBox(
           width: 290,
@@ -205,31 +260,34 @@ class _KanbanPageState extends State<KanbanPage> {
   }
 
   Widget _pedidoWidget(BuildContext context, PedidoModel pedido) {
-    return Container(
-      width: double.maxFinite,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-          color: const Color(0xFFFFFFFF),
-          borderRadius: const BorderRadius.all(Radius.circular(6)),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF000000).withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 1,
-              offset: const Offset(0, 0),
-            ),
-          ]),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (pedido.tags.isNotEmpty) ...[
-            _tagsWidget(pedido),
+    return InkWell(
+      onTap: () => setState(() => this.pedido = pedido),
+      child: Container(
+        width: double.maxFinite,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+            color: const Color(0xFFFFFFFF),
+            borderRadius: const BorderRadius.all(Radius.circular(6)),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF000000).withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 1,
+                offset: const Offset(0, 0),
+              ),
+            ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (pedido.tags.isNotEmpty) ...[
+              _tagsWidget(pedido),
+              const H(8),
+            ],
+            Text(pedido.localizador),
             const H(8),
+            _detailsWidget(pedido)
           ],
-          Text(pedido.localizador),
-          const H(8),
-          _detailsWidget(pedido)
-        ],
+        ),
       ),
     );
   }
@@ -261,32 +319,52 @@ class _KanbanPageState extends State<KanbanPage> {
 
   Widget _detailsWidget(PedidoModel pedido) {
     return Wrap(
+      runSpacing: 8,
+      spacing: 8,
       children: [
         if (pedido.deliveryAt != null)
           _detailWidget(
             Icons.timer_outlined,
             value: pedido.deliveryAt!.toddMM(),
           ),
+        if (pedido.archives.isNotEmpty)
+          _detailWidget(
+            Icons.file_present,
+            value: pedido.archives.length.toString(),
+          ),
+        if (pedido.checks.isNotEmpty)
+          _detailWidget(
+            Icons.checklist,
+            value:
+                '${pedido.checks.where((e) => e.isCheck).length}/${pedido.checks.length}',
+          ),
+        if (pedido.comments.isNotEmpty)
+          _detailWidget(
+            Icons.comment_outlined,
+            value: pedido.comments.length.toString(),
+          ),
       ],
     );
   }
 
   Widget _detailWidget(IconData icon, {String? value}) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          color: const Color(0xFF787C86),
-          size: 14,
-        ),
-        if (value != null) ...[
-          const W(4),
-          Text(
-            value,
-            style: const TextStyle(color: Color(0xFF787C86), fontSize: 12),
+    return IntrinsicWidth(
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: const Color(0xFF787C86),
+            size: 14,
           ),
-        ]
-      ],
+          if (value != null) ...[
+            const W(4),
+            Text(
+              value,
+              style: const TextStyle(color: Color(0xFF787C86), fontSize: 12),
+            ),
+          ]
+        ],
+      ),
     );
   }
 }

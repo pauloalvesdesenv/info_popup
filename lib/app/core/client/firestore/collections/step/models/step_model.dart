@@ -1,25 +1,28 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:flutter/material.dart';
 
 class StepModel {
   final String id;
   final String name;
   final Color color;
-  final List<StepModel> fromSteps;
-  final List<StepModel> toSteps;
   final List<UsuarioRole> moveRoles;
   final DateTime createdAt;
   final ScrollController scrollController = ScrollController();
+  List<String> fromStepsIds;
+
+  List<StepModel> get fromSteps =>
+      fromStepsIds.map((e) => FirestoreClient.steps.getById(e)).toList();
 
   StepModel({
     required this.id,
     required this.name,
     required this.color,
-    required this.fromSteps,
-    required this.toSteps,
+    required this.fromStepsIds,
     required this.moveRoles,
     required this.createdAt,
   });
@@ -28,8 +31,8 @@ class StepModel {
     String? id,
     String? name,
     Color? color,
-    List<StepModel>? fromSteps,
-    List<StepModel>? toSteps,
+    List<String>? fromStepsIds,
+    List<String>? toStepsIds,
     List<UsuarioRole>? moveRoles,
     DateTime? createdAt,
   }) {
@@ -37,8 +40,7 @@ class StepModel {
       id: id ?? this.id,
       name: name ?? this.name,
       color: color ?? this.color,
-      fromSteps: fromSteps ?? this.fromSteps,
-      toSteps: toSteps ?? this.toSteps,
+      fromStepsIds: fromStepsIds ?? this.fromStepsIds,
       moveRoles: moveRoles ?? this.moveRoles,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -49,8 +51,7 @@ class StepModel {
       'id': id,
       'name': name,
       'color': color.value,
-      'fromSteps': fromSteps.map((x) => x.toMap()).toList(),
-      'toSteps': toSteps.map((x) => x.id).toList(),
+      'fromStepsIds': fromStepsIds,
       'moveRoles': moveRoles.map((x) => x.index).toList(),
       'createdAt': createdAt.millisecondsSinceEpoch,
     };
@@ -61,10 +62,7 @@ class StepModel {
       id: map['id'] ?? '',
       name: map['name'] ?? '',
       color: Color(map['color']),
-      fromSteps: List<StepModel>.from(
-          map['fromSteps']?.map((x) => StepModel.fromMap(x))),
-      toSteps: List<StepModel>.from(
-          map['toSteps']?.map((x) => FirestoreClient.steps.getById(x))),
+      fromStepsIds: map['fromStepsIds'] != null ? List<String>.from(map['fromStepsIds']) : <String>[],
       moveRoles: List<UsuarioRole>.from(
           map['moveRoles']?.map((x) => UsuarioRole.values[x])),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
@@ -78,6 +76,52 @@ class StepModel {
 
   @override
   String toString() {
-    return 'StepModel(id: $id, name: $name, color: $color, fromSteps: $fromSteps, toSteps: $toSteps, moveRoles: $moveRoles, createdAt: $createdAt)';
+    return 'StepModel(id: $id, name: $name, color: $color, fromSteps: $fromSteps, moveRoles: $moveRoles, createdAt: $createdAt)';
   }
+}
+
+
+class TesteClass {
+  final List<String> fromStepsIds;
+  TesteClass({
+    required this.fromStepsIds,
+  });
+
+  TesteClass copyWith({
+    List<String>? fromStepsIds,
+  }) {
+    return TesteClass(
+      fromStepsIds: fromStepsIds ?? this.fromStepsIds,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'fromStepsIds': fromStepsIds,
+    };
+  }
+
+  factory TesteClass.fromMap(Map<String, dynamic> map) {
+    return TesteClass(
+      fromStepsIds: List<String>.from(map['fromStepsIds']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory TesteClass.fromJson(String source) => TesteClass.fromMap(json.decode(source));
+
+  @override
+  String toString() => 'TesteClass(fromStepsIds: $fromStepsIds)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is TesteClass &&
+      listEquals(other.fromStepsIds, fromStepsIds);
+  }
+
+  @override
+  int get hashCode => fromStepsIds.hashCode;
 }
