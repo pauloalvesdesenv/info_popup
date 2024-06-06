@@ -121,8 +121,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
             ),
             const H(16),
             AppDropDown<ClienteModel?>(
-              label: 'Cliente',
               hasFilter: true,
+              label: 'Cliente',
               item: form.cliente,
               itens: FirestoreClient.clientes.data,
               onCreated: () async {
@@ -131,6 +131,9 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                 form.cliente = cliente;
                 form.obra = form.cliente!.obras.first;
                 pedidoCtrl.formStream.update();
+                await FirestoreClient.clientes.fetch();
+                pedidoCtrl.formStream.update();
+                return cliente;
               },
               itemLabel: (e) => e!.nome,
               onSelect: (e) async {
