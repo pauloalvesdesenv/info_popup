@@ -3,6 +3,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_m
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
@@ -64,8 +65,14 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
         title: Text('${pedidoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Pedido',
             style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          if(widget.pedido != null && usuario.permission.pedido.contains(UserPermissionType.update))  IconLoadingButton(() async =>
-              await pedidoCtrl.onConfirm(context, widget.pedido, false))
+          if ((widget.pedido != null &&
+                  usuario.permission.pedido
+                      .contains(UserPermissionType.update)) ||
+              (widget.pedido == null &&
+                  usuario.permission.pedido
+                      .contains(UserPermissionType.create)))
+            IconLoadingButton(() async =>
+                await pedidoCtrl.onConfirm(context, widget.pedido, false))
         ],
         backgroundColor: AppColors.primaryMain,
       ),
@@ -80,6 +87,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
       children: [
         ExpansionTile(
           initiallyExpanded: true,
+          maintainState: true,
           controller: form.tileController,
           leading: const Icon(Icons.info_outline),
           title: Text('Informações do Pedido', style: AppCss.mediumBold),
@@ -240,6 +248,20 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                 pedidoCtrl.formStream.update();
               },
             ),
+            if (widget.pedido == null) ...[
+              const H(16),
+              AppDropDown<StepModel>(
+                label: 'Etapa Inicial',
+                hasFilter: true,
+                item: form.step,
+                itens: FirestoreClient.steps.data,
+                itemLabel: (e) => e.name,
+                onSelect: (e) async {
+                  form.step = e!;
+                  pedidoCtrl.formStream.update();
+                },
+              ),
+            ],
             const H(16),
             DatePickerField(
               required: false,

@@ -55,7 +55,9 @@ class StepController {
         final edit = form.toStepModel();
         await FirestoreClient.steps.update(edit);
       } else {
-        await FirestoreClient.steps.add(form.toStepModel());
+        final step = await FirestoreClient.steps.add(form.toStepModel());
+        FirestoreClient.kanban.data.kanban[step!] = [];
+        FirestoreClient.kanban.update();
       }
       pop(_);
 

@@ -8,6 +8,7 @@ import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_status_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +65,10 @@ class PedidoController {
           pedidoStream.update();
         }
       } else {
-        await FirestoreClient.pedidos.add(form.toPedidoModel(pedido));
+        final model =
+            await FirestoreClient.pedidos.add(form.toPedidoModel(pedido));
+        await FirestoreClient.pedidos.fetch();
+        await kanbanCtrl.onAddPedido(model!.step.id, model.id);
       }
       if (isFromOrder) {
         Navigator.pop(_, form.isEdit ? pedido : null);

@@ -1,21 +1,20 @@
 import 'dart:developer';
 
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/kanban/models/kanban_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PedidoCollection {
-  static final PedidoCollection _instance = PedidoCollection._();
+class KanbanCollection {
+  static final KanbanCollection _instance = KanbanCollection._();
 
-  PedidoCollection._();
+  KanbanCollection._();
 
-  factory PedidoCollection() => _instance;
-  String name = 'pedidos';
+  factory KanbanCollection() => _instance;
+  String name = 'kanban';
 
-  AppStream<List<PedidoModel>> dataStream = AppStream<List<PedidoModel>>();
-  List<PedidoModel> get data => dataStream.value;
+  AppStream<KanbanModel> dataStream = AppStream<KanbanModel>();
+  KanbanModel get data => dataStream.value;
 
   CollectionReference<Map<String, dynamic>> get collection =>
       FirebaseFirestore.instance.collection(name);
@@ -31,13 +30,7 @@ class PedidoCollection {
     if (_isStarted && lock) return;
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
-    final pedidos =
-        data.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-    // for (final pedido in pedidos) {
-    //   pedido.index = pedidos.indexOf(pedido);
-    //   update(pedido);
-    // }
-    dataStream.add(pedidos);
+    dataStream.add(KanbanModel.fromMap(data.docs.first.data()));
   }
 
   bool _isListen = false;
@@ -75,20 +68,15 @@ class PedidoCollection {
             : collection)
         .snapshots()
         .listen((e) {
-      final data = e.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-
-      data.sort((a, b) => a.localizador.compareTo(b.localizador));
-
-      dataStream.add(data);
+      dataStream.add(KanbanModel.fromMap(e.docs.first.data()));
     });
   }
 
-  PedidoModel getById(String id) => data.singleWhere((e) => e.id == id);
+  // KanbanModel getById(String id) => data.singleWhere((e) => e.id == id);
+  // KanbanProdutoModel getProdutoByKanbanId(String pedidoId, String produtoId) =>
+  //     getById(pedidoId).produtos.firstWhere((e) => e.id == produtoId);
 
-  PedidoProdutoModel getProdutoByPedidoId(String pedidoId, String produtoId) =>
-      getById(pedidoId).produtos.firstWhere((e) => e.id == produtoId);
-
-  Future<PedidoModel?> add(PedidoModel model) async {
+  Future<KanbanModel?> add(KanbanModel model) async {
     try {
       await collection.doc(model.id).set(model.toMap());
       return model;
@@ -99,10 +87,10 @@ class PedidoCollection {
     }
   }
 
-  Future<PedidoModel?> update(PedidoModel model) async {
+  Future<KanbanModel?> update() async {
     try {
-      await collection.doc(model.id).update(model.toMap());
-      return model;
+      await collection.doc('doc').update(data.toMap());
+      return data;
     } catch (_, __) {
       log(_.toString());
       log(__.toString());
@@ -110,13 +98,7 @@ class PedidoCollection {
     }
   }
 
-  Future<void> delete(PedidoModel model) async {
+  Future<void> delete(KanbanModel model) async {
     await collection.doc(model.id).delete();
-  }
-
-  Future<void> fetchAllItens() async {
-    for (final pedido in data) {
-      await FirestoreClient.pedidos.update(pedido);
-    }
   }
 }

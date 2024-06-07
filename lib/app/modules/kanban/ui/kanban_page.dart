@@ -12,10 +12,11 @@ import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
-import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/base/base_controller.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_minify_page.dart';
 import 'package:flutter/material.dart';
 
@@ -27,8 +28,6 @@ class KanbanPage extends StatefulWidget {
 }
 
 class _KanbanPageState extends State<KanbanPage> {
-  final ScrollController scrollKanban = ScrollController();
-  PedidoModel? pedido;
   @override
   void initState() {
     FirestoreClient.pedidos.fetch();
@@ -51,10 +50,10 @@ class _KanbanPageState extends State<KanbanPage> {
         backgroundColor: AppColors.primaryMain,
       ),
       body: StreamOut(
-        stream: FirestoreClient.steps.dataStream.listen,
-        builder: (context, steps) => StreamOut(
-          stream: FirestoreClient.pedidos.dataStream.listen,
-          builder: (context, pedidos) => Container(
+        stream: FirestoreClient.kanban.dataStream.listen,
+        builder: (_, kanban) => StreamOut(
+          stream: kanbanCtrl.utilsStream.listen,
+          builder: (context, utils) => Container(
             decoration: const BoxDecoration(
                 image: DecorationImage(
               image: AssetImage('assets/images/kanban_background.png'),
@@ -63,34 +62,36 @@ class _KanbanPageState extends State<KanbanPage> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                _kanbanWidget(steps, pedidos),
-                if (pedido != null) ...[
-                  AnimatedOpacity(
-                    duration: const Duration(milliseconds: 500),
-                    opacity: pedido != null ? 1 : 0,
-                    child: InkWell(
-                      onTap: () => setState(() => pedido = null),
-                      child: Container(
-                        height: double.maxFinite,
-                        width: double.maxFinite,
-                        color: Colors.black.withOpacity(0.8),
-                      ),
-                    ),
-                  ),
-                  AnimatedOpacity(
-                    duration: const Duration(milliseconds: 500),
-                    opacity: pedido != null ? 1 : 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      width: 800,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: PedidoMinifyPage(
-                            pedido!, () => setState(() => pedido = null)),
-                      ),
-                    ),
-                  ),
-                ]
+                _kanbanWidget(utils, kanban.kanban),
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 400),
+                  opacity: utils.isPedidoSelected ? 1 : 0,
+                  child: !utils.isPedidoSelected
+                      ? const SizedBox()
+                      : InkWell(
+                          onTap: () => kanbanCtrl.setPedido(null),
+                          child: Container(
+                            height: double.maxFinite,
+                            width: double.maxFinite,
+                            color: Colors.black.withOpacity(0.8),
+                          ),
+                        ),
+                ),
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 400),
+                  opacity: utils.isPedidoSelected ? 1 : 0,
+                  child: !utils.isPedidoSelected
+                      ? const SizedBox()
+                      : Container(
+                          padding: const EdgeInsets.all(16),
+                          width: 800,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: PedidoMinifyPage(utils.pedido!,
+                                () => kanbanCtrl.setPedido(null)),
+                          ),
+                        ),
+                ),
               ],
             ),
           ),
@@ -99,7 +100,8 @@ class _KanbanPageState extends State<KanbanPage> {
     );
   }
 
-  Column _kanbanWidget(List<StepModel> steps, List<PedidoModel> pedidos) {
+  Column _kanbanWidget(
+      KanbanUtils utils, Map<StepModel, List<PedidoModel>> kanban) {
     return Column(
       children: [
         Expanded(
@@ -110,20 +112,22 @@ class _KanbanPageState extends State<KanbanPage> {
             interactive: true,
             radius: const Radius.circular(4),
             thickness: 8,
-            controller: scrollKanban,
+            controller: utils.scroll,
             trackVisibility: true,
             thumbVisibility: true,
             child: ListView.separated(
-              controller: scrollKanban,
+              controller: utils.scroll,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              itemCount: steps.length,
+              itemCount: kanban.keys.length,
               scrollDirection: Axis.horizontal,
               separatorBuilder: (_, i) => const W(16),
-              itemBuilder: (_, i) => _stepWidget(steps[i],
-                  pedidos.where((e) => steps[i].id == e.step.id).toList()),
+              itemBuilder: (_, i) => _stepWidget(
+                kanban.keys.toList()[i],
+                kanban[kanban.keys.toList()[i]]!,
+              ),
             ),
           ),
-        ),
+        )
       ],
     );
   }
@@ -165,30 +169,19 @@ class _KanbanPageState extends State<KanbanPage> {
                 thickness: 8,
                 child: ListView(
                   children: [
-                    DragTarget<PedidoModel>(
-                      onAcceptWithDetails: (details) =>
-                          onAccept(details, step, pedidos, index: 0),
-                      builder: (_, __, ___) => const H(8),
-                    ),
+                    _dragTargetWidget(step, pedidos, 0),
                     ListView.separated(
                       controller: step.scrollController,
                       shrinkWrap: true,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 8),
-                      separatorBuilder: (_, i) => DragTarget<PedidoModel>(
-                        onAcceptWithDetails: (details) =>
-                            onAccept(details, step, pedidos, index: i),
-                        builder: (_, __, ___) => const H(8),
-                      ),
+                      separatorBuilder: (_, i) =>
+                          _dragTargetWidget(step, pedidos, i + 1),
                       itemCount: pedidos.length,
                       itemBuilder: (_, e) => _itemListViewWidget(pedidos, e),
                     ),
-                    DragTarget<PedidoModel>(
-                      onAcceptWithDetails: (details) => onAccept(
-                          details, step, pedidos,
-                          index: pedidos.length),
-                      builder: (_, __, ___) => const H(8),
-                    ),
+                    _dragTargetWidget(step, pedidos, pedidos.length,
+                        isLast: true),
                   ],
                 ),
               ),
@@ -199,33 +192,31 @@ class _KanbanPageState extends State<KanbanPage> {
     );
   }
 
-  void onAccept(DragTargetDetails<PedidoModel> details, StepModel step,
-      List<PedidoModel> pedidos,
-      {int? index}) {
-    final accept =
-        step.fromSteps.map((e) => e.id).contains(details.data.step.id);
-    if (!accept) {
-      NotificationService.showNegative(
-          'Operação não permitida', 'Você não mover para esta etapa.');
-      return;
-    }
-    PedidoModel pedido =
-        FirestoreClient.pedidos.data.firstWhere((e) => e.id == details.data.id);
-    if (pedido.step.id != step.id) {
-      pedido.steps.add(PedidoStepModel(
-          id: HashService.get, step: step, createdAt: DateTime.now()));
-      FirestoreClient.pedidos.dataStream.update();
-      FirestoreClient.pedidos.update(pedido);
-    }
-    pedido =
-        FirestoreClient.pedidos.data.firstWhere((e) => e.id == details.data.id);
-    final pedidosByStep = pedidos.where((e) => e.step.id == step.id).toList();
-    final i = index ?? pedidosByStep.indexOf(pedido);
-    pedidosByStep.removeAt(i);
-    pedidosByStep.insert(i, pedido);
-    pedido.index = i;
-    FirestoreClient.pedidos.dataStream.update();
-  }
+  Widget _dragTargetWidget(StepModel step, List<PedidoModel> pedidos, int index,
+          {bool isLast = false}) =>
+      DragTarget<PedidoModel>(
+        onAcceptWithDetails: (details) =>
+            kanbanCtrl.onAccept(details, step, pedidos, index),
+        onMove: (e) {
+          print('onMove');
+        },
+        builder: (context, candidateData, rejectedData) {
+          bool isHover = candidateData.isNotEmpty;
+          return AnimatedOpacity(
+            opacity: isHover ? 1 : 0,
+            duration: const Duration(milliseconds: 100),
+            child: Container(
+              width: 20,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              height: isHover || isLast ? 100 : 8,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          );
+        },
+      );
 
   LongPressDraggable<PedidoModel> _itemListViewWidget(
       List<PedidoModel> pedidos, int e) {
@@ -261,7 +252,7 @@ class _KanbanPageState extends State<KanbanPage> {
 
   Widget _pedidoWidget(BuildContext context, PedidoModel pedido) {
     return InkWell(
-      onTap: () => setState(() => this.pedido = pedido),
+      onTap: () => kanbanCtrl.setPedido(pedido),
       child: Container(
         width: double.maxFinite,
         padding: const EdgeInsets.all(8),
@@ -279,6 +270,7 @@ class _KanbanPageState extends State<KanbanPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(pedido.index.toString(), style: AppCss.minimumBold),
             if (pedido.tags.isNotEmpty) ...[
               _tagsWidget(pedido),
               const H(8),

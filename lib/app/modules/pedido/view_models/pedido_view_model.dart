@@ -4,6 +4,8 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_step_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/comment/comment_quill_model.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
@@ -38,12 +40,14 @@ class PedidoCreateModel {
   DateTime? deliveryAt;
   ExpansionTileController tileController = ExpansionTileController();
   ChecklistModel? checklist;
+  StepModel step = FirestoreClient.steps.data.first;
 
   late bool isEdit;
 
   PedidoCreateModel()
       : id = HashService.get,
-        isEdit = false;
+        isEdit = false,
+        step = FirestoreClient.steps.data.first;
 
   String getDetails() {
     List<String> localizador = [];
@@ -72,6 +76,7 @@ class PedidoCreateModel {
     produtos =
         pedido.produtos.map((e) => PedidoProdutoCreateModel.edit(e)).toList();
     deliveryAt = pedido.deliveryAt;
+    step = pedido.steps.last.step;
   }
 
   PedidoModel toPedidoModel(PedidoModel? pedido) => PedidoModel(
@@ -92,7 +97,7 @@ class PedidoCreateModel {
           .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
           .toList(),
       deliveryAt: deliveryAt,
-      steps: [],
+      steps: [PedidoStepModel(id: id, step: step, createdAt: DateTime.now())],
       tags: [],
       checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
       comments: [],

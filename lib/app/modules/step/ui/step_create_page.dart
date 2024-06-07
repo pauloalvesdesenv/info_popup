@@ -85,7 +85,9 @@ class _StepCreatePageState extends State<StepCreatePage> {
         AppDropDownList<StepModel>(
             label: 'Recebe de',
             addeds: form.fromSteps,
-            itens: FirestoreClient.steps.data,
+            itens: FirestoreClient.steps.data
+                .where((e) => e.id != form.id)
+                .toList(),
             itemLabel: (e) => e.name,
             onChanged: () {
               stepCtrl.formStream.add(form);
@@ -96,7 +98,7 @@ class _StepCreatePageState extends State<StepCreatePage> {
             addeds: form.moveRoles,
             itens: UsuarioRole.values,
             itemLabel: (e) => e.label ?? 'Selecione',
-            onChanged: () {
+          onChanged: () {
               stepCtrl.formStream.add(form);
             }),
         const H(24),
