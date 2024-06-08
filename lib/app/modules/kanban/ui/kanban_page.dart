@@ -30,7 +30,7 @@ class KanbanPage extends StatefulWidget {
 class _KanbanPageState extends State<KanbanPage> {
   @override
   void initState() {
-    FirestoreClient.pedidos.fetch();
+    kanbanCtrl.onInit();
     super.initState();
   }
 
@@ -50,50 +50,47 @@ class _KanbanPageState extends State<KanbanPage> {
         backgroundColor: AppColors.primaryMain,
       ),
       body: StreamOut(
-        stream: FirestoreClient.kanban.dataStream.listen,
-        builder: (_, kanban) => StreamOut(
-          stream: kanbanCtrl.utilsStream.listen,
-          builder: (context, utils) => Container(
-            decoration: const BoxDecoration(
-                image: DecorationImage(
-              image: AssetImage('assets/images/kanban_background.png'),
-              fit: BoxFit.cover,
-            )),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                _kanbanWidget(utils, kanban.kanban),
-                AnimatedOpacity(
-                  duration: const Duration(milliseconds: 400),
-                  opacity: utils.isPedidoSelected ? 1 : 0,
-                  child: !utils.isPedidoSelected
-                      ? const SizedBox()
-                      : InkWell(
-                          onTap: () => kanbanCtrl.setPedido(null),
-                          child: Container(
-                            height: double.maxFinite,
-                            width: double.maxFinite,
-                            color: Colors.black.withOpacity(0.8),
-                          ),
+        stream: kanbanCtrl.utilsStream.listen,
+        builder: (context, utils) => Container(
+          decoration: const BoxDecoration(
+              image: DecorationImage(
+            image: AssetImage('assets/images/kanban_background.png'),
+            fit: BoxFit.cover,
+          )),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              _kanbanWidget(utils, utils.kanban),
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 400),
+                opacity: utils.isPedidoSelected ? 1 : 0,
+                child: !utils.isPedidoSelected
+                    ? const SizedBox()
+                    : InkWell(
+                        onTap: () => kanbanCtrl.setPedido(null),
+                        child: Container(
+                          height: double.maxFinite,
+                          width: double.maxFinite,
+                          color: Colors.black.withOpacity(0.8),
                         ),
-                ),
-                AnimatedOpacity(
-                  duration: const Duration(milliseconds: 400),
-                  opacity: utils.isPedidoSelected ? 1 : 0,
-                  child: !utils.isPedidoSelected
-                      ? const SizedBox()
-                      : Container(
-                          padding: const EdgeInsets.all(16),
-                          width: 800,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: PedidoMinifyPage(utils.pedido!,
-                                () => kanbanCtrl.setPedido(null)),
-                          ),
+                      ),
+              ),
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 400),
+                opacity: utils.isPedidoSelected ? 1 : 0,
+                child: !utils.isPedidoSelected
+                    ? const SizedBox()
+                    : Container(
+                        padding: const EdgeInsets.all(16),
+                        width: 800,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: PedidoMinifyPage(
+                              utils.pedido!, () => kanbanCtrl.setPedido(null)),
                         ),
-                ),
-              ],
-            ),
+                      ),
+              ),
+            ],
           ),
         ),
       ),

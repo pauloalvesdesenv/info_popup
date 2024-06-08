@@ -1,4 +1,3 @@
-import 'package:aco_plus/app/core/client/firestore/collections/kanban/models/kanban_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
@@ -18,11 +17,31 @@ class StepController {
 
   factory StepController() => _instance;
 
-  KanbanModel get kanban => FirestoreClient.kanban.data;
-
-  final AppStream<KanbanUtils> utilsStream =
-      AppStream<KanbanUtils>.seed(KanbanUtils());
+  final AppStream<KanbanUtils> utilsStream = AppStream<KanbanUtils>();
   KanbanUtils get utils => utilsStream.value;
+
+  void onInit() {
+    final kanban = mountKanban();
+    utilsStream.add(KanbanUtils(kanban: kanban));
+    FirestoreClient.pedidos.fetch();
+  }
+
+  Map<StepModel, List<PedidoModel>> mountKanban() {
+    final pedidos = FirestoreClient.pedidos.data;
+    final steps = FirestoreClient.steps.data;
+    final kanban = <StepModel, List<PedidoModel>>{};
+    for (var step in steps) {
+      final pedidosStep = pedidos.where((e) => e.step.id == step.id).toList();
+      pedidosStep.sort((a, b) => a.index.compareTo(b.index));
+      kanban[step] = pedidosStep;
+    }
+    return kanban;
+  }
+
+  void updateKanban() {
+    utils.kanban = mountKanban();
+    utilsStream.update();
+  }
 
   void setPedido(PedidoModel? pedido) {
     utils.pedido = pedido;
@@ -37,10 +56,8 @@ class StepController {
   ) async {
     // if (!_onWillAccept(details, step)) return;
     final pedido = details.data;
-    _onMovePedido(pedidos, pedido, step, index);
-    FirestoreClient.kanban.dataStream.update();
+    _onMovePedido(pedido, step, index);
     await FirestoreClient.pedidos.update(pedido);
-    FirestoreClient.kanban.update();
     // PedidoModel pedido = getPedidoById(details.data.id);
     // if (pedido.step.id != step.id) _onAddStep(pedido, step);
     // pedido =
@@ -65,24 +82,29 @@ class StepController {
     FirestoreClient.pedidos.dataStream.update();
   }
 
-  void _onMovePedido(List<PedidoModel> pedidos, PedidoModel pedido,
-      StepModel step, int index) {
-    kanban.kanban[pedido.step]!.removeWhere((e) => e.id == pedido.id);
-    kanban.kanban[step]!.insert(index, pedido);
+  void _onMovePedido(PedidoModel pedido, StepModel step, int index) {
+    utils.kanban[pedido.step]!.remove(pedido);
+    utils.kanban[step]!.insert(index, pedido);
     pedido.steps.add(PedidoStepModel(
         id: HashService.get, step: step, createdAt: DateTime.now()));
   }
+
+  void _onRemovePedidoFromStep(String stepId, String pedidoId) {
+    final step = utils.kanban.keys.firstWhere((e) => e.id == stepId);
+    final pedido = utils.kanban[step]!.firstWhere((e) => e.id == pedidoId);
+    utils.kanban[step]!.remove(pedido);
+  }
+
+  void _onAddPedidoFromStep(String stepId, String pedidoId) {
+    final step = utils.kanban.keys.firstWhere((e) => e.id == stepId);
+    final pedido = utils.kanban[step]!.firstWhere((e) => e.id == pedidoId);
+    utils.kanban[step]!.remove(pedido);
+  }
+
 
   PedidoModel getPedidoById(String id) =>
       FirestoreClient.pedidos.data.firstWhere((e) => e.id == id);
 
   List<PedidoModel> getPedidosByStep(StepModel step) =>
       FirestoreClient.pedidos.data.where((e) => e.id == step.id).toList();
-
-  Future<void> onAddPedido(String stepId, String pedidoId) async {
-    final pedido = FirestoreClient.pedidos.getById(pedidoId);
-    final step = FirestoreClient.steps.getById(stepId);
-    kanban.kanban[step]!.add(pedido);
-    await FirestoreClient.kanban.update();
-  }
 }

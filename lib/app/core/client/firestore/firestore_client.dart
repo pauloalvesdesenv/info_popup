@@ -1,6 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/checklist/checklist_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_collection.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/kanban/kanban_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/ordem_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/pedido_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_collection.dart';
@@ -17,7 +16,6 @@ class FirestoreClient {
   static ProdutoCollection produtos = ProdutoCollection();
   static PedidoCollection pedidos = PedidoCollection();
   static OrdemCollection ordens = OrdemCollection();
-  static KanbanCollection kanban = KanbanCollection();
 
 
   static init() async {
@@ -29,7 +27,6 @@ class FirestoreClient {
     await checklists.start();
     await pedidos.start();
     await ordens.start();
-    await kanban.start();
 
     await usuarios.listen();
     await clientes.listen();
@@ -39,6 +36,5 @@ class FirestoreClient {
     await checklists.listen();
     await pedidos.listen();
     await ordens.listen();
-    await kanban.listen();
   }
 }

@@ -55,12 +55,9 @@ class StepController {
         final edit = form.toStepModel();
         await FirestoreClient.steps.update(edit);
       } else {
-        final step = await FirestoreClient.steps.add(form.toStepModel());
-        FirestoreClient.kanban.data.kanban[step!] = [];
-        FirestoreClient.kanban.update();
+        await FirestoreClient.steps.add(form.toStepModel());
       }
       pop(_);
-
       NotificationService.showPositive(
           'Step ${form.isEdit ? 'Editado' : 'Adicionado'}',
           'Operação realizada com sucesso',
