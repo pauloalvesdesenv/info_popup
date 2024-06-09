@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/components/h.dart';
+import 'package:aco_plus/app/core/enums/widget_view_mode.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_details_widget.dart';
 import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_tags_widget.dart';
@@ -43,7 +44,8 @@ class KanbanCardPedidoWidget extends StatelessWidget {
             Row(
               children: [
                 Expanded(child: KanbanCardDetailsWidget(pedido)),
-                KanbanCardUsersWidget(pedido),
+                KanbanCardUsersWidget(pedido,
+                    viewMode: WidgetViewMode.normal),
               ],
             )
           ],

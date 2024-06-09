@@ -15,6 +15,7 @@ import 'package:aco_plus/app/core/components/archive/archive_model.dart';
 import 'package:aco_plus/app/core/components/checklist/check_item_model.dart';
 import 'package:aco_plus/app/core/components/comment/comment_model.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
+import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_step_widget.dart';
 
 class PedidoModel {
   final String id;
@@ -33,6 +34,7 @@ class PedidoModel {
   final List<CheckItemModel> checks;
   final List<CommentModel> comments;
   final List<UsuarioModel> users;
+
 
   StepModel get step => steps.last.step;
   PedidoStatus get status => statusess.last.status;

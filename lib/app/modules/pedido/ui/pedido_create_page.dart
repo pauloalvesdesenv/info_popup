@@ -269,9 +269,9 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
               item: form.deliveryAt,
               onChanged: (_) {
                 form.deliveryAt = _;
-                form.tileController.collapse();
-                Future.delayed(const Duration(milliseconds: 300))
-                    .then((value) => form.produtoFocus.requestFocus());
+                // form.tileController.collapse();
+                // Future.delayed(const Duration(milliseconds: 300))
+                //     .then((value) => form.produtoFocus.requestFocus());
                 pedidoCtrl.formStream.update();
               },
             ),

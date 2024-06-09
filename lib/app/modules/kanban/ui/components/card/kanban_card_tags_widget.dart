@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 
 class KanbanCardTagsWidget extends StatelessWidget {
   final PedidoModel pedido;
+  final bool showDesc;
   const KanbanCardTagsWidget(
     this.pedido, {
+    this.showDesc = true,
     super.key,
   });
 
@@ -26,14 +28,18 @@ class KanbanCardTagsWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration:
           BoxDecoration(color: e.color, borderRadius: BorderRadius.circular(4)),
-      child: Text(
-        e.nome,
-        style: TextStyle(
-          color: e.color.computeLuminance() > 0.5 ? Colors.black : Colors.white,
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      child: showDesc
+          ? Text(
+              e.nome,
+              style: TextStyle(
+                color: e.color.computeLuminance() > 0.5
+                    ? Colors.black
+                    : Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          : null,
     );
   }
 }

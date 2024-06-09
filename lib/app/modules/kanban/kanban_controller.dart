@@ -5,6 +5,7 @@ import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
+import 'package:intl/intl.dart';
 
 final kanbanCtrl = StepController();
 
@@ -18,10 +19,11 @@ class StepController {
   final AppStream<KanbanUtils> utilsStream = AppStream<KanbanUtils>();
   KanbanUtils get utils => utilsStream.value;
 
-  void onInit() {
+  void onInit() async {
+    await FirestoreClient.pedidos.fetch();
     final kanban = mountKanban();
-    utilsStream.add(KanbanUtils(kanban: kanban));
-    FirestoreClient.pedidos.fetch();
+    final calendar = _mountCalendar();
+    utilsStream.add(KanbanUtils(kanban: kanban, calendar: calendar));
   }
 
   Map<StepModel, List<PedidoModel>> mountKanban() {
@@ -33,6 +35,27 @@ class StepController {
       kanban[step] = pedidosStep;
     }
     return kanban;
+  }
+
+  Future<void> onMountCalendar() async {
+    await FirestoreClient.pedidos.fetch();
+    utils.calendar = _mountCalendar();
+    utilsStream.update();
+  }
+
+  Map<String, List<PedidoModel>> _mountCalendar() {
+    final calendar = <String, List<PedidoModel>>{};
+    final keys = FirestoreClient.pedidos.data
+        .where((e) => e.deliveryAt != null)
+        .map((e) => e.deliveryAt!)
+        .toSet();
+    for (DateTime key in keys) {
+      calendar[DateFormat('dd/MM/yyyy').format(key)] = FirestoreClient
+          .pedidos.data
+          .where((e) => e.deliveryAt == key)
+          .toList();
+    }
+    return calendar;
   }
 
   void updateKanban() {

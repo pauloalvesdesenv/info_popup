@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 
 class KanbanCardDetailsWidget extends StatelessWidget {
   final PedidoModel pedido;
+  final bool showDeliveryAt;
   const KanbanCardDetailsWidget(
     this.pedido, {
     super.key,
+    this.showDeliveryAt = true,
   });
 
   @override
@@ -16,11 +18,12 @@ class KanbanCardDetailsWidget extends StatelessWidget {
       runSpacing: 8,
       spacing: 8,
       children: [
-        if (pedido.deliveryAt != null)
-          _detailWidget(
-            Icons.timer_outlined,
-            value: pedido.deliveryAt!.toddMM(),
-          ),
+        if (showDeliveryAt)
+          if (pedido.deliveryAt != null)
+            _detailWidget(
+              Icons.timer_outlined,
+              value: pedido.deliveryAt!.toddMM(),
+            ),
         if (pedido.archives.isNotEmpty)
           _detailWidget(
             Icons.file_present,
