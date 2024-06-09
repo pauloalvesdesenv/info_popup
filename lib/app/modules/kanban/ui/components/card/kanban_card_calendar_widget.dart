@@ -36,7 +36,7 @@ class _KanbanCardCalendarWidgetState extends State<KanbanCardCalendarWidget> {
           width: double.maxFinite,
           padding: const EdgeInsets.fromLTRB(0.03, 0.03, 0.03, 1),
           decoration: const BoxDecoration(
-              color: Colors.black,
+              color: Colors.black,//
               borderRadius: BorderRadius.all(Radius.circular(3))),
           child: Container(
             padding: const EdgeInsets.all(8),
