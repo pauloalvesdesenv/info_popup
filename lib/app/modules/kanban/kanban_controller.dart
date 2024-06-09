@@ -1,12 +1,10 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
-import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
-import 'package:flutter/material.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 
 final kanbanCtrl = StepController();
 
@@ -32,7 +30,6 @@ class StepController {
     final kanban = <StepModel, List<PedidoModel>>{};
     for (var step in steps) {
       final pedidosStep = pedidos.where((e) => e.step.id == step.id).toList();
-      pedidosStep.sort((a, b) => a.index.compareTo(b.index));
       kanban[step] = pedidosStep;
     }
     return kanban;
@@ -49,62 +46,54 @@ class StepController {
   }
 
   void onAccept(
-    DragTargetDetails<PedidoModel> details,
     StepModel step,
-    List<PedidoModel> pedidos,
+    PedidoModel pedido,
     int index,
   ) async {
-    // if (!_onWillAccept(details, step)) return;
-    final pedido = details.data;
+    if (!onWillAccept(pedido, step)) return;
     _onMovePedido(pedido, step, index);
-    await FirestoreClient.pedidos.update(pedido);
-    // PedidoModel pedido = getPedidoById(details.data.id);
-    // if (pedido.step.id != step.id) _onAddStep(pedido, step);
-    // pedido =
-    //     FirestoreClient.pedidos.data.firstWhere((e) => e.id == details.data.id);
-    // _onMovePedido(pedidos, pedido, step, index);
-    // FirestoreClient.pedidos.dataStream.update();
+    _onAddStep(pedido, step);
+    utilsStream.update();
   }
 
-  bool _onWillAccept(DragTargetDetails<PedidoModel> details, StepModel step) {
-    final accept =
-        step.fromSteps.map((e) => e.id).contains(details.data.step.id);
-    if (!accept) {
+  bool onWillAccept(PedidoModel pedido, StepModel step) {
+    final isStepAvailable =
+        step.fromSteps.map((e) => e.id).contains(pedido.step.id);
+    if (!isStepAvailable) {
       NotificationService.showNegative(
-          'Operação não permitida', 'Você não mover para esta etapa.');
+          'Operação não permitida', 'Etapa não aceita esta operação');
+      return false;
     }
-    return accept;
+    final isUserAvailable = step.moveRoles.contains(usuario.role);
+    if (!isUserAvailable) {
+      NotificationService.showNegative('Operação não permitida',
+          'Usuário não tem permissão para alterar essa etapa');
+      return false;
+    }
+    return true;
   }
 
   void _onAddStep(PedidoModel pedido, StepModel step) {
-    pedido.steps.add(PedidoStepModel(
-        id: HashService.get, step: step, createdAt: DateTime.now()));
+    pedido.addStep(step);
     FirestoreClient.pedidos.dataStream.update();
+    FirestoreClient.pedidos.update(pedido);
   }
 
   void _onMovePedido(PedidoModel pedido, StepModel step, int index) {
-    utils.kanban[pedido.step]!.remove(pedido);
-    utils.kanban[step]!.insert(index, pedido);
-    pedido.steps.add(PedidoStepModel(
-        id: HashService.get, step: step, createdAt: DateTime.now()));
+    _onAddPedidoFromStep(step.id, index,
+        pedido: _onRemovePedidoFromStep(pedido.step.id, pedido.id));
   }
 
-  void _onRemovePedidoFromStep(String stepId, String pedidoId) {
-    final step = utils.kanban.keys.firstWhere((e) => e.id == stepId);
-    final pedido = utils.kanban[step]!.firstWhere((e) => e.id == pedidoId);
-    utils.kanban[step]!.remove(pedido);
+  PedidoModel _onRemovePedidoFromStep(String stepId, String pedidoId) {
+    final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
+    final pedido = utils.kanban[key]!.firstWhere((e) => e.id == pedidoId);
+    utils.kanban[key]!.remove(pedido);
+    return pedido;
   }
 
-  void _onAddPedidoFromStep(String stepId, String pedidoId) {
-    final step = utils.kanban.keys.firstWhere((e) => e.id == stepId);
-    final pedido = utils.kanban[step]!.firstWhere((e) => e.id == pedidoId);
-    utils.kanban[step]!.remove(pedido);
+  void _onAddPedidoFromStep(String stepId, int index,
+      {required PedidoModel pedido}) {
+    final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
+    utils.kanban[key]!.insert(index, pedido);
   }
-
-
-  PedidoModel getPedidoById(String id) =>
-      FirestoreClient.pedidos.data.firstWhere((e) => e.id == id);
-
-  List<PedidoModel> getPedidosByStep(StepModel step) =>
-      FirestoreClient.pedidos.data.where((e) => e.id == step.id).toList();
 }

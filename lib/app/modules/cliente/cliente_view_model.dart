@@ -4,7 +4,6 @@ import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:cpf_cnpj_validator/cnpj_validator.dart';
 import 'package:cpf_cnpj_validator/cpf_validator.dart';
-import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class ClienteUtils {
   final TextController search = TextController();

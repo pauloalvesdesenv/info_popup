@@ -12,8 +12,8 @@ class AppTheme {
         selectionHandleColor: const Color(0xFFBFD0D0),
       ),
       datePickerTheme: DatePickerThemeData(
-        dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primaryMain;
           }
           return null;
@@ -22,27 +22,27 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.resolveWith((states) =>
-                states.contains(MaterialState.disabled)
+            backgroundColor: WidgetStateProperty.resolveWith((states) =>
+                states.contains(WidgetState.disabled)
                     ? AppColors.neutralMedium
                     : AppColors.primaryMain),
-            textStyle: MaterialStatePropertyAll(
+            textStyle: WidgetStatePropertyAll(
                 const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)
                     .setColor(AppColors.neutralLightest)),
-            foregroundColor: MaterialStatePropertyAll(AppColors.white),
+            foregroundColor: WidgetStatePropertyAll(AppColors.white),
             padding:
-                const MaterialStatePropertyAll(EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
-            shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: AppCss.radius8))),
+                const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
+            shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: AppCss.radius8))),
       ),
       iconButtonTheme: IconButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: MaterialStatePropertyAll(
+          backgroundColor: WidgetStatePropertyAll(
             AppColors.primaryMain,
           ),
-          foregroundColor: MaterialStatePropertyAll(AppColors.white),
-          iconSize: const MaterialStatePropertyAll(24),
-          shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: AppCss.radius8)),
-          padding: const MaterialStatePropertyAll(EdgeInsets.all(12)),
+          foregroundColor: WidgetStatePropertyAll(AppColors.white),
+          iconSize: const WidgetStatePropertyAll(24),
+          shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: AppCss.radius8)),
+          padding: const WidgetStatePropertyAll(EdgeInsets.all(12)),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

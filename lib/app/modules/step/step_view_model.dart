@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
@@ -40,5 +41,6 @@ class StepCreateModel {
         fromStepsIds: fromSteps.map((e) => e.id).toList(),
         moveRoles: moveRoles,
         createdAt: createdAt,
+        index: FirestoreClient.steps.data.length - 1,
       );
 }

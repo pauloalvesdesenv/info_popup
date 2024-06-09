@@ -8,7 +8,9 @@ import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_status_bottom.dart';
+import 'package:aco_plus/app/modules/pedido/ui/pedido_step_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -43,6 +45,9 @@ class PedidoController {
 
   List<PedidoModel> getPedidoesFiltered(
       String search, List<PedidoModel> pedidos) {
+    pedidos = utils.steps.isEmpty
+        ? pedidos
+        : pedidos.where((e) => e.step.id == utils.steps.last.id).toList();
     if (search.length < 3) return pedidos;
     List<PedidoModel> filtered = [];
     for (final pedido in pedidos) {
@@ -188,5 +193,12 @@ class PedidoController {
   void updatePedidoFirestore() {
     pedidoStream.update();
     FirestoreClient.pedidos.update(pedido);
+  }
+
+  Future<void> onChangePedidoStep(PedidoModel pedido) async {
+    final step = await showPedidoStepBottom(pedido);
+    if (step == null) return;
+    if (pedido.steps.last.step == step) return;
+    kanbanCtrl.onAccept(step, pedido, 0);
   }
 }

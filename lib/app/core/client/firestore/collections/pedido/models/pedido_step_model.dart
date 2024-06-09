@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 
 class PedidoStepModel {
   final String id;
@@ -13,6 +14,12 @@ class PedidoStepModel {
     required this.step,
     required this.createdAt,
   });
+
+  factory PedidoStepModel.create(StepModel step) => PedidoStepModel(
+        id: HashService.get,
+        step: step,
+        createdAt: DateTime.now(),
+      );
 
   Map<String, dynamic> toMap() {
     return {

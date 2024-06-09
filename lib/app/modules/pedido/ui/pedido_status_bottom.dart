@@ -62,12 +62,12 @@ class _PedidoStatusBottomState extends State<PedidoStatusBottom> {
                         padding: const EdgeInsets.only(left: 8),
                         child: IconButton(
                           style: ButtonStyle(
-                              padding: const MaterialStatePropertyAll(
+                              padding: const WidgetStatePropertyAll(
                                   EdgeInsets.all(16)),
                               backgroundColor:
-                                  MaterialStatePropertyAll(AppColors.white),
+                                  WidgetStatePropertyAll(AppColors.white),
                               foregroundColor:
-                                  MaterialStatePropertyAll(AppColors.black)),
+                                  WidgetStatePropertyAll(AppColors.black)),
                           onPressed: () => Navigator.pop(context),
                           icon: const Icon(Icons.keyboard_backspace),
                         ),

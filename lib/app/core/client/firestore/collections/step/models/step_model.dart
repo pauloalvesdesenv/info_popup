@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class StepModel {
   final String id;
@@ -14,9 +14,12 @@ class StepModel {
   final DateTime createdAt;
   final ScrollController scrollController = ScrollController();
   List<String> fromStepsIds;
+  int index;
 
   List<StepModel> get fromSteps =>
       fromStepsIds.map((e) => FirestoreClient.steps.getById(e)).toList();
+
+  bool get isEnable => moveRoles.contains(usuario.role);
 
   StepModel({
     required this.id,
@@ -25,6 +28,7 @@ class StepModel {
     required this.fromStepsIds,
     required this.moveRoles,
     required this.createdAt,
+    required this.index,
   });
 
   StepModel copyWith({
@@ -35,6 +39,7 @@ class StepModel {
     List<String>? toStepsIds,
     List<UsuarioRole>? moveRoles,
     DateTime? createdAt,
+    int? index,
   }) {
     return StepModel(
       id: id ?? this.id,
@@ -43,6 +48,7 @@ class StepModel {
       fromStepsIds: fromStepsIds ?? this.fromStepsIds,
       moveRoles: moveRoles ?? this.moveRoles,
       createdAt: createdAt ?? this.createdAt,
+      index: index ?? this.index,
     );
   }
 
@@ -54,6 +60,7 @@ class StepModel {
       'fromStepsIds': fromStepsIds,
       'moveRoles': moveRoles.map((x) => x.index).toList(),
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'index': index
     };
   }
 
@@ -61,8 +68,11 @@ class StepModel {
     return StepModel(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
+      index: map['index'] ?? 0,
       color: Color(map['color']),
-      fromStepsIds: map['fromStepsIds'] != null ? List<String>.from(map['fromStepsIds']) : <String>[],
+      fromStepsIds: map['fromStepsIds'] != null
+          ? List<String>.from(map['fromStepsIds'])
+          : <String>[],
       moveRoles: List<UsuarioRole>.from(
           map['moveRoles']?.map((x) => UsuarioRole.values[x])),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
@@ -79,7 +89,6 @@ class StepModel {
     return 'StepModel(id: $id, name: $name, color: $color, fromSteps: $fromSteps, moveRoles: $moveRoles, createdAt: $createdAt)';
   }
 }
-
 
 class TesteClass {
   final List<String> fromStepsIds;
@@ -109,7 +118,8 @@ class TesteClass {
 
   String toJson() => json.encode(toMap());
 
-  factory TesteClass.fromJson(String source) => TesteClass.fromMap(json.decode(source));
+  factory TesteClass.fromJson(String source) =>
+      TesteClass.fromMap(json.decode(source));
 
   @override
   String toString() => 'TesteClass(fromStepsIds: $fromStepsIds)';
@@ -118,8 +128,7 @@ class TesteClass {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is TesteClass &&
-      listEquals(other.fromStepsIds, fromStepsIds);
+    return other is TesteClass && listEquals(other.fromStepsIds, fromStepsIds);
   }
 
   @override

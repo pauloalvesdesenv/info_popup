@@ -103,10 +103,10 @@ class _ObraCreatePageState extends State<ObraCreatePage> {
         if (form.isEdit)
           TextButton.icon(
               style: ButtonStyle(
-                fixedSize: const MaterialStatePropertyAll(Size.fromWidth(double.maxFinite)),
-                foregroundColor: MaterialStatePropertyAll(AppColors.error),
-                backgroundColor: MaterialStatePropertyAll(AppColors.white),
-                shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                fixedSize: const WidgetStatePropertyAll(Size.fromWidth(double.maxFinite)),
+                foregroundColor: WidgetStatePropertyAll(AppColors.error),
+                backgroundColor: WidgetStatePropertyAll(AppColors.white),
+                shape: WidgetStatePropertyAll(RoundedRectangleBorder(
                     borderRadius: AppCss.radius8, side: BorderSide(color: AppColors.error))),
               ),
               onPressed: () async {

@@ -21,6 +21,8 @@ class PedidoUtils {
   SortType sortType = SortType.alfabetic;
   SortOrder sortOrder = SortOrder.asc;
   CommentQuillModel quill = CommentQuillModel();
+  List<StepModel> steps = [];
+  bool showFilter = false;
 }
 
 class PedidoCreateModel {
@@ -101,5 +103,5 @@ class PedidoCreateModel {
       tags: [],
       checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
       comments: [],
-      index: FirestoreClient.pedidos.data.length);
+      users: []);
 }

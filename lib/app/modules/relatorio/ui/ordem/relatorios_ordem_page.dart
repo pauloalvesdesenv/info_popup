@@ -155,10 +155,10 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
                                     relatorioCtrl.ordemViewModelStream.update();
                                   },
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
+                                    backgroundColor: WidgetStateProperty.all(
                                         Colors.transparent),
                                     foregroundColor:
-                                        MaterialStateProperty.all(Colors.black),
+                                        WidgetStateProperty.all(Colors.black),
                                   ),
                                   icon: Icon(Icons.close,
                                       color: Colors.grey[500]),
