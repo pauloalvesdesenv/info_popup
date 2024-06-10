@@ -205,7 +205,7 @@ class _PedidosPageState extends State<PedidosPage> {
                       ),
                       if (pedido.deliveryAt != null)
                         Text(
-                          'Data Entrega: ${pedido.deliveryAt.text()}',
+                          'Previsão de Entrega: ${pedido.deliveryAt.text()}',
                           style: AppCss.minimumRegular
                               .setSize(13)
                               .setColor(AppColors.neutralDark)

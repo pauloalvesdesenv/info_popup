@@ -48,7 +48,7 @@
 // //   Widget build(BuildContext context) {
 // //     return StreamOut(
 // //       stream: pedidoCtrl.pedidoStream.listen,
-// //       builder: (_, form) => 
+// //       builder: (_, form) =>
 // //     );
 // //   }
 
@@ -57,7 +57,7 @@
 // //       height: double.maxFinite,
 // //       child: ListView(
 // //         children: [
-          
+
 
 // //           _descWidget(form),
 // //           const Divisor(),
@@ -348,7 +348,7 @@
 // //           RowItensLabel([
 // //             ItemLabel('Descrição',
 // //                 form.descricao.isEmpty ? 'Sem descrição' : form.descricao),
-// //             ItemLabel('Data Entrega', form.deliveryAt.text()),
+// //             ItemLabel('Previsão de Entrega', form.deliveryAt.text()),
 // //           ]),
 // //         ],
 // //       ),

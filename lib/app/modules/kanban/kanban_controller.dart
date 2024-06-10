@@ -19,15 +19,19 @@ class StepController {
   final AppStream<KanbanUtils> utilsStream = AppStream<KanbanUtils>();
   KanbanUtils get utils => utilsStream.value;
 
-  void onInit() async {
+  Future<void> onInit() async {
     await FirestoreClient.pedidos.fetch();
-    onMount();
+    final kanban = mountKanban();
+    final calendar = _mountCalendar();
+    utilsStream.add(KanbanUtils(kanban: kanban, calendar: calendar));
   }
 
   void onMount() async {
     final kanban = mountKanban();
     final calendar = _mountCalendar();
-    utilsStream.add(KanbanUtils(kanban: kanban, calendar: calendar));
+    utils.calendar = calendar;
+    utils.kanban = kanban;
+    utilsStream.update();
   }
 
   Map<StepModel, List<PedidoModel>> mountKanban() {
@@ -84,14 +88,17 @@ class StepController {
   }
 
   bool onWillAccept(PedidoModel pedido, StepModel step) {
-    final isStepAvailable =
-        step.fromSteps.map((e) => e.id).contains(pedido.step.id);
-    if (!isStepAvailable) {
-      NotificationService.showNegative(
-          'Operação não permitida', 'Etapa não aceita esta operação');
-      return false;
+    if (pedido.step.id != step.id) {
+      final isStepAvailable =
+          step.fromSteps.map((e) => e.id).contains(pedido.step.id);
+      if (!isStepAvailable) {
+        NotificationService.showNegative(
+            'Operação não permitida', 'Etapa não aceita esta operação');
+        return false;
+      }
     }
-    final isUserAvailable = step.moveRoles.contains(usuario.role);
+    final isUserAvailable = step.moveRoles.contains(usuario.role) &&
+        pedido.step.moveRoles.contains(usuario.role);
     if (!isUserAvailable) {
       NotificationService.showNegative('Operação não permitida',
           'Usuário não tem permissão para alterar essa etapa');

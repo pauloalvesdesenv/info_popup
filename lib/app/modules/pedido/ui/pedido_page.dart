@@ -83,6 +83,7 @@ class _PedidoPageState extends State<PedidoPage> {
             onDelete: widget.onDelete,
           ),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(child: PedidoTagsWidget(pedido)),
             PedidoUsersWidget(pedido),

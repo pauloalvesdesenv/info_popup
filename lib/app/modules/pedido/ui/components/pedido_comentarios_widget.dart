@@ -23,7 +23,7 @@ class PedidoCommentsWidget extends StatelessWidget {
             stream: pedidoCtrl.utilsStream.listen,
             builder: (_, utils) => CommentsWidget(
               titleNotification:
-                  '${usuario.nome} mencionou você no no pedido ${pedido.localizador}',
+                  '${usuario.nome} mencionou você no pedido ${pedido.localizador}',
               items: pedido.comments,
               onChanged: () => pedidoCtrl.updatePedidoFirestore(),
             ),

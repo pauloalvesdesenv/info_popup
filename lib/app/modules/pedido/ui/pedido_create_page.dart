@@ -265,7 +265,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
             const H(16),
             DatePickerField(
               required: false,
-              label: 'Data Entrega',
+              label: 'Previsão de Entrega',
               item: form.deliveryAt,
               onChanged: (_) {
                 form.deliveryAt = _;
@@ -288,7 +288,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                   children: [
                     AppDropDown<ProdutoModel?>(
                       label: 'Produto',
-                      focus: form.produtoFocus,
+                      controller: form.produto.produtoEC,
+                      nextFocus: form.produto.qtde.focus,
                       item: form.produto.produtoModel,
                       itens: FirestoreClient.produtos.data
                           .where((e) => !form.produtos
@@ -316,7 +317,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                           FocusScope.of(context).unfocus();
                           form.produtos.add(form.produto);
                           form.produto = PedidoProdutoCreateModel();
-                          form.produtoFocus.requestFocus();
+                          form.produto.produtoEC.controller.clear();
+                          form.produto.produtoEC.focus.requestFocus();
                           pedidoCtrl.formStream.update();
                         }
                       },
@@ -331,9 +333,10 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                   onPressed: !form.produto.isEnable
                       ? null
                       : () {
-                          FocusScope.of(context).unfocus();
                           form.produtos.add(form.produto);
                           form.produto = PedidoProdutoCreateModel();
+                          form.produto.produtoEC.controller.clear();
+                          form.produto.produtoEC.focus.requestFocus();
                           pedidoCtrl.formStream.update();
                         },
                   style: ButtonStyle(

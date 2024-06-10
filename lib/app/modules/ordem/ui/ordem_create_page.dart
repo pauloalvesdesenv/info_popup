@@ -53,11 +53,11 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
             if ((widget.ordem != null &&
-                  usuario.permission.ordem
-                      .contains(UserPermissionType.update)) ||
-              (widget.ordem == null &&
-                  usuario.permission.ordem
-                      .contains(UserPermissionType.create)))
+                    usuario.permission.ordem
+                        .contains(UserPermissionType.update)) ||
+                (widget.ordem == null &&
+                    usuario.permission.ordem
+                        .contains(UserPermissionType.create)))
               IconLoadingButton(() async {
                 await ordemCtrl.onConfirm(context, widget.ordem);
               })
@@ -254,7 +254,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                           ],
                         ),
                         Text(
-                          'DATA ENTREGA: ${produto.pedido.deliveryAt.text()}',
+                          'Previsão de Entrega: ${produto.pedido.deliveryAt.text()}',
                           style: AppCss.minimumRegular
                               .copyWith(fontSize: 12)
                               .setColor(AppColors.neutralDark),

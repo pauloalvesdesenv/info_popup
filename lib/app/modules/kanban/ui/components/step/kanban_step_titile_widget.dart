@@ -25,9 +25,11 @@ class KanbanStepTitleWidget extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                Text(
-                  step.name,
-                  style: AppCss.minimumBold,
+                Expanded(
+                  child: Text(
+                    step.name,
+                    style: AppCss.minimumBold,
+                  ),
                 ),
                 if (!step.isEnable)
                   Container(

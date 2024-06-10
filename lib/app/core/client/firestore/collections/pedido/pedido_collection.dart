@@ -33,10 +33,6 @@ class PedidoCollection {
     final data = await FirebaseFirestore.instance.collection(name).get();
     final pedidos =
         data.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-    // for (final pedido in pedidos) {
-    //   pedido.index = pedidos.indexOf(pedido);
-    //   update(pedido);
-    // }
     dataStream.add(pedidos);
   }
 
@@ -76,8 +72,6 @@ class PedidoCollection {
         .snapshots()
         .listen((e) {
       final data = e.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-
-      data.sort((a, b) => a.localizador.compareTo(b.localizador));
       dataStream.add(data);
     });
   }

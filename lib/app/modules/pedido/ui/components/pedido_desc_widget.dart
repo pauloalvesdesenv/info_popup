@@ -28,7 +28,7 @@ class PedidoDescWidget extends StatelessWidget {
             ItemLabel('Descrição',
                 pedido.descricao.isEmpty ? 'Sem descrição' : pedido.descricao),
             if (pedido.deliveryAt != null)
-              ItemLabel('Data Entrega', pedido.deliveryAt!.text()),
+              ItemLabel('Previsão de Entrega', pedido.deliveryAt!.text()),
           ]),
         ],
       ),

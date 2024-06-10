@@ -118,9 +118,14 @@ class _StepsPageState extends State<StepsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                Icon(
-                  Icons.drag_indicator,
-                  color: AppColors.primaryMain,
+                Container(
+                  width: 25,
+                  height: 25,
+                  decoration: BoxDecoration(
+                    color: step.color,
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: AppColors.neutralMedium),
+                  ),
                 ),
                 const W(16),
                 Expanded(
@@ -150,21 +155,13 @@ class _StepsPageState extends State<StepsPage> {
                     ],
                   ),
                 ),
-                Container(
-                  width: 25,
-                  height: 25,
-                  decoration: BoxDecoration(
-                    color: step.color,
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: AppColors.neutralMedium),
-                  ),
-                ),
                 const W(8),
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 14,
                   color: AppColors.neutralMedium,
                 ),
+                const W(25)
               ],
             ),
           ),

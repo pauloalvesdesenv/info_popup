@@ -52,7 +52,7 @@ class _PedidoUsersBottomState extends State<PedidoUsersBottom> {
                   stream: pedidoCtrl.pedidoStream.listen,
                   builder: (context, pedido) {
                     return Container(
-                      height: 390,
+                      height: 450,
                       decoration: BoxDecoration(
                         color: AppColors.white,
                         borderRadius: const BorderRadius.only(

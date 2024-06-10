@@ -34,7 +34,6 @@ class PedidoCreateModel {
   ObraModel? obra;
   PedidoTipo? tipo;
   PedidoProdutoCreateModel produto = PedidoProdutoCreateModel();
-  FocusNode produtoFocus = FocusNode();
   final GlobalKey produtoKey = GlobalKey();
   List<PedidoProdutoCreateModel> produtos = [];
   DateTime? deliveryAt;

@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
@@ -41,14 +42,19 @@ class KanbanTopBarWidget extends StatelessWidget
                 kanbanCtrl.utilsStream.update();
               },
               icon: Icon(
-                utils.view == KanbanViewMode.calendar
+                utils.view != KanbanViewMode.calendar
                     ? Icons.calendar_month
                     : Icons.view_kanban,
                 color: AppColors.white,
               )),
           if (usuario.permission.pedido.contains(UserPermissionType.create))
             IconButton(
-                onPressed: () => push(context, const PedidoCreatePage()),
+                onPressed: () async {
+                  await push(context, const PedidoCreatePage());
+                  final pedidos = FirestoreClient.pedidos.data;
+                  pedidos.sort((a, b) => a.id.compareTo(b.id));
+                  kanbanCtrl.onAccept(pedidos.last.step, pedidos.last, 0);
+                },
                 icon: Icon(
                   Icons.add,
                   color: AppColors.white,
