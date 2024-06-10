@@ -31,7 +31,7 @@ Future<void> initFirebaseMessaging() async {
     await onOpenNotification();
     await setupFlutterNotifications();
     // await _menssaging.subscribeToTopic(kDebugMode ? 'debug' : 'release');
-    // FirebaseMessaging.onBackgroundMessage((message) async => showFlutterNotification(message));
+    FirebaseMessaging.onBackgroundMessage((message) async => showFlutterNotification(message));
     FirebaseMessaging.onMessage.listen((message) {
       showFlutterNotification(message);
     });

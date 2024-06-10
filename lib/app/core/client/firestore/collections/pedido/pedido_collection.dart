@@ -78,7 +78,6 @@ class PedidoCollection {
       final data = e.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
 
       data.sort((a, b) => a.localizador.compareTo(b.localizador));
-
       dataStream.add(data);
     });
   }

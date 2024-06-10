@@ -21,6 +21,10 @@ class StepController {
 
   void onInit() async {
     await FirestoreClient.pedidos.fetch();
+    onMount();
+  }
+
+  void onMount() {
     final kanban = mountKanban();
     final calendar = _mountCalendar();
     utilsStream.add(KanbanUtils(kanban: kanban, calendar: calendar));
