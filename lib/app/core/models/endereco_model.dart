@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:aco_plus/app/core/client/http/viacep/viacep_model.dart';
 import 'package:aco_plus/app/core/extensions/text_controller_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class EnderecoModel {
   String cep = '';

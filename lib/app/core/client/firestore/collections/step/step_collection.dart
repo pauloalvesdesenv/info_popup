@@ -31,7 +31,7 @@ class StepCollection {
     final data = await FirebaseFirestore.instance.collection(name).get();
     final countries =
         data.docs.map((e) => StepModel.fromMap(e.data())).toList();
-    countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    countries.sort((a, b) => a.index.compareTo(b.index));
     dataStream.add(countries);
   }
 
@@ -71,7 +71,7 @@ class StepCollection {
         .snapshots()
         .listen((e) {
       final countries = e.docs.map((e) => StepModel.fromMap(e.data())).toList();
-      countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      countries.sort((a, b) => a.index.compareTo(b.index));
       dataStream.add(countries);
     });
   }

@@ -3,7 +3,6 @@ import 'package:aco_plus/app/core/enums/obra_status.dart';
 import 'package:aco_plus/app/core/models/endereco_model.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
-import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class ObraUtils {
   final TextController search = TextController();

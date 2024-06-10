@@ -1,7 +1,9 @@
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/usuario/usuario_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
+import 'package:aco_plus/app/core/components/app_drop_down_list.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/done_button.dart';
@@ -87,6 +89,36 @@ class _UsuarioCreatePageState extends State<UsuarioCreatePage> {
               form.role = e;
               usuarioCtrl.formStream.update();
             },
+          ),
+          const H(16),
+          AppDropDownList<UserPermissionType>(
+            label: 'Permissões de Cliente',
+            itens: UserPermissionType.values,
+            addeds: form.permission.cliente,
+            onChanged: () {
+              usuarioCtrl.formStream.update();
+            },
+            itemLabel: (e) => e.label,
+          ),
+          const H(16),
+          AppDropDownList<UserPermissionType>(
+            label: 'Permissões de Pedidos',
+            itens: UserPermissionType.values,
+            addeds: form.permission.pedido,
+            onChanged: () {
+              usuarioCtrl.formStream.update();
+            },
+            itemLabel: (e) => e.label,
+          ),
+          const H(16),
+          AppDropDownList<UserPermissionType>(
+            label: 'Permissões de Ordens',
+            itens: UserPermissionType.values,
+            addeds: form.permission.ordem,
+            onChanged: () {
+              usuarioCtrl.formStream.update();
+            },
+            itemLabel: (e) => e.label,
           ),
           const H(24),
           if (form.isEdit)

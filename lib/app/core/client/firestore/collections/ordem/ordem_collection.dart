@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
-import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrdemCollection {

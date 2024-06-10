@@ -15,7 +15,9 @@ class AppDropDown<T> extends StatefulWidget {
   final bool required;
   final bool disable;
   final FocusNode? focus;
+  final FocusNode? nextFocus;
   final bool hasFilter;
+  final TextController? controller;
 
   const AppDropDown({
     required this.label,
@@ -28,6 +30,8 @@ class AppDropDown<T> extends StatefulWidget {
     this.required = true,
     this.disable = false,
     this.hasFilter = false,
+    this.nextFocus,
+    this.controller,
     super.key,
   });
 
@@ -37,6 +41,9 @@ class AppDropDown<T> extends StatefulWidget {
 
 class _AppDropDown<T> extends State<AppDropDown<T>> {
   final TextController _controller = TextController();
+
+  TextController get controller => widget.controller ?? _controller;
+
   @override
   Widget build(BuildContext context) {
     return TypeAheadField<T>(
@@ -61,8 +68,8 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
                 widget.onSelect.call(created);
               },
       ),
-      controller: _controller.controller,
-      focusNode: _controller.focus,
+      controller: controller.controller,
+      focusNode: widget.focus ?? controller.focus,
       suggestionsCallback: (pattern) async => widget.itens
           .where((e) =>
               !widget.hasFilter ||
@@ -84,8 +91,11 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
       onSelected: (e) {
         setState(() {
           widget.onSelect.call(e);
-          _controller.focus.unfocus();
-          _controller.controller.text = widget.itemLabel.call(e);
+          controller.focus.unfocus();
+          controller.controller.text = widget.itemLabel.call(e);
+          if (widget.nextFocus != null) {
+            FocusScope.of(context).requestFocus(widget.nextFocus);
+          }
         });
       },
     );

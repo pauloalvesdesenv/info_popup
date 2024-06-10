@@ -27,8 +27,8 @@ class InfoDialog extends StatelessWidget {
         TextButton(
           onPressed: () => Navigator.pop(context, true),
           style: ButtonStyle(
-            foregroundColor: MaterialStatePropertyAll(AppColors.primaryMain),
-            backgroundColor: const MaterialStatePropertyAll(Color(0xFFebeaf3)),
+            foregroundColor: WidgetStatePropertyAll(AppColors.primaryMain),
+            backgroundColor: const WidgetStatePropertyAll(Color(0xFFebeaf3)),
           ),
           child: const Text('Voltar'),
         ),

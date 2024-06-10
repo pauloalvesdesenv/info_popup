@@ -1,7 +1,10 @@
+import 'package:aco_plus/app/core/client/firestore/collections/checklist/models/checklist_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
@@ -23,6 +26,7 @@ import 'package:aco_plus/app/modules/cliente/ui/cliente_create_simplify_bottom.d
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -61,8 +65,14 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
         title: Text('${pedidoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Pedido',
             style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          IconLoadingButton(() async =>
-              await pedidoCtrl.onConfirm(context, widget.pedido, false))
+          if ((widget.pedido != null &&
+                  usuario.permission.pedido
+                      .contains(UserPermissionType.update)) ||
+              (widget.pedido == null &&
+                  usuario.permission.pedido
+                      .contains(UserPermissionType.create)))
+            IconLoadingButton(() async =>
+                await pedidoCtrl.onConfirm(context, widget.pedido, false))
         ],
         backgroundColor: AppColors.primaryMain,
       ),
@@ -77,6 +87,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
       children: [
         ExpansionTile(
           initiallyExpanded: true,
+          maintainState: true,
           controller: form.tileController,
           leading: const Icon(Icons.info_outline),
           title: Text('Informações do Pedido', style: AppCss.mediumBold),
@@ -131,9 +142,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                 form.cliente = cliente;
                 form.obra = form.cliente!.obras.first;
                 pedidoCtrl.formStream.update();
-                await FirestoreClient.clientes.fetch();
-                pedidoCtrl.formStream.update();
-                return cliente;
+                return null;
               },
               itemLabel: (e) => e!.nome,
               onSelect: (e) async {
@@ -228,15 +237,41 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
               },
             ),
             const H(16),
+            AppDropDown<ChecklistModel?>(
+              label: 'Modelo de checklist',
+              hasFilter: true,
+              item: form.checklist,
+              itens: FirestoreClient.checklists.data,
+              itemLabel: (e) => e!.nome,
+              onSelect: (e) async {
+                form.checklist = e;
+                pedidoCtrl.formStream.update();
+              },
+            ),
+            if (widget.pedido == null) ...[
+              const H(16),
+              AppDropDown<StepModel>(
+                label: 'Etapa Inicial',
+                hasFilter: false,
+                item: form.step,
+                itens: FirestoreClient.steps.data,
+                itemLabel: (e) => e.name,
+                onSelect: (e) async {
+                  form.step = e!;
+                  pedidoCtrl.formStream.update();
+                },
+              ),
+            ],
+            const H(16),
             DatePickerField(
               required: false,
-              label: 'Data Entrega',
+              label: 'Previsão de Entrega',
               item: form.deliveryAt,
               onChanged: (_) {
                 form.deliveryAt = _;
-                form.tileController.collapse();
-                Future.delayed(const Duration(milliseconds: 300))
-                    .then((value) => form.produtoFocus.requestFocus());
+                // form.tileController.collapse();
+                // Future.delayed(const Duration(milliseconds: 300))
+                //     .then((value) => form.produtoFocus.requestFocus());
                 pedidoCtrl.formStream.update();
               },
             ),
@@ -253,7 +288,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                   children: [
                     AppDropDown<ProdutoModel?>(
                       label: 'Produto',
-                      focus: form.produtoFocus,
+                      controller: form.produto.produtoEC,
+                      nextFocus: form.produto.qtde.focus,
                       item: form.produto.produtoModel,
                       itens: FirestoreClient.produtos.data
                           .where((e) => !form.produtos
@@ -281,7 +317,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                           FocusScope.of(context).unfocus();
                           form.produtos.add(form.produto);
                           form.produto = PedidoProdutoCreateModel();
-                          form.produtoFocus.requestFocus();
+                          form.produto.produtoEC.controller.clear();
+                          form.produto.produtoEC.focus.requestFocus();
                           pedidoCtrl.formStream.update();
                         }
                       },
@@ -296,9 +333,10 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                   onPressed: !form.produto.isEnable
                       ? null
                       : () {
-                          FocusScope.of(context).unfocus();
                           form.produtos.add(form.produto);
                           form.produto = PedidoProdutoCreateModel();
+                          form.produto.produtoEC.controller.clear();
+                          form.produto.produtoEC.focus.requestFocus();
                           pedidoCtrl.formStream.update();
                         },
                   style: ButtonStyle(

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:aco_plus/app/core/client/firestore/collections/usuario/usuario_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppRepository {

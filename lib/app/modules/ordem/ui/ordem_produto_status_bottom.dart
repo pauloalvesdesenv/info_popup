@@ -59,9 +59,9 @@ class _OrdemProdutoStatusBottomState extends State<OrdemProdutoStatusBottom> {
                         padding: const EdgeInsets.only(left: 8),
                         child: IconButton(
                           style: ButtonStyle(
-                              padding: const MaterialStatePropertyAll(EdgeInsets.all(16)),
-                              backgroundColor: MaterialStatePropertyAll(AppColors.white),
-                              foregroundColor: MaterialStatePropertyAll(AppColors.black)),
+                              padding: const WidgetStatePropertyAll(EdgeInsets.all(16)),
+                              backgroundColor: WidgetStatePropertyAll(AppColors.white),
+                              foregroundColor: WidgetStatePropertyAll(AppColors.black)),
                           onPressed: () => Navigator.pop(context),
                           icon: const Icon(Icons.keyboard_backspace),
                         ),

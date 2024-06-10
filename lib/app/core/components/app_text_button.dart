@@ -11,6 +11,7 @@ class AppTextButton extends StatefulWidget {
   final bool isEnable;
   final IconData? icon;
   final ButtonStyle? style;
+  final bool isLoading;
 
   const AppTextButton(
       {required this.label,
@@ -19,6 +20,7 @@ class AppTextButton extends StatefulWidget {
       this.fill = Fill.filled,
       this.icon,
       this.style,
+      this.isLoading = false,
       super.key});
 
   const AppTextButton.filled(
@@ -28,6 +30,7 @@ class AppTextButton extends StatefulWidget {
       this.fill = Fill.filled,
       this.icon,
       this.style,
+      this.isLoading = false,
       super.key});
 
   const AppTextButton.outlined(
@@ -36,6 +39,7 @@ class AppTextButton extends StatefulWidget {
       this.isEnable = true,
       this.fill = Fill.outlined,
       this.icon,
+      this.isLoading = false,
       super.key,
       this.style});
 
@@ -77,16 +81,18 @@ class _AppTextButtonState extends State<AppTextButton> {
 
   ButtonStyle get style {
     if (widget.style != null) {
-      return widget.style!
-          .copyWith(fixedSize: const MaterialStatePropertyAll(Size(double.maxFinite, 43)));
+      return widget.style!.copyWith(
+          fixedSize: const WidgetStatePropertyAll(Size(double.maxFinite, 43)));
     }
     final outlined = Fill.outlined == widget.fill;
     return ButtonStyle(
-      fixedSize: const MaterialStatePropertyAll(Size(double.maxFinite, 43)),
-      foregroundColor: outlined ? MaterialStatePropertyAll(AppColors.primaryMain) : null,
-      backgroundColor: outlined ? MaterialStatePropertyAll(AppColors.white) : null,
+      fixedSize: const WidgetStatePropertyAll(Size(double.maxFinite, 43)),
+      foregroundColor:
+          outlined ? WidgetStatePropertyAll(AppColors.primaryMain) : null,
+      backgroundColor:
+          outlined ? WidgetStatePropertyAll(AppColors.white) : null,
       shape: outlined
-          ? MaterialStatePropertyAll(RoundedRectangleBorder(
+          ? WidgetStatePropertyAll(RoundedRectangleBorder(
               borderRadius: AppCss.radius8,
               side: BorderSide(color: AppColors.primaryMain, width: 2)))
           : null,

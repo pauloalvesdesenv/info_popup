@@ -3,8 +3,8 @@ import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
-import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/empty_data.dart';
+import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
@@ -27,7 +27,7 @@ class StepsPage extends StatefulWidget {
 class _StepsPageState extends State<StepsPage> {
   @override
   void initState() {
-    FirestoreClient.steps.fetch();
+    stepCtrl.onInit();
     super.initState();
   }
 
@@ -78,10 +78,19 @@ class _StepsPageState extends State<StepsPage> {
                       ? const EmptyData()
                       : RefreshIndicator(
                           onRefresh: () async => FirestoreClient.steps.fetch(),
-                          child: ListView.separated(
-                            itemCount: steps.length,
-                            separatorBuilder: (_, i) => const Divisor(),
-                            itemBuilder: (_, i) => _itemStepWidget(steps[i]),
+                          child: ReorderableListView(
+                            onReorder: (oldIndex, newIndex) {
+                              if (newIndex > oldIndex) newIndex = newIndex - 1;
+                              final step = steps.removeAt(oldIndex);
+                              steps.insert(newIndex, step);
+                              for (var i = 0; i < steps.length; i++) {
+                                steps[i].index = i;
+                                FirestoreClient.steps.dataStream.update();
+                                FirestoreClient.steps.update(steps[i]);
+                              }
+                            },
+                            children:
+                                steps.map((e) => _itemStepWidget(e)).toList(),
                           ),
                         ),
                 ),
@@ -93,38 +102,69 @@ class _StepsPageState extends State<StepsPage> {
     );
   }
 
-  ListTile _itemStepWidget(StepModel step) {
-    return ListTile(
-      onTap: () => push(StepCreatePage(step: step)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: Text(
-        step.name,
-        style: AppCss.mediumBold,
-      ),
-      subtitle: Text(
-        'Criado em ${step.createdAt.textHour()}',
-        style: AppCss.minimumRegular,
-      ),
-      trailing: SizedBox(
-        width: 50,
-        child: Row(
-          children: [
-            Container(
-              width: 25,
-              height: 25,
-              decoration: BoxDecoration(
-                color: step.color,
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: AppColors.neutralMedium),
-              ),
+  Widget _itemStepWidget(StepModel step) {
+    return Material(
+      color: const Color(0xFFF7FCFC),
+      key: ValueKey(step),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: AppColors.neutralLight),
+          ),
+        ),
+        child: InkWell(
+          onTap: () => push(StepCreatePage(step: step)),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  width: 25,
+                  height: 25,
+                  decoration: BoxDecoration(
+                    color: step.color,
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: AppColors.neutralMedium),
+                  ),
+                ),
+                const W(16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        step.name,
+                        style: AppCss.mediumBold,
+                      ),
+                      Text(
+                        'Recebe de: ${step.fromSteps.map((e) => e.name).join(', ')}',
+                        style: AppCss.minimumRegular.setSize(12),
+                      ),
+                      const H(2),
+                      Text(
+                        'Permissão: ${step.moveRoles.map((e) => e.name).join(', ')}',
+                        style: AppCss.minimumRegular.setSize(11),
+                      ),
+                      const H(4),
+                      Text(
+                        'Criado em ${step.createdAt.textHour()}',
+                        style: AppCss.minimumRegular
+                            .setSize(10)
+                            .setColor(Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                const W(8),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14,
+                  color: AppColors.neutralMedium,
+                ),
+                const W(25)
+              ],
             ),
-            const W(8),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              color: AppColors.neutralMedium,
-            ),
-          ],
+          ),
         ),
       ),
     );

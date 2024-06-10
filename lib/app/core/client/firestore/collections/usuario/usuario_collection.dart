@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/usuario/usuario_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 
 class UsuarioCollection {

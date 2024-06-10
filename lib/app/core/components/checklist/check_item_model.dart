@@ -23,4 +23,14 @@ class CheckItemModel {
 
   factory CheckItemModel.fromJson(String source) =>
       CheckItemModel.fromMap(json.decode(source));
+
+  CheckItemModel copyWith({
+    String? title,
+    bool? isCheck,
+  }) {
+    return CheckItemModel(
+      title: title ?? this.title,
+      isCheck: isCheck ?? this.isCheck,
+    );
+  }
 }

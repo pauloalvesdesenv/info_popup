@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
@@ -14,7 +15,6 @@ class StepCreateModel {
   TextController name = TextController();
   Color color = AppColors.primaryMain;
   List<StepModel> fromSteps = [];
-  List<StepModel> toSteps = [];
   List<UsuarioRole> moveRoles = [];
   DateTime createdAt = DateTime.now();
 
@@ -30,7 +30,6 @@ class StepCreateModel {
     name.text = etapa.name;
     color = etapa.color;
     fromSteps = etapa.fromSteps;
-    toSteps = etapa.toSteps;
     moveRoles = etapa.moveRoles;
     createdAt = etapa.createdAt;
   }
@@ -39,9 +38,9 @@ class StepCreateModel {
         id: id,
         name: name.text,
         color: color,
-        fromSteps: fromSteps,
-        toSteps: toSteps,
+        fromStepsIds: fromSteps.map((e) => e.id).toList(),
         moveRoles: moveRoles,
         createdAt: createdAt,
+        index: FirestoreClient.steps.data.length - 1,
       );
 }

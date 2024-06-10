@@ -9,6 +9,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/tag/models/tag_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/archive/archive_model.dart';
 import 'package:aco_plus/app/core/components/checklist/check_item_model.dart';
@@ -31,9 +32,11 @@ class PedidoModel {
   final List<ArchiveModel> archives;
   final List<CheckItemModel> checks;
   final List<CommentModel> comments;
-  int index;
+  final List<UsuarioModel> users;
+
 
   StepModel get step => steps.last.step;
+  PedidoStatus get status => statusess.last.status;
 
   bool get isChangeStatusAvailable =>
       tipo == PedidoTipo.cda &&
@@ -42,6 +45,8 @@ class PedidoModel {
         PedidoStatus.produzindoCDA,
         PedidoStatus.pronto
       ].contains(statusess.last.status);
+
+  void addStep(step) => steps.add(PedidoStepModel.create(step));
 
   PedidoModel({
     required this.id,
@@ -58,7 +63,7 @@ class PedidoModel {
     required this.tags,
     required this.checks,
     required this.comments,
-    required this.index,
+    required this.users,
     this.archives = const [],
   });
 
@@ -133,7 +138,7 @@ class PedidoModel {
       'archives': archives.map((x) => x.toMap()).toList(),
       'checks': checks.map((x) => x.toMap()).toList(),
       'comments': comments.map((x) => x.toMap()).toList(),
-      'index': index,
+      'users': users.map((x) => x.id).toList(),
     };
   }
 
@@ -171,7 +176,8 @@ class PedidoModel {
       tags: map['tags'] != null
           ? List<TagModel>.from(map['tags']?.map((x) => TagModel.fromMap(x)))
           : [],
-      index: map['index'] ?? 0,
+      users: List<UsuarioModel>.from(
+          map['users']?.map((x) => FirestoreClient.usuarios.getById(x)) ?? []),
     );
   }
 
@@ -195,6 +201,7 @@ class PedidoModel {
     List<TagModel>? tags,
     List<CheckItemModel>? checks,
     List<CommentModel>? comments,
+    List<UsuarioModel>? users,
     int? index,
   }) {
     return PedidoModel(
@@ -212,7 +219,7 @@ class PedidoModel {
       deliveryAt: deliveryAt ?? this.deliveryAt,
       steps: steps ?? this.steps,
       tags: tags ?? this.tags,
-      index: index ?? this.index,
+      users: users ?? this.users,
     );
   }
 

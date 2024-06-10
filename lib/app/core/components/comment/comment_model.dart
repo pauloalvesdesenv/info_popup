@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:aco_plus/app/core/client/firestore/collections/usuario/usuario_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 
 class CommentModel {
   final UsuarioModel user;
@@ -9,6 +9,7 @@ class CommentModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? reaction;
+  final List<UsuarioModel> mentioneds;
   final List<CommentModel> respostas;
   CommentModel({
     required this.user,
@@ -17,6 +18,7 @@ class CommentModel {
     required this.createdAt,
     required this.updatedAt,
     required this.respostas,
+    required this.mentioneds,
     this.reaction,
   });
 
@@ -29,6 +31,7 @@ class CommentModel {
       'updatedAt': updatedAt.millisecondsSinceEpoch,
       'reaction': reaction,
       'respostas': respostas.map((x) => x.toMap()).toList(),
+      'mentioneds': mentioneds.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -42,6 +45,8 @@ class CommentModel {
       reaction: map['reaction'] ?? '',
       respostas: List<CommentModel>.from(
           map['respostas']?.map((x) => CommentModel.fromMap(x))),
+      mentioneds: List<UsuarioModel>.from(
+          map['mentioneds']?.map((x) => UsuarioModel.fromMap(x))),
     );
   }
 

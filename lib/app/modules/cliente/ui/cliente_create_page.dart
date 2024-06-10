@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_multiple_registers.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -15,6 +16,7 @@ import 'package:aco_plus/app/modules/cliente/cliente_controller.dart';
 import 'package:aco_plus/app/modules/cliente/cliente_view_model.dart';
 import 'package:aco_plus/app/modules/endereco/endereco_create_page.dart';
 import 'package:aco_plus/app/modules/obra/ui/obra_create_page.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:cpf_cnpj_validator/cnpj_validator.dart';
 import 'package:cpf_cnpj_validator/cpf_validator.dart';
 import 'package:flutter/material.dart';
@@ -58,8 +60,14 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
               '${clienteCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Cliente',
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
-            IconLoadingButton(() async => await clienteCtrl.onConfirm(
-                context, widget.cliente, widget.isFromOrder))
+            if ((widget.cliente != null &&
+                  usuario.permission.cliente
+                      .contains(UserPermissionType.update)) ||
+              (widget.cliente == null &&
+                  usuario.permission.cliente
+                      .contains(UserPermissionType.create)))
+              IconLoadingButton(() async => await clienteCtrl.onConfirm(
+                  context, widget.cliente, widget.isFromOrder))
           ],
           backgroundColor: AppColors.primaryMain,
         ),
@@ -168,22 +176,23 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
           ),
         ),
         const H(24),
-        if (form.isEdit)
-          TextButton.icon(
-              style: ButtonStyle(
-                fixedSize: const MaterialStatePropertyAll(
-                    Size.fromWidth(double.maxFinite)),
-                foregroundColor: MaterialStatePropertyAll(AppColors.error),
-                backgroundColor: MaterialStatePropertyAll(AppColors.white),
-                shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                    borderRadius: AppCss.radius8,
-                    side: BorderSide(color: AppColors.error))),
-              ),
-              onPressed: () => clienteCtrl.onDelete(context, widget.cliente!),
-              label: const Text('Excluir'),
-              icon: const Icon(
-                Icons.delete_outline,
-              )),
+        if (usuario.permission.cliente.contains(UserPermissionType.delete))
+          if (form.isEdit)
+            TextButton.icon(
+                style: ButtonStyle(
+                  fixedSize: const WidgetStatePropertyAll(
+                      Size.fromWidth(double.maxFinite)),
+                  foregroundColor: WidgetStatePropertyAll(AppColors.error),
+                  backgroundColor: WidgetStatePropertyAll(AppColors.white),
+                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                      borderRadius: AppCss.radius8,
+                      side: BorderSide(color: AppColors.error))),
+                ),
+                onPressed: () => clienteCtrl.onDelete(context, widget.cliente!),
+                label: const Text('Excluir'),
+                icon: const Icon(
+                  Icons.delete_outline,
+                )),
       ],
     );
   }

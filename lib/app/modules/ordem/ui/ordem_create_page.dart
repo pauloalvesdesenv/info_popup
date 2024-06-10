@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/orde
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_checkbox.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
@@ -19,6 +20,7 @@ import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/ordem/ordem_controller.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 
 class OrdemCreatePage extends StatefulWidget {
@@ -50,9 +52,15 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
           title: Text('${ordemCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Ordem',
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
-            IconLoadingButton(() async {
-              await ordemCtrl.onConfirm(context, widget.ordem);
-            })
+            if ((widget.ordem != null &&
+                    usuario.permission.ordem
+                        .contains(UserPermissionType.update)) ||
+                (widget.ordem == null &&
+                    usuario.permission.ordem
+                        .contains(UserPermissionType.create)))
+              IconLoadingButton(() async {
+                await ordemCtrl.onConfirm(context, widget.ordem);
+              })
           ],
           backgroundColor: AppColors.primaryMain,
         ),
@@ -116,7 +124,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                             itens: SortOrder.values,
                             itemLabel: (e) => e.name,
                             onSelect: (e) {
-                              form.sortOrder = e  ?? SortOrder.asc;
+                              form.sortOrder = e ?? SortOrder.asc;
                               ordemCtrl.formStream.update();
                             },
                           ),
@@ -246,7 +254,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                           ],
                         ),
                         Text(
-                          'DATA ENTREGA: ${produto.pedido.deliveryAt.text()}',
+                          'Previsão de Entrega: ${produto.pedido.deliveryAt.text()}',
                           style: AppCss.minimumRegular
                               .copyWith(fontSize: 12)
                               .setColor(AppColors.neutralDark),

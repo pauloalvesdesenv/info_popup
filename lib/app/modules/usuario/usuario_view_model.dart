@@ -1,5 +1,7 @@
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/usuario/usuario_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_permission_model.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 
@@ -12,6 +14,7 @@ class UsuarioCreateModel {
   TextController nome = TextController();
   TextController email = TextController();
   TextController senha = TextController();
+  UsuarioPermissionCreateModel permission = UsuarioPermissionCreateModel();
   UsuarioRole? role;
   late bool isEdit;
 
@@ -26,6 +29,7 @@ class UsuarioCreateModel {
     email.text = user.email;
     role = user.role;
     senha.text = user.senha;
+    permission = UsuarioPermissionCreateModel.edit(user);
   }
 
   UsuarioModel toUsuarioModel() => UsuarioModel(
@@ -34,5 +38,34 @@ class UsuarioCreateModel {
         email: email.text,
         role: role!,
         senha: senha.text,
+        permission: permission.toUserPermissionModel(),
+        steps: [],
+        deviceTokens: [],
+      );
+}
+
+class UsuarioPermissionCreateModel {
+  final String id;
+  List<UserPermissionType> cliente = UserPermissionType.values.toList();
+  List<UserPermissionType> pedido = UserPermissionType.values.toList();
+  List<UserPermissionType> ordem = UserPermissionType.values.toList();
+  late bool isEdit;
+
+  UsuarioPermissionCreateModel()
+      : id = HashService.get,
+        isEdit = false;
+
+  UsuarioPermissionCreateModel.edit(UsuarioModel user)
+      : id = user.id,
+        isEdit = true {
+    cliente = user.permission.cliente;
+    pedido = user.permission.pedido;
+    ordem = user.permission.ordem;
+  }
+
+  UserPermissionModel toUserPermissionModel() => UserPermissionModel(
+        cliente: cliente,
+        pedido: pedido,
+        ordem: ordem,
       );
 }

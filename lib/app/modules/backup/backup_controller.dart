@@ -32,7 +32,9 @@ class BackupController {
 
   Future<void> onFetch() async {
     final backups = <BackupModel>[];
-    for (var item in (await FirebaseStorage.instance.ref().child('backups').listAll()).items) {
+    for (var item
+        in (await FirebaseStorage.instance.ref().child('backups').listAll())
+            .items) {
       final backup = BackupModel.fromRef(item);
       backup.url = await item.getDownloadURL();
       backups.add(backup);
@@ -59,7 +61,8 @@ class BackupController {
     final bytes = utf8.encode(json.encode(backup));
     final name =
         'backup_${DateFormat('dd_MM_yyyy_hh_mm_ss').format(DateTime.now())}.json';
-    backupDownload(name, 'backups', bytes);
+    await backupDownload(name, 'backups', bytes);
+    await onInit();
   }
 
   void onAddCollection(Map<String, dynamic> backup, String key,

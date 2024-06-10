@@ -72,13 +72,12 @@ class PedidoCollection {
         .snapshots()
         .listen((e) {
       final data = e.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-
-      data.sort((a, b) => a.localizador.compareTo(b.localizador));
       dataStream.add(data);
     });
   }
 
   PedidoModel getById(String id) => data.singleWhere((e) => e.id == id);
+
   PedidoProdutoModel getProdutoByPedidoId(String pedidoId, String produtoId) =>
       getById(pedidoId).produtos.firstWhere((e) => e.id == produtoId);
 

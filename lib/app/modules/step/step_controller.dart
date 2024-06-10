@@ -24,6 +24,11 @@ class StepController {
       AppStream<StepUtils>.seed(StepUtils());
   StepUtils get utils => utilsStream.value;
 
+  void onInit() {
+    utilsStream.add(StepUtils());
+    FirestoreClient.steps.fetch();
+  }
+
   final AppStream<StepCreateModel> formStream = AppStream<StepCreateModel>();
   StepCreateModel get form => formStream.value;
 
@@ -53,7 +58,6 @@ class StepController {
         await FirestoreClient.steps.add(form.toStepModel());
       }
       pop(_);
-
       NotificationService.showPositive(
           'Step ${form.isEdit ? 'Editado' : 'Adicionado'}',
           'Operação realizada com sucesso',

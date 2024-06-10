@@ -1,10 +1,12 @@
+import 'package:aco_plus/app/core/client/firestore/collections/checklist/models/checklist_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_step_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:aco_plus/app/core/components/comment/comment_quill_model.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
@@ -17,7 +19,8 @@ class PedidoUtils {
   final TextController search = TextController();
   SortType sortType = SortType.alfabetic;
   SortOrder sortOrder = SortOrder.asc;
-  CommentQuillModel quill = CommentQuillModel();
+  List<StepModel> steps = [];
+  bool showFilter = false;
 }
 
 class PedidoCreateModel {
@@ -31,17 +34,19 @@ class PedidoCreateModel {
   ObraModel? obra;
   PedidoTipo? tipo;
   PedidoProdutoCreateModel produto = PedidoProdutoCreateModel();
-  FocusNode produtoFocus = FocusNode();
   final GlobalKey produtoKey = GlobalKey();
   List<PedidoProdutoCreateModel> produtos = [];
   DateTime? deliveryAt;
   ExpansionTileController tileController = ExpansionTileController();
+  ChecklistModel? checklist;
+  StepModel step = FirestoreClient.steps.data.first;
 
   late bool isEdit;
 
   PedidoCreateModel()
       : id = HashService.get,
-        isEdit = false;
+        isEdit = false,
+        step = FirestoreClient.steps.data.first;
 
   String getDetails() {
     List<String> localizador = [];
@@ -70,6 +75,7 @@ class PedidoCreateModel {
     produtos =
         pedido.produtos.map((e) => PedidoProdutoCreateModel.edit(e)).toList();
     deliveryAt = pedido.deliveryAt;
+    step = pedido.steps.last.step;
   }
 
   PedidoModel toPedidoModel(PedidoModel? pedido) => PedidoModel(
@@ -90,10 +96,11 @@ class PedidoCreateModel {
             .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
             .toList(),
         deliveryAt: deliveryAt,
-        steps: [],
-        tags: [],
-        checks: [],
-        comments: [],
-        index: FirestoreClient.pedidos.data.length
+        steps: pedido?.steps ??
+            [PedidoStepModel(id: id, step: step, createdAt: DateTime.now())],
+        tags: pedido?.tags ?? [],
+        checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
+        comments: pedido?.comments ?? [],
+        users: pedido?.users ?? [],
       );
 }

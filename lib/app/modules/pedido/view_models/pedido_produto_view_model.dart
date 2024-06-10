@@ -9,6 +9,7 @@ import 'package:aco_plus/app/core/services/hash_service.dart';
 class PedidoProdutoCreateModel {
   final String id;
   ProdutoModel? produtoModel;
+  TextController produtoEC = TextController();
   TextController qtde = TextController();
 
   bool get isEnable => produtoModel != null && qtde.doubleValue > 0;

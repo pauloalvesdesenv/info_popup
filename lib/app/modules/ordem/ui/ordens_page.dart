@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
@@ -18,6 +19,7 @@ import 'package:aco_plus/app/modules/ordem/ordem_controller.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_create_page.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_page.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 
 class OrdensPage extends StatefulWidget {
@@ -28,10 +30,9 @@ class OrdensPage extends StatefulWidget {
 }
 
 class _OrdensPageState extends State<OrdensPage> {
-
   @override
   void initState() {
-    FirestoreClient.ordens.fetch();
+    ordemCtrl.onInit();
     super.initState();
   }
 
@@ -50,12 +51,13 @@ class _OrdensPageState extends State<OrdensPage> {
         title:
             Text('Ordens', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          IconButton(
-              onPressed: () => push(context, const OrdemCreatePage()),
-              icon: Icon(
-                Icons.add,
-                color: AppColors.white,
-              ))
+          if (usuario.permission.ordem.contains(UserPermissionType.create))
+            IconButton(
+                onPressed: () => push(context, const OrdemCreatePage()),
+                icon: Icon(
+                  Icons.add,
+                  color: AppColors.white,
+                ))
         ],
         backgroundColor: AppColors.primaryMain,
       ),
@@ -82,12 +84,12 @@ class _OrdensPageState extends State<OrdensPage> {
                       ? const EmptyData()
                       : RefreshIndicator(
                           onRefresh: () async => FirestoreClient.ordens.fetch(),
-                        child: ListView.separated(
+                          child: ListView.separated(
                             itemCount: ordens.length,
                             separatorBuilder: (_, i) => const Divisor(),
                             itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
                           ),
-                      ),
+                        ),
                 ),
               ],
             );

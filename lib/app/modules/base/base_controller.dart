@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:aco_plus/app/core/client/http/fcm/fcm_provider.dart';
 import 'package:aco_plus/app/core/enums/app_module.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:flutter/material.dart';
 
 final baseCtrl = BaseController();
 
@@ -17,5 +18,6 @@ class BaseController {
 
   void onInit() {
     moduleStream.add(AppModule.values.first);
+    FCMProvider.putToken();
   }
 }
