@@ -72,5 +72,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'aco-plus-fa455.appspot.com',
     iosBundleId: 'com.m2.acoplus.RunnerTests',
   );
-
 }
