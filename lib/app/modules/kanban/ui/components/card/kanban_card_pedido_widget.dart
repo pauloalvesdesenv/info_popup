@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 
 class KanbanCardPedidoWidget extends StatelessWidget {
   final PedidoModel pedido;
+  final WidgetViewMode viewMode;
   const KanbanCardPedidoWidget(
     this.pedido, {
+    this.viewMode = WidgetViewMode.normal,
     super.key,
   });
 
@@ -32,23 +34,24 @@ class KanbanCardPedidoWidget extends StatelessWidget {
                 offset: const Offset(0, 0),
               ),
             ]),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (pedido.tags.isNotEmpty) ...[
-              KanbanCardTagsWidget(pedido: pedido, viewMode: WidgetViewMode.normal),
-              const H(8),
-            ],
-            Text(pedido.localizador),
-            const H(8),
-            Row(
-              children: [
-                Expanded(child: KanbanCardDetailsWidget(pedido)),
-                KanbanCardUsersWidget(pedido,
-                    viewMode: WidgetViewMode.normal),
+        child: IntrinsicHeight(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (pedido.tags.isNotEmpty) ...[
+                KanbanCardTagsWidget(pedido: pedido, viewMode: viewMode),
+                const H(8),
               ],
-            )
-          ],
+              Text(pedido.localizador),
+              const H(8),
+              Row(
+                children: [
+                  Expanded(child: KanbanCardDetailsWidget(pedido)),
+                  KanbanCardUsersWidget(pedido, viewMode: viewMode),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
