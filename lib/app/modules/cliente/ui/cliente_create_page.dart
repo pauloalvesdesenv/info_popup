@@ -60,8 +60,12 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
               '${clienteCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Cliente',
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
-            if (widget.cliente != null &&
-                usuario.permission.cliente.contains(UserPermissionType.update))
+            if ((widget.cliente != null &&
+                  usuario.permission.cliente
+                      .contains(UserPermissionType.update)) ||
+              (widget.cliente == null &&
+                  usuario.permission.cliente
+                      .contains(UserPermissionType.create)))
               IconLoadingButton(() async => await clienteCtrl.onConfirm(
                   context, widget.cliente, widget.isFromOrder))
           ],

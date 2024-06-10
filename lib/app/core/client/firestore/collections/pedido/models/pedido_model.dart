@@ -15,7 +15,6 @@ import 'package:aco_plus/app/core/components/archive/archive_model.dart';
 import 'package:aco_plus/app/core/components/checklist/check_item_model.dart';
 import 'package:aco_plus/app/core/components/comment/comment_model.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
-import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_step_widget.dart';
 
 class PedidoModel {
   final String id;

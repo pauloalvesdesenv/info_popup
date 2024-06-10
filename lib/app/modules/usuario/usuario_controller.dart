@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
+import 'package:aco_plus/app/core/services/push_notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_view_model.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -86,6 +87,11 @@ class UsuarioController {
 
   Future<void> getCurrentUser() async {
     UsuarioModel? user = await AppRepository.get();
+    if (user != null &&
+        FirestoreClient.usuarios.data.any((e) => e.id == user!.id)) {
+      user = FirestoreClient.usuarios.getById(user.id);
+      AppRepository.add(user);
+    }
     usuarioStream.add(user);
   }
 
@@ -95,6 +101,8 @@ class UsuarioController {
   }
 
   Future<void> clearCurrentUser() async {
+    usuario?.deviceTokens.removeWhere((e) => e == deviceToken);
+    FirestoreClient.usuarios.update(usuario!);
     await AppRepository.clear();
     getCurrentUser();
   }

@@ -52,8 +52,12 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
           title: Text('${ordemCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Ordem',
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
-            if (widget.ordem != null &&
-                usuario.permission.ordem.contains(UserPermissionType.update))
+            if ((widget.ordem != null &&
+                  usuario.permission.ordem
+                      .contains(UserPermissionType.update)) ||
+              (widget.ordem == null &&
+                  usuario.permission.ordem
+                      .contains(UserPermissionType.create)))
               IconLoadingButton(() async {
                 await ordemCtrl.onConfirm(context, widget.ordem);
               })
