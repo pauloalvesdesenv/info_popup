@@ -39,7 +39,8 @@ class UsuarioCreateModel {
         role: role!,
         senha: senha.text,
         permission: permission.toUserPermissionModel(),
-        steps: []
+        steps: [],
+        deviceTokens: [],
       );
 }
 

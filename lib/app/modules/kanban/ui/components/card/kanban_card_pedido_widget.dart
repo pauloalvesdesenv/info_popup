@@ -36,7 +36,7 @@ class KanbanCardPedidoWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (pedido.tags.isNotEmpty) ...[
-              KanbanCardTagsWidget(pedido),
+              KanbanCardTagsWidget(pedido: pedido, viewMode: WidgetViewMode.normal),
               const H(8),
             ],
             Text(pedido.localizador),

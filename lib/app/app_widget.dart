@@ -6,6 +6,7 @@ import 'package:aco_plus/app/modules/base/base_page.dart';
 import 'package:aco_plus/app/modules/sign/ui/sign_up_page.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 import 'app_controller.dart';
@@ -28,16 +29,19 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return OverlaySupport(
-        child: MaterialApp(
-            color: AppColors.primaryMain,
-            theme: AppTheme.theme,
-            debugShowCheckedModeBanner: false,
-            navigatorKey: _appController.key,
-            title: 'AÇO+',
-            home: StreamOutNull<UsuarioModel?>(
-              stream: usuarioCtrl.usuarioStream.listen,
-              child: (_, data) => data == null ? const SignUpPage() : const BasePage(),
-            )));
+    return Portal(
+      child: OverlaySupport(
+          child: MaterialApp(
+              color: AppColors.primaryMain,
+              theme: AppTheme.theme,
+              debugShowCheckedModeBanner: false,
+              navigatorKey: _appController.key,
+              title: 'AÇO+',
+              home: StreamOutNull<UsuarioModel?>(
+                stream: usuarioCtrl.usuarioStream.listen,
+                child: (_, data) =>
+                    data == null ? const SignUpPage() : const BasePage(),
+              ))),
+    );
   }
 }

@@ -36,7 +36,7 @@ class _KanbanCardCalendarWidgetState extends State<KanbanCardCalendarWidget> {
           width: double.maxFinite,
           padding: const EdgeInsets.fromLTRB(0.03, 0.03, 0.03, 1),
           decoration: const BoxDecoration(
-              color: Colors.black,//
+              color: Colors.black,
               borderRadius: BorderRadius.all(Radius.circular(3))),
           child: Container(
             padding: const EdgeInsets.all(8),
@@ -48,7 +48,8 @@ class _KanbanCardCalendarWidgetState extends State<KanbanCardCalendarWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (widget.pedido.tags.isNotEmpty) ...[
-                  KanbanCardTagsWidget(widget.pedido, showDesc: false),
+                  KanbanCardTagsWidget(
+                      pedido: widget.pedido, viewMode: WidgetViewMode.minified),
                   const H(4),
                 ],
                 Row(

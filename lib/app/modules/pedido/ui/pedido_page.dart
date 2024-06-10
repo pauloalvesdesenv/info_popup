@@ -65,6 +65,7 @@ class _PedidoPageState extends State<PedidoPage> {
 
   Widget _kanbanReasonWidget(PedidoModel pedido) {
     return Material(
+      surfaceTintColor: Colors.transparent,
       child: body(pedido),
     );
   }

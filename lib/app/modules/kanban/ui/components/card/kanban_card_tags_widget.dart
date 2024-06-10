@@ -1,15 +1,20 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/tag/models/tag_model.dart';
+import 'package:aco_plus/app/core/enums/widget_view_mode.dart';
 import 'package:flutter/material.dart';
 
 class KanbanCardTagsWidget extends StatelessWidget {
   final PedidoModel pedido;
-  final bool showDesc;
-  const KanbanCardTagsWidget(
-    this.pedido, {
-    this.showDesc = true,
+  final WidgetViewMode viewMode;
+
+  const KanbanCardTagsWidget({
+    required this.viewMode,
+    required this.pedido,
     super.key,
   });
+
+  bool get isCollapsed => viewMode == WidgetViewMode.minified;
+  bool get isExpanded => viewMode == WidgetViewMode.normal;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +33,7 @@ class KanbanCardTagsWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration:
           BoxDecoration(color: e.color, borderRadius: BorderRadius.circular(4)),
-      child: showDesc
+      child: isExpanded
           ? Text(
               e.nome,
               style: TextStyle(
@@ -39,7 +44,10 @@ class KanbanCardTagsWidget extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             )
-          : null,
+          : SizedBox(
+              height: 2,
+              width: e.nome.length * 3.0,
+            ),
     );
   }
 }

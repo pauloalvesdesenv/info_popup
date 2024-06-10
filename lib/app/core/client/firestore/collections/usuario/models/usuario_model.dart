@@ -12,16 +12,17 @@ class UsuarioModel {
   final UsuarioRole role;
   final UserPermissionModel permission;
   final List<StepModel> steps;
+  final List<String> deviceTokens;
 
-  UsuarioModel({
-    required this.id,
-    required this.nome,
-    required this.email,
-    required this.senha,
-    required this.role,
-    required this.permission,
-    required this.steps,
-  });
+  UsuarioModel(
+      {required this.id,
+      required this.nome,
+      required this.email,
+      required this.senha,
+      required this.role,
+      required this.permission,
+      required this.steps,
+      required this.deviceTokens});
 
   UsuarioModel copyWith({
     String? id,
@@ -31,6 +32,7 @@ class UsuarioModel {
     UsuarioRole? role,
     UserPermissionModel? permission,
     List<StepModel>? steps,
+    List<String>? deviceTokens,
   }) {
     return UsuarioModel(
       id: id ?? this.id,
@@ -40,6 +42,7 @@ class UsuarioModel {
       role: role ?? this.role,
       permission: permission ?? this.permission,
       steps: steps ?? this.steps,
+      deviceTokens: deviceTokens ?? this.deviceTokens,
     );
   }
 
@@ -52,20 +55,32 @@ class UsuarioModel {
       'role': role.index,
       'permission': permission.toMap(),
       'steps': steps.map((x) => x.toMap()).toList(),
+      'deviceTokens': deviceTokens
     };
   }
 
+  Map<String, dynamic> toMention() => {
+        "id": id,
+        "display": nome,
+        "photo":
+            "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
+      };
+
   factory UsuarioModel.fromMap(Map<String, dynamic> map) {
     return UsuarioModel(
-        id: map['id'] ?? '',
-        nome: map['nome'] ?? '',
-        email: map['email'] ?? '',
-        senha: map['senha'] ?? '',
-        role: UsuarioRole.values[map['role']],
-        permission: map['permission'] != null
-            ? UserPermissionModel.fromMap(map['permission'])
-            : UserPermissionModel.all(),
-        steps: []);
+      id: map['id'] ?? '',
+      nome: map['nome'] ?? '',
+      email: map['email'] ?? '',
+      senha: map['senha'] ?? '',
+      role: UsuarioRole.values[map['role']],
+      permission: map['permission'] != null
+          ? UserPermissionModel.fromMap(map['permission'])
+          : UserPermissionModel.all(),
+      steps: [],
+      deviceTokens: map['deviceTokens'] != null
+          ? List<String>.from(map['deviceTokens'])
+          : [],
+    );
   }
 
   String toJson() => json.encode(toMap());

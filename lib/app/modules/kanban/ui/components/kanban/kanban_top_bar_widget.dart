@@ -31,6 +31,21 @@ class KanbanTopBarWidget extends StatelessWidget
         ),
         title: Text('Kaban', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
+          IconButton(
+              onPressed: () {
+                if (utils.view == KanbanViewMode.calendar) {
+                  utils.view = KanbanViewMode.kanban;
+                } else {
+                  utils.view = KanbanViewMode.calendar;
+                }
+                kanbanCtrl.utilsStream.update();
+              },
+              icon: Icon(
+                utils.view == KanbanViewMode.calendar
+                    ? Icons.calendar_month
+                    : Icons.view_kanban,
+                color: AppColors.white,
+              )),
           if (usuario.permission.pedido.contains(UserPermissionType.create))
             IconButton(
                 onPressed: () => push(context, const PedidoCreatePage()),

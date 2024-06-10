@@ -32,7 +32,7 @@ class _KanbanCardStepWidgetState extends State<KanbanCardStepWidget> {
       child: isCollapsed
           ? SizedBox(
               height: 4,
-              width: widget.step.name.length * 5.0,
+              width: widget.step.name.length * 3.0,
             )
           : Text(widget.step.name,
               style: AppCss.minimumRegular.copyWith(

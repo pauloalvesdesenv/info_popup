@@ -1,12 +1,10 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
-import 'package:aco_plus/app/core/components/h.dart';
-import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
-import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_calendar_widget.dart';
+import 'package:aco_plus/app/modules/kanban/ui/components/calendar/kanban_calendar_builder_widget.dart';
+import 'package:aco_plus/app/modules/kanban/ui/components/calendar/kanban_calendar_weekday_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:separated_column/separated_column.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class KanbanCalendarWidget extends StatefulWidget {
@@ -18,10 +16,31 @@ class KanbanCalendarWidget extends StatefulWidget {
 }
 
 class _KanbanCalendarWidgetState extends State<KanbanCalendarWidget> {
+  final ScrollController _scrollController = ScrollController();
   @override
   void initState() {
     kanbanCtrl.onMountCalendar();
     super.initState();
+  }
+
+  DateTime getBorderDates({bool? first, bool? last}) {
+    final now = DateTime.now();
+    final nowDate = DateTime(now.year, now.month, 1);
+    final dates = [
+      ...widget.utils.calendar.keys
+          .toList()
+          .map((e) => DateFormat('dd/MM/yyyy').parse(e)),
+      nowDate,
+    ];
+    dates.sort();
+    if (first == true) return dates.first.subtract(const Duration(days: 31));
+    if (last == true) return dates.last.add(const Duration(days: 31));
+    throw Exception('Invalid border date');
+  }
+
+  List<PedidoModel> getPedidos(DateTime day) {
+    final key = DateFormat('dd/MM/yyyy').format(day);
+    return widget.utils.calendar[key] ?? [];
   }
 
   @override
@@ -30,108 +49,75 @@ class _KanbanCalendarWidgetState extends State<KanbanCalendarWidget> {
       color: Colors.white.withOpacity(0.5),
       width: double.maxFinite,
       height: double.maxFinite,
-      child: SingleChildScrollView(
-        child: TableCalendar(
-          availableGestures: AvailableGestures.none,
-          firstDay: DateTime.utc(2021, 1, 1),
-          lastDay: DateTime.utc(2025, 12, 31),
-          focusedDay: DateTime.now(),
-          rowHeight: 130,
-          daysOfWeekHeight: 30,
-          calendarFormat: CalendarFormat.month,
-          calendarBuilders: CalendarBuilders(
-            dowBuilder: (context, day) => Container(
-              width: double.maxFinite,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: RawScrollbar(
+        controller: _scrollController,
+        trackColor: Colors.grey[700],
+        thumbColor: Colors.grey[400],
+        interactive: true,
+        radius: const Radius.circular(4),
+        thickness: 8,
+        trackVisibility: true,
+        thumbVisibility: true,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: TableCalendar(
+            availableGestures: AvailableGestures.none,
+            firstDay: getBorderDates(first: true),
+            lastDay: getBorderDates(last: true),
+            focusedDay: DateTime.now(),
+            rowHeight: 130,
+            daysOfWeekHeight: 30,
+            calendarFormat: CalendarFormat.month,
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
-                border: Border.all(color: Colors.grey[400]!, width: 0.5),
+                color: Colors.white60,
               ),
-              child: Center(
-                child: Text(
-                  DateFormat('E').format(day),
-                  style: AppCss.minimumRegular.copyWith(
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11,
-                      height: 1),
-                ),
+              titleTextStyle: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
+              leftChevronIcon: Icon(Icons.chevron_left),
+              rightChevronIcon: Icon(Icons.chevron_right),
             ),
-            // dowBuilder: (context, day) => const SizedBox(),
-            defaultBuilder: (context, day, focusedDay) => _defaultBuilder(
-              day: day,
-              pedidos:
-                  widget.utils.calendar[DateFormat('dd/MM/yyyy').format(day)] ??
-                      <PedidoModel>[],
-              backgroundColor: [6, 7].contains(day.weekday)
-                  ? Colors.grey[200]!
-                  : Colors.white,
-            ),
-            todayBuilder: (context, day, focusedDay) => _defaultBuilder(
+            calendarBuilders: CalendarBuilders(
+              dowBuilder: (context, day) => KanbanCalendarWeekdayWidget(day),
+              defaultBuilder: (context, day, focusedDay) =>
+                  KanbanCalendarBuilderWidget(
                 day: day,
-                pedidos: widget
-                        .utils.calendar[DateFormat('dd/MM/yyyy').format(day)] ??
-                    <PedidoModel>[],
+                pedidos: getPedidos(day),
+                backgroundColor: [6, 7].contains(day.weekday)
+                    ? Colors.grey[200]!
+                    : Colors.white,
+              ),
+              todayBuilder: (context, day, focusedDay) =>
+                  KanbanCalendarBuilderWidget(
+                day: day,
+                pedidos: getPedidos(day),
                 backgroundColor: [6, 7].contains(day.weekday)
                     ? const Color(0xFFE3EFF5)
-                    : const Color(0xFFE3EFF5)),
-            disabledBuilder: (context, day, focusedDay) => _defaultBuilder(
+                    : const Color(0xFFE3EFF5),
+              ),
+              outsideBuilder: (context, day, focusedDay) =>
+                  KanbanCalendarBuilderWidget(
                 day: day,
-                pedidos: widget
-                        .utils.calendar[DateFormat('dd/MM/yyyy').format(day)] ??
-                    <PedidoModel>[],
-                backgroundColor: const Color(0xFFE3EFF5)),
-            outsideBuilder: (context, day, focusedDay) => _defaultBuilder(
-              day: day,
-              pedidos:
-                  widget.utils.calendar[DateFormat('dd/MM/yyyy').format(day)] ??
-                      <PedidoModel>[],
-              backgroundColor: [6, 7].contains(day.weekday)
-                  ? Colors.grey[200]!
-                  : Colors.grey[50]!,
+                pedidos: getPedidos(day),
+                backgroundColor: [6, 7].contains(day.weekday)
+                    ? Colors.grey[200]!
+                    : Colors.grey[50]!,
+              ),
+              disabledBuilder: (context, day, focusedDay) =>
+                  KanbanCalendarBuilderWidget(
+                day: day,
+                pedidos: getPedidos(day),
+                backgroundColor: const Color(0xFFE3EFF5),
+              ),
+              weekNumberBuilder: (context, weekNumber) => const SizedBox(),
             ),
-            weekNumberBuilder: (context, weekNumber) => const Text('teste'),
           ),
         ),
-      ),
-    );
-  }
-
-  Container _defaultBuilder({
-    required DateTime day,
-    required List<PedidoModel> pedidos,
-    required Color backgroundColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        border: Border.all(
-            color: const Color.fromARGB(255, 209, 210, 214).withOpacity(0.8),
-            width: 0.25),
-      ),
-      width: double.maxFinite,
-      child: ListView(
-        physics: pedidos.isEmpty ? const NeverScrollableScrollPhysics() : null,
-        children: [
-          Center(
-            child: Text(
-              DateFormat('d').format(day),
-              style: AppCss.minimumRegular.copyWith(
-                  color: Colors.grey[900],
-                  fontWeight: FontWeight.bold,
-                  fontSize: 11,
-                  height: 1),
-            ),
-          ),
-          const H(8),
-          if (pedidos.isNotEmpty)
-            SeparatedColumn(
-                separatorBuilder: (_, __) => const H(8),
-                children:
-                    pedidos.map((e) => KanbanCardCalendarWidget(e)).toList()),
-        ],
       ),
     );
   }
