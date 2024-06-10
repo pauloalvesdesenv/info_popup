@@ -6,7 +6,6 @@ import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/kanban/ui/components/kanban/kanban_body_widget.dart';
 import 'package:aco_plus/app/modules/kanban/ui/components/kanban/kanban_top_bar_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
 
 class KanbanPage extends StatefulWidget {
   const KanbanPage({super.key});
@@ -19,8 +18,9 @@ class _KanbanPageState extends State<KanbanPage> {
   @override
   void initState() {
     kanbanCtrl.onInit();
-    FirestoreClient.pedidos.dataStream.listen
-        .doOnData((e) => kanbanCtrl.onMount());
+    FirestoreClient.pedidos.dataStream.controller.listen((e) {
+      kanbanCtrl.onMount();
+    });
     super.initState();
   }
 

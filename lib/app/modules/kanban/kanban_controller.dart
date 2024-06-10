@@ -24,7 +24,7 @@ class StepController {
     onMount();
   }
 
-  void onMount() {
+  void onMount() async {
     final kanban = mountKanban();
     final calendar = _mountCalendar();
     utilsStream.add(KanbanUtils(kanban: kanban, calendar: calendar));

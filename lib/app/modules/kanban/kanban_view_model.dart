@@ -8,7 +8,7 @@ enum KanbanViewMode {
 }
 
 class KanbanUtils {
-  KanbanViewMode view = KanbanViewMode.calendar;
+  KanbanViewMode view = KanbanViewMode.kanban;
   Map<StepModel, List<PedidoModel>> kanban;
   Map<String, List<PedidoModel>> calendar;
   final ScrollController scroll = ScrollController();

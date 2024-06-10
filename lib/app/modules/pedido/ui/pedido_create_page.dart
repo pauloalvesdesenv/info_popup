@@ -252,7 +252,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
               const H(16),
               AppDropDown<StepModel>(
                 label: 'Etapa Inicial',
-                hasFilter: true,
+                hasFilter: false,
                 item: form.step,
                 itens: FirestoreClient.steps.data,
                 itemLabel: (e) => e.name,
