@@ -15,6 +15,8 @@ String? urlAfterAppOen;
 
 final _menssaging = FirebaseMessaging.instance;
 
+String? deviceToken;
+
 Future<void> initFirebaseMessaging() async {
   try {
     await _menssaging.requestPermission(
@@ -26,8 +28,7 @@ Future<void> initFirebaseMessaging() async {
       provisional: false,
       sound: true,
     );
-    final token = await getDeviceToken();
-    log(token ?? 'unavailable token');
+    deviceToken = await getDeviceToken();
     await onOpenNotification();
     await setupFlutterNotifications();
     // await _menssaging.subscribeToTopic(kDebugMode ? 'debug' : 'release');
