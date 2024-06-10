@@ -1,9 +1,7 @@
-import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:aco_plus/app/core/services/push_notification_service.dart';
-import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
-import 'package:flutter/material.dart';
+import 'package:aco_plus/app/core/client/http/fcm/fcm_provider.dart';
 import 'package:aco_plus/app/core/enums/app_module.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:flutter/material.dart';
 
 final baseCtrl = BaseController();
 
@@ -20,13 +18,6 @@ class BaseController {
 
   void onInit() {
     moduleStream.add(AppModule.values.first);
-    onUpdateUserDeviceToken();
-  }
-
-  Future<void> onUpdateUserDeviceToken() async {
-    final token = await getDeviceToken();
-    if (token != null && usuario.deviceTokens.contains(token)) return;
-    usuario.deviceTokens.add(token!);
-    FirestoreClient.usuarios.update(usuario);
+    FCMProvider.putToken();
   }
 }
