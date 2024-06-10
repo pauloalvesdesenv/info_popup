@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/components/comment/ui/comments_widget.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 
 class PedidoCommentsWidget extends StatelessWidget {
@@ -21,7 +22,8 @@ class PedidoCommentsWidget extends StatelessWidget {
           StreamOut(
             stream: pedidoCtrl.utilsStream.listen,
             builder: (_, utils) => CommentsWidget(
-              quill: utils.quill,
+              titleNotification:
+                  '${usuario.nome} mencionou você no no pedido ${pedido.localizador}',
               items: pedido.comments,
               onChanged: () => pedidoCtrl.updatePedidoFirestore(),
             ),

@@ -7,8 +7,6 @@ import 'dart:math' as math;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:googleapis_auth/auth_io.dart' as auth;
-import 'package:http/http.dart' as http;
 
 late AndroidNotificationChannel channel;
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -32,7 +30,7 @@ Future<void> initFirebaseMessaging() async {
     log(token ?? 'unavailable token');
     await onOpenNotification();
     await setupFlutterNotifications();
-    await _menssaging.subscribeToTopic(kDebugMode ? 'debug' : 'release');
+    // await _menssaging.subscribeToTopic(kDebugMode ? 'debug' : 'release');
     // FirebaseMessaging.onBackgroundMessage((message) async => showFlutterNotification(message));
     FirebaseMessaging.onMessage.listen((message) {
       showFlutterNotification(message);
@@ -46,7 +44,12 @@ Future<void> initFirebaseMessaging() async {
 }
 
 Future<String?> getDeviceToken() async {
-  if (Platform.isAndroid) {
+  if (kIsWeb) {
+    return await _menssaging.getToken(
+        vapidKey: kIsWeb
+            ? 'BOp4Fx_efcGMjerqT1aNM-VwixbtTg-3k_XkESpq3961o59HCh-743r2Iqf_bQ04uUwd39VZszhngi8GhR9CjNA'
+            : null);
+  } else if (Platform.isAndroid) {
     return await _menssaging.getToken();
   } else {
     try {

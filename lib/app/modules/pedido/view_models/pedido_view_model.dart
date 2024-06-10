@@ -7,7 +7,6 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:aco_plus/app/core/components/comment/comment_quill_model.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
@@ -20,7 +19,6 @@ class PedidoUtils {
   final TextController search = TextController();
   SortType sortType = SortType.alfabetic;
   SortOrder sortOrder = SortOrder.asc;
-  CommentQuillModel quill = CommentQuillModel();
   List<StepModel> steps = [];
   bool showFilter = false;
 }

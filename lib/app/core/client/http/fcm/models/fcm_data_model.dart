@@ -10,13 +10,17 @@ class FCMDataModel {
   });
 
   Map<String, dynamic> toMap() => {
-        "notification": {
-          "title": title,
-          "body": description,
-          "click_action": null,
-          "icon": null
-        },
-        "data": {"type": "type", "data": "data"},
-        "to": token
+        "message": {
+          "token": token,
+          "notification": {"title": title, "body": description},
+          "android": {
+            "notification": {"click_action": "TOP_STORY_ACTIVITY"}
+          },
+          "apns": {
+            "payload": {
+              "aps": {"category": "NEW_MESSAGE_CATEGORY"}
+            }
+          }
+        }
       };
 }

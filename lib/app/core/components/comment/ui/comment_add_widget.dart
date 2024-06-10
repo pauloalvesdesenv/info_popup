@@ -1,9 +1,7 @@
-import 'dart:convert';
-
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_avatar.dart';
 import 'package:aco_plus/app/core/components/app_text_button.dart';
-import 'package:aco_plus/app/core/components/comment/comment_quill_model.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
@@ -13,10 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 
 class CommentAddWidget extends StatefulWidget {
-  final CommentQuillModel quill;
-  final void Function(String) onSave;
-  const CommentAddWidget(
-      {required this.quill, required this.onSave, super.key});
+  final void Function(String, List<UsuarioModel>) onSave;
+  const CommentAddWidget({required this.onSave, super.key});
 
   @override
   State<CommentAddWidget> createState() => _CommentAddWidgetState();
@@ -26,6 +22,7 @@ class _CommentAddWidgetState extends State<CommentAddWidget> {
   bool _isEditing = false;
   GlobalKey<FlutterMentionsState> key = GlobalKey<FlutterMentionsState>();
   final FocusNode focusNode = FocusNode();
+  String get getText => key.currentState?.controller?.text ?? '';
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +63,7 @@ class _CommentAddWidgetState extends State<CommentAddWidget> {
                   border: OutlineInputBorder(),
                   hintText: 'Escreva um comentário...',
                 ),
+                onChanged: (value) => setState(() {}),
                 suggestionListDecoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(4),
@@ -104,14 +102,17 @@ class _CommentAddWidgetState extends State<CommentAddWidget> {
           SizedBox(
             width: 100,
             child: AppTextButton(
-              isEnable: widget.quill.quillControllerViewer.plainTextEditingValue
-                  .text.isNotEmpty,
+              isEnable: getText.isNotEmpty,
               onPressed: () {
                 setState(() {
-                  widget.onSave(json.encode(widget
-                      .quill.quillControllerEditor.document
-                      .toDelta()
-                      .toJson()));
+                  List<UsuarioModel> mentioneds = [];
+                  for (var users in FirestoreClient.usuarios.data
+                      .where((e) => e.id != usuario.id)) {
+                    if (getText.contains('@${users.nome}')) {
+                      mentioneds.add(users);
+                    }
+                  }
+                  widget.onSave(getText, mentioneds);
                   _isEditing = false;
                 });
               },

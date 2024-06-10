@@ -46,7 +46,6 @@ dependencies:
   flutter_typeahead: ^5.2.0
   pdfx: ^2.6.0
   mime: ^1.0.5
-  flutter_quill: ^9.2.3
   http: ^1.2.1
   cached_network_image: ^3.3.1
   collection: any

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:aco_plus/app/core/components/app_avatar.dart';
 import 'package:aco_plus/app/core/components/comment/comment_model.dart';
 import 'package:aco_plus/app/core/components/h.dart';
@@ -7,7 +5,6 @@ import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
 
 class CommentWidget extends StatelessWidget {
   final CommentModel comment;
@@ -45,8 +42,7 @@ class CommentWidget extends StatelessWidget {
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(
-                    Document.fromJson(json.decode(comment.delta)).toPlainText(),
+                child: Text('',
                     style: AppCss.mediumRegular.copyWith(fontSize: 16)),
               ),
               const H(8),
