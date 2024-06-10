@@ -151,6 +151,7 @@ class _CheckListWidgetState extends State<CheckListWidget> {
       children: [
         Expanded(
           child: AppField(
+            autoFocus: false,
             hint: 'Adicione um item',
             controller: _titleEC,
             onChanged: (_) => setState(() {}),

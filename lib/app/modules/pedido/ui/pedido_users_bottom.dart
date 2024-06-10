@@ -107,10 +107,14 @@ class _PedidoUsersBottomState extends State<PedidoUsersBottom> {
                                           materialTapTargetSize:
                                               MaterialTapTargetSize.shrinkWrap,
                                           visualDensity: VisualDensity.compact,
-                                          secondary: AppAvatar(
-                                            backgroundColor: Colors.grey[200],
-                                            name: user.nome,
-                                            radius: 16,
+                                          secondary: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 8),
+                                            child: AppAvatar(
+                                              backgroundColor: Colors.grey[200],
+                                              name: user.nome,
+                                              radius: 16,
+                                            ),
                                           ),
                                           title: Text(user.nome,
                                               style: AppCss.mediumRegular),

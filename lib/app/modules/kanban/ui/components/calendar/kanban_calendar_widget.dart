@@ -33,8 +33,8 @@ class _KanbanCalendarWidgetState extends State<KanbanCalendarWidget> {
       nowDate,
     ];
     dates.sort();
-    if (first == true) return dates.first.subtract(const Duration(days: 31));
-    if (last == true) return dates.last.add(const Duration(days: 31));
+    if (first == true) return dates.first.subtract(const Duration(days: 100));
+    if (last == true) return dates.last.add(const Duration(days: 100));
     throw Exception('Invalid border date');
   }
 
@@ -45,80 +45,86 @@ class _KanbanCalendarWidgetState extends State<KanbanCalendarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white.withOpacity(0.5),
-      width: double.maxFinite,
-      height: double.maxFinite,
-      child: RawScrollbar(
-        controller: _scrollController,
-        trackColor: Colors.grey[700],
-        thumbColor: Colors.grey[400],
-        interactive: true,
-        radius: const Radius.circular(4),
-        thickness: 8,
-        trackVisibility: true,
-        thumbVisibility: true,
-        child: SingleChildScrollView(
+    return LayoutBuilder(builder: (context, constraints) {
+      return Container(
+        color: Colors.white.withOpacity(0.5),
+        width: double.maxFinite,
+        height: double.maxFinite,
+        child: RawScrollbar(
           controller: _scrollController,
-          child: TableCalendar(
-            availableGestures: AvailableGestures.none,
-            firstDay: getBorderDates(first: true),
-            lastDay: getBorderDates(last: true),
-            focusedDay: DateTime.now(),
-            rowHeight: 130,
-            daysOfWeekHeight: 30,
-            calendarFormat: CalendarFormat.month,
-            headerStyle: const HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-              decoration: BoxDecoration(
-                color: Colors.white60,
+          trackColor: Colors.grey[700],
+          thumbColor: Colors.grey[400],
+          interactive: true,
+          radius: const Radius.circular(4),
+          thickness: 8,
+          trackVisibility: true,
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: SizedBox(
+              child: TableCalendar(
+                currentDay: DateTime.now(),
+                availableGestures: AvailableGestures.horizontalSwipe,
+                firstDay: getBorderDates(first: true),
+                lastDay: getBorderDates(last: true),
+                focusedDay: DateTime.now(),
+                rowHeight: 170,
+                daysOfWeekHeight: 30,
+                calendarFormat: CalendarFormat.month,
+                headerStyle: const HeaderStyle(
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                  decoration: BoxDecoration(
+                    color: Colors.white60,
+                  ),
+                  titleTextStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  leftChevronIcon: Icon(Icons.chevron_left),
+                  rightChevronIcon: Icon(Icons.chevron_right),
+                ),
+                calendarBuilders: CalendarBuilders(
+                  dowBuilder: (context, day) =>
+                      KanbanCalendarWeekdayWidget(day),
+                  defaultBuilder: (context, day, focusedDay) =>
+                      KanbanCalendarBuilderWidget(
+                    day: day,
+                    pedidos: getPedidos(day),
+                    backgroundColor: [6, 7].contains(day.weekday)
+                        ? Colors.grey[200]!
+                        : Colors.white,
+                  ),
+                  todayBuilder: (context, day, focusedDay) =>
+                      KanbanCalendarBuilderWidget(
+                    day: day,
+                    pedidos: getPedidos(day),
+                    backgroundColor: [6, 7].contains(day.weekday)
+                        ? const Color(0xFFE3EFF5)
+                        : const Color(0xFFE3EFF5),
+                  ),
+                  outsideBuilder: (context, day, focusedDay) =>
+                      KanbanCalendarBuilderWidget(
+                    day: day,
+                    pedidos: getPedidos(day),
+                    backgroundColor: [6, 7].contains(day.weekday)
+                        ? Colors.grey[200]!
+                        : Colors.grey[50]!,
+                  ),
+                  disabledBuilder: (context, day, focusedDay) =>
+                      KanbanCalendarBuilderWidget(
+                    day: day,
+                    pedidos: getPedidos(day),
+                    backgroundColor: const Color(0xFFE3EFF5),
+                  ),
+                  weekNumberBuilder: (context, weekNumber) => const SizedBox(),
+                ),
               ),
-              titleTextStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              leftChevronIcon: Icon(Icons.chevron_left),
-              rightChevronIcon: Icon(Icons.chevron_right),
-            ),
-            calendarBuilders: CalendarBuilders(
-              dowBuilder: (context, day) => KanbanCalendarWeekdayWidget(day),
-              defaultBuilder: (context, day, focusedDay) =>
-                  KanbanCalendarBuilderWidget(
-                day: day,
-                pedidos: getPedidos(day),
-                backgroundColor: [6, 7].contains(day.weekday)
-                    ? Colors.grey[200]!
-                    : Colors.white,
-              ),
-              todayBuilder: (context, day, focusedDay) =>
-                  KanbanCalendarBuilderWidget(
-                day: day,
-                pedidos: getPedidos(day),
-                backgroundColor: [6, 7].contains(day.weekday)
-                    ? const Color(0xFFE3EFF5)
-                    : const Color(0xFFE3EFF5),
-              ),
-              outsideBuilder: (context, day, focusedDay) =>
-                  KanbanCalendarBuilderWidget(
-                day: day,
-                pedidos: getPedidos(day),
-                backgroundColor: [6, 7].contains(day.weekday)
-                    ? Colors.grey[200]!
-                    : Colors.grey[50]!,
-              ),
-              disabledBuilder: (context, day, focusedDay) =>
-                  KanbanCalendarBuilderWidget(
-                day: day,
-                pedidos: getPedidos(day),
-                backgroundColor: const Color(0xFFE3EFF5),
-              ),
-              weekNumberBuilder: (context, weekNumber) => const SizedBox(),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
+import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
@@ -17,7 +18,9 @@ import 'package:aco_plus/app/modules/pedido/ui/components/pedido_steps_widget.da
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_tags_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_top_bar.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_users_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 enum PedidoInitReason { page, kanban }
 
@@ -82,7 +85,6 @@ class _PedidoPageState extends State<PedidoPage> {
         Row(
           children: [
             Expanded(child: PedidoTagsWidget(pedido)),
-            const W(16),
             PedidoUsersWidget(pedido),
             const W(12),
           ],
@@ -105,7 +107,11 @@ class _PedidoPageState extends State<PedidoPage> {
         const Divisor(),
         PedidoChecksWidget(pedido),
         const Divisor(),
-        PedidoCommentsWidget(pedido)
+        PedidoCommentsWidget(pedido),
+        if (!kIsWeb)
+          KeyboardVisibilityBuilder(
+              builder: (_, isVisible) =>
+                  isVisible ? const H(250) : const SizedBox())
       ],
     );
   }

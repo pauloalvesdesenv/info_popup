@@ -25,52 +25,66 @@ class _KanbanCardCalendarWidgetState extends State<KanbanCardCalendarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => kanbanCtrl.setPedido(widget.pedido),
-      child: MouseRegion(
-        onEnter: (event) =>
-            setState(() => stepViewMode = KanbanCardStepViewMode.expanded),
-        onExit: (event) =>
-            setState(() => stepViewMode = KanbanCardStepViewMode.collapsed),
-        child: Container(
-          width: double.maxFinite,
-          padding: const EdgeInsets.fromLTRB(0.03, 0.03, 0.03, 1),
-          decoration: const BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.all(Radius.circular(3))),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Color(0xFFFFFFFF),
-              borderRadius: BorderRadius.all(Radius.circular(3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (widget.pedido.tags.isNotEmpty) ...[
-                  KanbanCardTagsWidget(
-                      pedido: widget.pedido, viewMode: WidgetViewMode.minified),
-                  const H(4),
-                ],
-                Row(
+    return LayoutBuilder(
+      builder: (context, contrains) {
+        bool isSM = contrains.maxWidth < 100;
+        print(isSM.toString());
+        return InkWell(
+          onTap: () => kanbanCtrl.setPedido(widget.pedido),
+          child: MouseRegion(
+            onEnter: (event) =>
+                setState(() => stepViewMode = KanbanCardStepViewMode.expanded),
+            onExit: (event) =>
+                setState(() => stepViewMode = KanbanCardStepViewMode.collapsed),
+            child: Container(
+              width: double.maxFinite,
+              padding: const EdgeInsets.fromLTRB(0.03, 0.03, 0.03, 1),
+              decoration: const BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.all(Radius.circular(3))),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFFFFF),
+                  borderRadius: BorderRadius.all(Radius.circular(3)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                        child: Text(widget.pedido.localizador,
-                            style: AppCss.minimumRegular
-                                .copyWith(fontSize: 10, color: Colors.black))),
-                    if (widget.pedido.users.isNotEmpty)
-                      KanbanCardUsersWidget(widget.pedido,
-                          viewMode: WidgetViewMode.minified)
+                    if (widget.pedido.tags.isNotEmpty) ...[
+                      KanbanCardTagsWidget(
+                          pedido: widget.pedido,
+                          viewMode:
+                              stepViewMode == KanbanCardStepViewMode.expanded
+                                  ? WidgetViewMode.normal
+                                  : WidgetViewMode.minified),
+                      const H(4),
+                    ],
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Text(widget.pedido.localizador,
+                                style: AppCss.minimumRegular.copyWith(
+                                    fontSize: 10, color: Colors.black))),
+                        if (!isSM)
+                          if (widget.pedido.users.isNotEmpty)
+                            KanbanCardUsersWidget(widget.pedido,
+                                viewMode: stepViewMode ==
+                                        KanbanCardStepViewMode.expanded
+                                    ? WidgetViewMode.normal
+                                    : WidgetViewMode.minified)
+                      ],
+                    ),
+                    const H(4),
+                    KanbanCardStepWidget(widget.pedido.step,
+                        viewMode: stepViewMode),
                   ],
                 ),
-                const H(4),
-                KanbanCardStepWidget(widget.pedido.step,
-                    viewMode: stepViewMode),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

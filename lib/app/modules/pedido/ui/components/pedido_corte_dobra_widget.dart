@@ -29,7 +29,7 @@ class PedidoCorteDobraWidget extends StatelessWidget {
                       child: Text('Aguardando Produção',
                           style: AppCss.mediumRegular)),
                   Text(
-                    '${pedido.getQtdeAguardandoProducao().formatted}Kg (${(pedido.getPrcntgAguardandoProducao() * 100).percent}%)',
+                    '${pedido.getQtdeAguardandoProducao().toKg()} (${(pedido.getPrcntgAguardandoProducao() * 100).percent}%)',
                   )
                 ],
               ),
@@ -51,7 +51,7 @@ class PedidoCorteDobraWidget extends StatelessWidget {
                   Expanded(
                       child: Text('Produzindo', style: AppCss.mediumRegular)),
                   Text(
-                    '${pedido.getQtdeProduzindo().formatted}Kg (${(pedido.getPrcntgProduzindo() * 100).percent}%)',
+                    '${pedido.getQtdeProduzindo().toKg()} (${(pedido.getPrcntgProduzindo() * 100).percent}%)',
                   )
                 ],
               ),
@@ -72,7 +72,7 @@ class PedidoCorteDobraWidget extends StatelessWidget {
                 children: [
                   Expanded(child: Text('Pronto', style: AppCss.mediumRegular)),
                   Text(
-                    '${pedido.getQtdePronto().formatted}Kg (${(pedido.getPrcntgPronto() * 100).percent}%)',
+                    '${pedido.getQtdePronto().toKg()} (${(pedido.getPrcntgPronto() * 100).percent}%)',
                   )
                 ],
               ),

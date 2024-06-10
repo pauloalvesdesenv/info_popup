@@ -25,6 +25,14 @@ class _CommentAddWidgetState extends State<CommentAddWidget> {
   String get getText => key.currentState?.controller?.text ?? '';
 
   @override
+  void initState() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      focusNode.requestFocus();
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

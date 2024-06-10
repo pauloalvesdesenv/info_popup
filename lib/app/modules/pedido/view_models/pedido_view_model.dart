@@ -80,26 +80,28 @@ class PedidoCreateModel {
   }
 
   PedidoModel toPedidoModel(PedidoModel? pedido) => PedidoModel(
-      id: id,
-      tipo: tipo!,
-      descricao: descricao.text,
-      statusess: [
-        PedidoStatusModel(
-            id: HashService.get,
-            status: PedidoStatus.produzindoCD,
-            createdAt: pedido?.statusess.first.createdAt ?? DateTime.now())
-      ],
-      localizador: localizador.text,
-      createdAt: pedido?.createdAt ?? DateTime.now(),
-      cliente: cliente!,
-      obra: obra!,
-      produtos: produtos
-          .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
-          .toList(),
-      deliveryAt: deliveryAt,
-      steps: [PedidoStepModel(id: id, step: step, createdAt: DateTime.now())],
-      tags: [],
-      checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
-      comments: [],
-      users: []);
+        id: id,
+        tipo: tipo!,
+        descricao: descricao.text,
+        statusess: [
+          PedidoStatusModel(
+              id: HashService.get,
+              status: PedidoStatus.produzindoCD,
+              createdAt: pedido?.statusess.first.createdAt ?? DateTime.now())
+        ],
+        localizador: localizador.text,
+        createdAt: pedido?.createdAt ?? DateTime.now(),
+        cliente: cliente!,
+        obra: obra!,
+        produtos: produtos
+            .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
+            .toList(),
+        deliveryAt: deliveryAt,
+        steps: pedido?.steps ??
+            [PedidoStepModel(id: id, step: step, createdAt: DateTime.now())],
+        tags: pedido?.tags ?? [],
+        checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
+        comments: pedido?.comments ?? [],
+        users: pedido?.users ?? [],
+      );
 }

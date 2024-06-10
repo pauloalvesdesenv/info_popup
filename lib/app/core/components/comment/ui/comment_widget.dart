@@ -2,14 +2,17 @@ import 'package:aco_plus/app/core/components/app_avatar.dart';
 import 'package:aco_plus/app/core/components/comment/comment_model.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
 
 class CommentWidget extends StatelessWidget {
   final CommentModel comment;
+  final void Function(CommentModel comment) onRemove;
 
-  const CommentWidget({required this.comment, super.key});
+  const CommentWidget(
+      {required this.comment, required this.onRemove, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,16 +45,25 @@ class CommentWidget extends StatelessWidget {
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text('',
+                child: Text(comment.delta,
                     style: AppCss.mediumRegular.copyWith(fontSize: 16)),
               ),
               const H(8),
               Row(
                 children: [
                   const Spacer(),
-                  Icon(
-                    Icons.delete,
-                    color: Colors.grey[800],
+                  InkWell(
+                    onTap: () async {
+                      if (await showConfirmDialog(
+                          'Deseja excluir o comentário?',
+                          'Não será possível desfazer essa ação.')) {
+                        onRemove.call(comment);
+                      }
+                    },
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.grey[800],
+                    ),
                   )
                 ],
               )
