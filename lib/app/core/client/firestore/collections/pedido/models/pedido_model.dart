@@ -175,7 +175,9 @@ class PedidoModel {
             ],
       tags: map['tags'] != null
           ? List<TagModel>.from(map['tags']?.map((x) => TagModel.fromMap(x)))
-          : [],
+          : [
+            
+          ],
       users: List<UsuarioModel>.from(
           map['users']?.map((x) => FirestoreClient.usuarios.getById(x)) ?? []),
     );

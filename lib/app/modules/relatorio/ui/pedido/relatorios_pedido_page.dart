@@ -179,6 +179,11 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        itemInfo('Total Geral', relatorioCtrl.getPedidosTotal().toKg(),
+            labelStyle: AppCss.mediumBold,
+            valueStyle: AppCss.mediumBold,
+            padding: const EdgeInsets.all(16)),
+        const Divisor(),
         Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
@@ -223,13 +228,14 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'Bitola ${produto.descricaoReplaced}mm:',
-                          style: AppCss.minimumBold,
-                        ),
-                      ),
+                      itemInfo(
+                          'Bitola ${produto.descricaoReplaced}mm',
+                          relatorioCtrl
+                              .getPedidosTotalPorBitola(produto)
+                              .toKg(),
+                          labelStyle: AppCss.minimumBold,
+                          valueStyle: AppCss.minimumBold,
+                          padding: const EdgeInsets.all(16)),
                       for (final status in PedidoProdutoStatus.values)
                         Builder(builder: (context) {
                           double qtde = relatorioCtrl
@@ -253,12 +259,6 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
                     ],
                   );
           }),
-        const Divisor(),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: itemInfo('Total Geral', relatorioCtrl.getPedidosTotal().toKg(),
-              labelStyle: AppCss.minimumBold),
-        ),
       ],
     );
   }
@@ -317,11 +317,14 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
   }
 
   Widget itemInfo(String label, String value,
-      {Color? color, TextStyle? labelStyle}) {
+      {Color? color,
+      TextStyle? labelStyle,
+      EdgeInsets? padding,
+      TextStyle? valueStyle}) {
     return Container(
       color: color,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: padding ?? const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -335,7 +338,7 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
                 flex: 2,
                 child: Text(
                   value,
-                  style: AppCss.minimumRegular.copyWith(),
+                  style: valueStyle ?? AppCss.minimumRegular.copyWith(),
                   textAlign: TextAlign.end,
                 ))
           ],

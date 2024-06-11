@@ -1,6 +1,7 @@
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/components/app_checkbox.dart';
 import 'package:aco_plus/app/core/components/app_color_picker.dart';
 import 'package:aco_plus/app/core/components/app_drop_down_list.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
@@ -98,9 +99,18 @@ class _StepCreatePageState extends State<StepCreatePage> {
             addeds: form.moveRoles,
             itens: UsuarioRole.values,
             itemLabel: (e) => e.label ?? 'Selecione',
-          onChanged: () {
+            onChanged: () {
               stepCtrl.formStream.add(form);
             }),
+        const H(16),
+        AppCheckbox(
+          label: 'Padrão ao criar pedido',
+          value: form.isDefault,
+          onChanged: (e) {
+            form.isDefault = e;
+            stepCtrl.formStream.update();
+          },
+        ),
         const H(24),
         if (form.isEdit)
           TextButton.icon(

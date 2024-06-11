@@ -1,12 +1,14 @@
 import 'package:aco_plus/app/core/components/app_field.dart';
+import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class AppDropDown<T> extends StatefulWidget {
-  final String label;
+  final String? label;
   final T item;
   final List<T> itens;
   final String Function(T) itemLabel;
@@ -18,14 +20,16 @@ class AppDropDown<T> extends StatefulWidget {
   final FocusNode? nextFocus;
   final bool hasFilter;
   final TextController? controller;
+  final String? hint;
 
   const AppDropDown({
-    required this.label,
+    this.label,
     required this.item,
     required this.itens,
     required this.itemLabel,
     required this.onSelect,
     this.onCreated,
+    this.hint,
     this.focus,
     this.required = true,
     this.disable = false,
@@ -44,12 +48,19 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
 
   TextController get controller => widget.controller ?? _controller;
 
+  // @override
+  // void initState() {
+  //   controller.text = widget.itemLabel.call(widget.item) ?? '';
+  //   super.initState();
+  // }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.hasFilter == false) return defaultWidget(context);
     return TypeAheadField<T>(
       offset: const Offset(0, 0),
       builder: (_, __, ___) => AppField(
-        hint: 'Selecione',
+        hint: widget.hint ?? 'Selecione',
         controllerObj: __,
         focusObj: ___,
         label: widget.label,
@@ -98,6 +109,66 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
           }
         });
       },
+    );
+  }
+
+  Widget defaultWidget(BuildContext context) {
+    return IgnorePointer(
+      ignoring: widget.disable,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.label != null) ...{
+            Text(
+              '${widget.label}:${widget.required ? '*' : ''}',
+              style: AppCss.smallBold,
+            ),
+            const H(4),
+          },
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.neutralMedium),
+              borderRadius: AppCss.radius8,
+              color: widget.disable
+                  ? AppColors.neutralMedium.withOpacity(0.4)
+                  : null,
+            ),
+            child: DropdownButton<T>(
+              focusNode: widget.focus ?? widget.controller?.focus,
+              padding: const EdgeInsets.only(left: 8),
+              value: widget.item,
+              isExpanded: true,
+              underline: const SizedBox(),
+              onChanged: (_) => widget.onSelect.call(_ as T),
+              hint: Text(widget.hint ?? 'Selecione'),
+              icon: widget.disable
+                  ? const SizedBox()
+                  : IgnorePointer(
+                      ignoring: widget.item == null,
+                      child: InkWell(
+                        onTap: () {
+                          if (widget.item != null) {
+                            widget.onSelect.call(null as T);
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Icon(widget.item != null
+                              ? Icons.close
+                              : Icons.arrow_drop_down),
+                        ),
+                      ),
+                    ),
+              items: widget.itens
+                  .map((e) => DropdownMenuItem<T>(
+                        value: e,
+                        child: Text(widget.itemLabel.call(e)),
+                      ))
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

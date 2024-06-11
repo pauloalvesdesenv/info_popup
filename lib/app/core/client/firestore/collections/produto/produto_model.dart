@@ -36,4 +36,16 @@ class ProdutoModel {
   String toJson() => json.encode(toMap());
 
   factory ProdutoModel.fromJson(String source) => ProdutoModel.fromMap(json.decode(source));
+
+  ProdutoModel copyWith({
+    String? id,
+    String? nome,
+    String? descricao,
+  }) {
+    return ProdutoModel(
+      id: id ?? this.id,
+      nome: nome ?? this.nome,
+      descricao: descricao ?? this.descricao,
+    );
+  }
 }

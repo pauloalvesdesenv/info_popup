@@ -17,6 +17,7 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: StreamOut<AppModule>(
+        
         stream: baseCtrl.moduleStream.listen,
         builder: (_, module) => Column(
           children: [
@@ -92,6 +93,13 @@ class AppDrawer extends StatelessWidget {
                           isEnabled = usuario.permission.ordem
                               .contains(UserPermissionType.read);
 
+                          break;
+                        case AppModule.steps:
+                          isEnabled = usuario.role == UsuarioRole.administrador;
+
+                          break;
+                        case AppModule.tags:
+                          isEnabled = usuario.role == UsuarioRole.administrador;
                           break;
                         default:
                       }

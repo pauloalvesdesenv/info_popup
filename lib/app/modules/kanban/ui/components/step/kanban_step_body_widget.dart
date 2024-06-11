@@ -1,14 +1,17 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
 import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_draggable_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:separated_column/separated_column.dart';
 
 class KanbanStepBodyWidget extends StatelessWidget {
+  final KanbanUtils utils;
   final StepModel step;
   final List<PedidoModel> pedidos;
   const KanbanStepBodyWidget(
+    this.utils,
     this.step,
     this.pedidos, {
     super.key,
@@ -25,12 +28,18 @@ class KanbanStepBodyWidget extends StatelessWidget {
           bottomRight: Radius.circular(8),
         ),
       ),
-      child: Scrollbar(
-        controller: step.scrollController,
+      child: RawScrollbar(
+        trackColor: const Color(0xFFFAFAFA),
+        thumbColor: Colors.grey.withOpacity(0.7),
+        crossAxisMargin: 2,
         interactive: true,
         radius: const Radius.circular(4),
         thickness: 8,
+        controller: step.scrollController,
+        trackVisibility: true,
+        thumbVisibility: true,
         child: ListView(
+          padding: const EdgeInsets.only(right: 2),
           controller: step.scrollController,
           children: [
             _dragTargetWidget(step, pedidos, 0),
@@ -38,9 +47,14 @@ class KanbanStepBodyWidget extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: SeparatedColumn(
                 separatorBuilder: (_, i) =>
-                    _dragTargetWidget(step, pedidos, i + 1),
-                children:
-                    pedidos.map((e) => KanbanCardDraggableWidget(e)).toList(),
+                    utils.isPedidoVisibleFiltered(pedidos[i])
+                        ? _dragTargetWidget(step, pedidos, i + 1)
+                        : const SizedBox(),
+                children: pedidos
+                    .map((e) => utils.isPedidoVisibleFiltered(e)
+                        ? KanbanCardDraggableWidget(e)
+                        : const SizedBox())
+                    .toList(),
               ),
             ),
             _dragTargetWidget(step, pedidos, pedidos.length, isLast: true),

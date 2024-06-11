@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
@@ -132,20 +133,36 @@ class _StepsPageState extends State<StepsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        step.name,
-                        style: AppCss.mediumBold,
+                      Row(
+                        children: [
+                          Text(
+                            step.name,
+                            style: AppCss.mediumBold,
+                          ),
+                          const W(4),
+                          if (step.isDefault)
+                            Container(
+                              margin: const EdgeInsets.only(left: 3),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryMain,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                'Padrão',
+                                style: AppCss.minimumBold
+                                    .setColor(AppColors.white)
+                                    .setSize(11),
+                              ),
+                            ),
+                        ],
                       ),
                       Text(
-                        'Recebe de: ${step.fromSteps.map((e) => e.name).join(', ')}',
-                        style: AppCss.minimumRegular.setSize(12),
-                      ),
-                      const H(2),
-                      Text(
-                        'Permissão: ${step.moveRoles.map((e) => e.name).join(', ')}',
+                        'Permissão: ${step.moveRoles.map((e) => e.label).join(', ')}',
                         style: AppCss.minimumRegular.setSize(11),
                       ),
-                      const H(4),
+                      const H(2),
                       Text(
                         'Criado em ${step.createdAt.textHour()}',
                         style: AppCss.minimumRegular

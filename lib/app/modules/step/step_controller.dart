@@ -50,12 +50,15 @@ class StepController {
 
   Future<void> onConfirm(_, StepModel? step) async {
     try {
-      onValid(step);
+      onValid();
+      final newStep = form.toStepModel(step);
       if (form.isEdit) {
-        final edit = form.toStepModel();
-        await FirestoreClient.steps.update(edit);
+        await FirestoreClient.steps.update(newStep);
       } else {
-        await FirestoreClient.steps.add(form.toStepModel());
+        await FirestoreClient.steps.add(newStep);
+      }
+      if (newStep.isDefault) {
+        await FirestoreClient.steps.setDefault(newStep.id);
       }
       pop(_);
       NotificationService.showPositive(
@@ -70,6 +73,7 @@ class StepController {
   }
 
   Future<void> onDelete(_, StepModel step) async {
+    if (await _isDeleteUnavailable(step)) return;
     await FirestoreClient.steps.delete(step);
     pop(_);
     NotificationService.showPositive(
@@ -78,5 +82,20 @@ class StepController {
     await FirestoreClient.steps.fetch();
   }
 
-  void onValid(StepModel? step) {}
+  Future<bool> _isDeleteUnavailable(StepModel step) async =>
+      !await onDeleteProcess(
+        deleteTitle: 'Deseja excluir a etapa?',
+        deleteMessage: 'Todos os dados da etapa serão excluidos do sistema',
+        infoMessage:
+            'Para excluir a etapa, nenhum pedido pode estar vinculado a ela',
+        conditional:
+            !FirestoreClient.pedidos.data.every((e) => e.step.id != step.id),
+      );
+
+  void onValid() {
+    if (form.name.text.isEmpty) {
+      throw Exception('Nome não pode ser vazio');
+    }
+    
+  }
 }

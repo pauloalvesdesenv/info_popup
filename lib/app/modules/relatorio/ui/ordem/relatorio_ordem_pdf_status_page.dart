@@ -16,7 +16,7 @@ class RelatorioOrdemPdfStatusPage {
   RelatorioOrdemPdfStatusPage(this.model);
 
   pw.Page build(Uint8List bytes) => pw.MultiPage(
-    crossAxisAlignment: pw.CrossAxisAlignment.center,
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
         pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) => [
           pw.Image(pw.MemoryImage(bytes), width: 60, height: 60),
@@ -88,7 +88,7 @@ class RelatorioOrdemPdfStatusPage {
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text(relatorio.status.label,
+          pw.Text(relatorio.status.map((e) => e.label).join(', '),
               style: pw.TextStyle(
                   fontSize: 11,
                   fontWeight: pw.FontWeight.normal,

@@ -13,9 +13,9 @@ class KanbanStepsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RawScrollbar(
-      trackColor: Colors.grey[700],
+      trackColor: Colors.grey[400],
       trackRadius: const Radius.circular(8),
-      thumbColor: Colors.grey[400],
+      thumbColor: Colors.grey[700],
       interactive: true,
       radius: const Radius.circular(4),
       thickness: 8,
@@ -29,6 +29,7 @@ class KanbanStepsWidget extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         separatorBuilder: (_, i) => const W(16),
         itemBuilder: (_, i) => KanbanStepWidget(
+          utils,
           utils.kanban.keys.toList()[i],
           utils.kanban[utils.kanban.keys.toList()[i]]!,
         ),

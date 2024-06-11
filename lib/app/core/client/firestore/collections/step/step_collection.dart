@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 
 class StepCollection {
   static final StepCollection _instance = StepCollection._();
@@ -76,7 +78,18 @@ class StepCollection {
     });
   }
 
-  StepModel getById(String id) => data.singleWhere((e) => e.id == id);
+  StepModel getById(String id) =>
+      data.firstWhereOrNull((e) => e.id == id) ??
+      StepModel(
+        createdAt: DateTime.now(),
+        fromStepsIds: [],
+        isDefault: false,
+        moveRoles: [],
+        color: Colors.transparent,
+        id: 'step-not-found',
+        name: 'step-not-found',
+        index: 100000000,
+      );
 
   Future<StepModel?> add(StepModel model) async {
     try {
@@ -102,5 +115,13 @@ class StepCollection {
 
   Future<void> delete(StepModel model) async {
     await collection.doc(model.id).delete();
+  }
+
+  Future<void> setDefault(String id) async {
+    for (final step in data) {
+      step.isDefault = step.id == id;
+      dataStream.update();
+      await update(step);
+    }
   }
 }

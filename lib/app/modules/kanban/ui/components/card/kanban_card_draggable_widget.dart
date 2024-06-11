@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/enums/widget_view_mode.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_pedido_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,21 @@ class KanbanCardDraggableWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LongPressDraggable<PedidoModel>(
+        onDragUpdate: (details) {
+          final screenWidth = MediaQuery.of(context).size.width;
+          final xPos = details.globalPosition.dx;
+          if (xPos > screenWidth - 300) {
+            kanbanCtrl.utils.scroll.animateTo(
+                kanbanCtrl.utils.scroll.offset + 50,
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.ease);
+          } else if (xPos < 300) {
+            kanbanCtrl.utils.scroll.animateTo(
+                kanbanCtrl.utils.scroll.offset - 50,
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.ease);
+          }
+        },
         delay: const Duration(milliseconds: 180),
         data: pedido,
         childWhenDragging: SizedBox(

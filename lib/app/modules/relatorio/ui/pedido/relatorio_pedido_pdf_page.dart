@@ -173,7 +173,7 @@ class RelatorioPedidoPdfPage {
           PdfDivisor.build(
             color: Colors.grey[200],
           ),
-          _itemInfo('Quantidade Total de Bitolas',
+          _itemInfo('Quantidade Total de Kilos',
               "${relatorio.pedidos.fold<double>(0, (a, b) => a + (b.produtos.fold(0, (c, d) => c + d.qtde))).toStringAsFixed(2)} kg"),
           PdfDivisor.build(
             color: Colors.grey[200],
@@ -258,15 +258,30 @@ class RelatorioPedidoPdfPage {
                         children: [
                           pw.Padding(
                             padding: const pw.EdgeInsets.all(16),
-                            child: pw.Text(
-                              'Bitola ${produto.descricaoReplaced}mm',
-                              style: pw.TextStyle(
-                                  fontSize: 12,
-                                  font: pw.Font.times(),
-                                  fontWeight: pw.FontWeight.bold,
-                                  color:
-                                      PdfColor.fromInt(AppColors.black.value)),
-                            ),
+                            child: pw.Row(children: [
+                              pw.Expanded(
+                                child: pw.Text(
+                                  'Bitola ${produto.descricaoReplaced}mm',
+                                  style: pw.TextStyle(
+                                      fontSize: 12,
+                                      font: pw.Font.times(),
+                                      fontWeight: pw.FontWeight.bold,
+                                      color: PdfColor.fromInt(
+                                          AppColors.black.value)),
+                                ),
+                              ),
+                              pw.Text(
+                                relatorioCtrl
+                                    .getPedidosTotalPorBitola(produto)
+                                    .toKg(),
+                                style: pw.TextStyle(
+                                    fontSize: 12,
+                                    font: pw.Font.times(),
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColor.fromInt(
+                                        AppColors.black.value)),
+                              ),
+                            ]),
                           ),
                           for (final status in PedidoProdutoStatus.values)
                             pw.Builder(builder: (context) {

@@ -1,6 +1,7 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
+import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 enum RelatorioOrdemType {
@@ -36,11 +37,26 @@ extension RelatorioOrdemStatusExt on RelatorioOrdemStatus {
         return 'Produzidas';
     }
   }
+
+  Color get color {
+    switch (this) {
+      case RelatorioOrdemStatus.AGUARDANDO_PRODUCAO:
+        return AppColors.primaryMain;
+      case RelatorioOrdemStatus.EM_PRODUCAO:
+        return Colors.orange;
+      case RelatorioOrdemStatus.PRODUZIDAS:
+        return Colors.green;
+    }
+  }
 }
 
 class RelatorioOrdemViewModel {
-  RelatorioOrdemType? type;
-  RelatorioOrdemStatus? status;
+  RelatorioOrdemType? type = RelatorioOrdemType.STATUS;
+  List<RelatorioOrdemStatus> status = [
+    RelatorioOrdemStatus.AGUARDANDO_PRODUCAO,
+    RelatorioOrdemStatus.EM_PRODUCAO,
+    RelatorioOrdemStatus.PRODUZIDAS
+  ];
   DateTimeRange? dates;
   RelatorioOrdemModel? relatorio;
   TextController ordemEC = TextController();
@@ -50,7 +66,7 @@ class RelatorioOrdemViewModel {
 }
 
 class RelatorioOrdemModel {
-  late RelatorioOrdemStatus status;
+  late List<RelatorioOrdemStatus> status;
   late List<OrdemModel> ordens;
   late DateTimeRange? dates;
   late OrdemModel ordem;

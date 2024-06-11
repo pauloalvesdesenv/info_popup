@@ -1,3 +1,5 @@
+import 'package:aco_plus/app/core/client/firestore/collections/tag/models/tag_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:flutter/material.dart';
 
 enum PedidoTipo { cd, cda }
@@ -27,6 +29,15 @@ extension PedidoTipoExtension on PedidoTipo {
         return Colors.red[100]!;
       case PedidoTipo.cda:
         return Colors.green[100]!;
+    }
+  }
+
+  TagModel get tag {
+    switch (this) {
+      case PedidoTipo.cd:
+        return FirestoreClient.tags.cd;
+      case PedidoTipo.cda:
+        return FirestoreClient.tags.cda;
     }
   }
 }

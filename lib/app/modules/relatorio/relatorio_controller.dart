@@ -130,6 +130,18 @@ class PedidoController {
     return double.parse(qtde.toStringAsFixed(2));
   }
 
+  double getPedidosTotalPorBitola(ProdutoModel produto) {
+    double qtde = 0;
+    for (var pedido in pedidoViewModel.relatorio!.pedidos) {
+      for (var produto in pedido.produtos
+          .where((e) => e.produto.id == produto.id)
+          .toList()) {
+        qtde = qtde + produto.qtde;
+      }
+    }
+    return double.parse(qtde.toStringAsFixed(2));
+  }
+
   double getPedidosTotalPorBitolaStatus(
       ProdutoModel produto, PedidoProdutoStatus status) {
     double qtde = 0;
@@ -158,11 +170,17 @@ class PedidoController {
   }
 
   void onCreateRelatorioOrdemStatus() {
-    List<OrdemModel> ordens =
-        FirestoreClient.ordens.data.map((e) => e.copyWith()).toList();
+    List<OrdemModel> ordens = FirestoreClient.ordens.data
+        .map((o) => o.copyWith(
+            produto: o.produto.copyWith(),
+            produtos: o.produtos
+                .map((p) => p.copyWith(
+                    statusess: p.statusess.map((s) => s.copyWith()).toList()))
+                .toList()))
+        .toList();
     for (final ordem in ordens) {
       ordem.produtos = ordem.produtos
-          .where((e) => _whereProductStatus(e, ordemViewModel.status!))
+          .where((e) => _whereProductStatus(e, ordemViewModel.status))
           .toList();
     }
     ordens.removeWhere((e) => e.produtos.isEmpty);
@@ -174,7 +192,7 @@ class PedidoController {
           .toList();
     }
     final model = RelatorioOrdemModel.status(
-      ordemViewModel.status!,
+      ordemViewModel.status,
       ordens,
       dates: ordemViewModel.dates,
     );
@@ -193,19 +211,23 @@ class PedidoController {
   }
 
   bool _whereProductStatus(
-      PedidoProdutoModel produto, RelatorioOrdemStatus status) {
+      PedidoProdutoModel produto, List<RelatorioOrdemStatus> status) {
     final productStatus = produto.statusess.last.status;
-    switch (status) {
-      case RelatorioOrdemStatus.AGUARDANDO_PRODUCAO:
-        return [
-          PedidoProdutoStatus.separado,
-          PedidoProdutoStatus.aguardandoProducao
-        ].contains(productStatus);
-      case RelatorioOrdemStatus.EM_PRODUCAO:
-        return productStatus == PedidoProdutoStatus.produzindo;
-      case RelatorioOrdemStatus.PRODUZIDAS:
-        return productStatus == PedidoProdutoStatus.pronto;
+    bool isAvailable = false;
+    for (var status in status) {
+      switch (status) {
+        case RelatorioOrdemStatus.AGUARDANDO_PRODUCAO:
+          isAvailable = [
+            PedidoProdutoStatus.separado,
+            PedidoProdutoStatus.aguardandoProducao
+          ].contains(productStatus);
+        case RelatorioOrdemStatus.EM_PRODUCAO:
+          isAvailable = productStatus == PedidoProdutoStatus.produzindo;
+        case RelatorioOrdemStatus.PRODUZIDAS:
+          isAvailable = productStatus == PedidoProdutoStatus.pronto;
+      }
     }
+    return isAvailable;
   }
 
   double getOrdemTotal() {
@@ -271,7 +293,7 @@ class PedidoController {
 
     final name = isOrdemType
         ? "m2_relatorio_ordem_${ordemViewModel.relatorio!.ordem.id.toLowerCase()}${DateTime.now().toFileName()}.pdf"
-        : "m2_relatorio_bitola_status_${ordemViewModel.status!.label.toLowerCase()}${DateTime.now().toFileName()}.pdf";
+        : "m2_relatorio_bitola_status_${ordemViewModel.status.map((e) => e.label).join('_').toLowerCase()}${DateTime.now().toFileName()}.pdf";
 
     await downloadPDF(name, '/relatorio/ordem/', await pdf.save());
   }

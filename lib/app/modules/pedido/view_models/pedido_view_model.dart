@@ -39,14 +39,14 @@ class PedidoCreateModel {
   DateTime? deliveryAt;
   ExpansionTileController tileController = ExpansionTileController();
   ChecklistModel? checklist;
-  StepModel step = FirestoreClient.steps.data.first;
+  StepModel? step;
 
   late bool isEdit;
 
   PedidoCreateModel()
       : id = HashService.get,
         isEdit = false,
-        step = FirestoreClient.steps.data.first;
+        step = FirestoreClient.steps.data.firstWhereOrNull((e) => e.isDefault);
 
   String getDetails() {
     List<String> localizador = [];
@@ -75,7 +75,7 @@ class PedidoCreateModel {
     produtos =
         pedido.produtos.map((e) => PedidoProdutoCreateModel.edit(e)).toList();
     deliveryAt = pedido.deliveryAt;
-    step = pedido.steps.last.step;
+    step = FirestoreClient.steps.getById(pedido.steps.first.step.id);
   }
 
   PedidoModel toPedidoModel(PedidoModel? pedido) => PedidoModel(
@@ -97,8 +97,8 @@ class PedidoCreateModel {
             .toList(),
         deliveryAt: deliveryAt,
         steps: pedido?.steps ??
-            [PedidoStepModel(id: id, step: step, createdAt: DateTime.now())],
-        tags: pedido?.tags ?? [],
+            [PedidoStepModel(id: id, step: step!, createdAt: DateTime.now())],
+        tags: pedido?.tags ?? [tipo!.tag],
         checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
         comments: pedido?.comments ?? [],
         users: pedido?.users ?? [],

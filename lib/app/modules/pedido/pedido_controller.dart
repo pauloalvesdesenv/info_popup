@@ -120,6 +120,9 @@ class PedidoController {
     if (form.obra == null) {
       throw Exception('Selecione a obra do pedido');
     }
+    if (form.step == null) {
+      throw Exception('Selecione a etapa inicial do pedido');
+    }
   }
 
   //PEDIDO

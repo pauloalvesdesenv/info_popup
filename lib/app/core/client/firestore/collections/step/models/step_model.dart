@@ -13,8 +13,9 @@ class StepModel {
   final List<UsuarioRole> moveRoles;
   final DateTime createdAt;
   final ScrollController scrollController = ScrollController();
-  List<String> fromStepsIds;
   int index;
+  List<String> fromStepsIds;
+  bool isDefault = false;
 
   List<StepModel> get fromSteps =>
       fromStepsIds.map((e) => FirestoreClient.steps.getById(e)).toList();
@@ -29,6 +30,7 @@ class StepModel {
     required this.moveRoles,
     required this.createdAt,
     required this.index,
+    required this.isDefault,
   });
 
   StepModel copyWith({
@@ -40,6 +42,7 @@ class StepModel {
     List<UsuarioRole>? moveRoles,
     DateTime? createdAt,
     int? index,
+    bool? isDefault
   }) {
     return StepModel(
       id: id ?? this.id,
@@ -49,6 +52,7 @@ class StepModel {
       moveRoles: moveRoles ?? this.moveRoles,
       createdAt: createdAt ?? this.createdAt,
       index: index ?? this.index,
+      isDefault: isDefault ?? this.isDefault
     );
   }
 
@@ -60,7 +64,8 @@ class StepModel {
       'fromStepsIds': fromStepsIds,
       'moveRoles': moveRoles.map((x) => x.index).toList(),
       'createdAt': createdAt.millisecondsSinceEpoch,
-      'index': index
+      'index': index,
+      'isDefault': isDefault
     };
   }
 
@@ -76,6 +81,7 @@ class StepModel {
       moveRoles: List<UsuarioRole>.from(
           map['moveRoles']?.map((x) => UsuarioRole.values[x])),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      isDefault: map['isDefault'] ?? false
     );
   }
 

@@ -35,6 +35,15 @@ class _KanbanPageState extends State<KanbanPage> {
       drawer: const AppDrawer(),
       appBar: const KanbanTopBarWidget(),
       body: StreamOut(
+        loading: Container(
+          width: double.maxFinite,
+          height: double.maxFinite,
+          decoration: const BoxDecoration(
+          image: DecorationImage(
+        image: AssetImage('assets/images/kanban_background.png'),
+        fit: BoxFit.cover,
+      )),
+        ),
         stream: kanbanCtrl.utilsStream.listen,
         builder: (context, utils) => KanbanBodyWidget(utils),
       ),

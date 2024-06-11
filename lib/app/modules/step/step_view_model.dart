@@ -17,6 +17,7 @@ class StepCreateModel {
   List<StepModel> fromSteps = [];
   List<UsuarioRole> moveRoles = [];
   DateTime createdAt = DateTime.now();
+  bool isDefault = false;
 
   late bool isEdit;
 
@@ -32,15 +33,17 @@ class StepCreateModel {
     fromSteps = etapa.fromSteps;
     moveRoles = etapa.moveRoles;
     createdAt = etapa.createdAt;
+    isDefault = etapa.isDefault;
   }
 
-  StepModel toStepModel() => StepModel(
+  StepModel toStepModel(StepModel? etapa) => StepModel(
         id: id,
         name: name.text,
         color: color,
         fromStepsIds: fromSteps.map((e) => e.id).toList(),
         moveRoles: moveRoles,
         createdAt: createdAt,
-        index: FirestoreClient.steps.data.length - 1,
+        index: etapa?.index ?? FirestoreClient.steps.data.length,
+        isDefault: isDefault,
       );
 }
