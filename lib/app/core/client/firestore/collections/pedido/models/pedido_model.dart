@@ -33,7 +33,7 @@ class PedidoModel {
   final List<CheckItemModel> checks;
   final List<CommentModel> comments;
   final List<UsuarioModel> users;
-
+  int index;
 
   StepModel get step => steps.last.step;
   PedidoStatus get status => statusess.last.status;
@@ -64,6 +64,7 @@ class PedidoModel {
     required this.checks,
     required this.comments,
     required this.users,
+    required this.index,
     this.archives = const [],
   });
 
@@ -175,11 +176,10 @@ class PedidoModel {
             ],
       tags: map['tags'] != null
           ? List<TagModel>.from(map['tags']?.map((x) => TagModel.fromMap(x)))
-          : [
-            
-          ],
+          : [],
       users: List<UsuarioModel>.from(
           map['users']?.map((x) => FirestoreClient.usuarios.getById(x)) ?? []),
+      index: map['index'] ?? 0,
     );
   }
 
@@ -222,6 +222,7 @@ class PedidoModel {
       steps: steps ?? this.steps,
       tags: tags ?? this.tags,
       users: users ?? this.users,
+      index: index ?? this.index,
     );
   }
 

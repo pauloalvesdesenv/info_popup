@@ -21,12 +21,12 @@ class _KanbanPageState extends State<KanbanPage> {
   @override
   void initState() {
     kanbanCtrl.onInit().then((_) {
-      FirestoreClient.pedidos.dataStream.controller.listen((e) {
-        kanbanCtrl.onMount();
-      });
-      FirestoreClient.steps.dataStream.controller.listen((e) {
-        kanbanCtrl.onMount();
-      });
+      // FirestoreClient.pedidos.dataStream.controller.listen((e) {
+      //   kanbanCtrl.onMount();
+      // });
+      // FirestoreClient.steps.dataStream.controller.listen((e) {
+      //   kanbanCtrl.onMount();
+      // });
     });
     super.initState();
   }

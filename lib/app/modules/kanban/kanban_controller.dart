@@ -39,12 +39,12 @@ class StepController {
   }
 
   Map<StepModel, List<PedidoModel>> mountKanban() {
-    final pedidos = FirestoreClient.pedidos.data;
-    final steps = FirestoreClient.steps.data;
+    final pedidos = FirestoreClient.pedidos.data.toList();
     final kanban = <StepModel, List<PedidoModel>>{};
-    for (var step in steps) {
+    for (StepModel step in FirestoreClient.steps.data.toList()) {
       final pedidosStep = pedidos.where((e) => e.step.id == step.id).toList();
-      kanban[step] = pedidosStep;
+      pedidosStep.sort((a, b) => a.index.compareTo(b.index));
+      kanban.addAll({step: pedidosStep});
     }
     return kanban;
   }
@@ -120,6 +120,7 @@ class StepController {
   void _onMovePedido(PedidoModel pedido, StepModel step, int index) {
     _onAddPedidoFromStep(step.id, index,
         pedido: _onRemovePedidoFromStep(pedido.step.id, pedido.id));
+    _onUpdatePedidosIndex(step.id, index);
   }
 
   PedidoModel _onRemovePedidoFromStep(String stepId, String pedidoId) {
@@ -133,6 +134,15 @@ class StepController {
       {required PedidoModel pedido}) {
     final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
     utils.kanban[key]!.insert(index, pedido);
+  }
+
+  void _onUpdatePedidosIndex(String stepId, int index) {
+    final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
+    List<PedidoModel> pedidos = utils.kanban[key]!;
+    for (int i = 0; i < pedidos.length; i++) {
+      pedidos[i].index = i;
+      FirestoreClient.pedidos.update(pedidos[i]);
+    }
   }
 
   void onListenerSrollEnd(BuildContext context, Offset mouse) {
