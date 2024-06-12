@@ -17,20 +17,30 @@ class KanbanCardDraggableWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return LongPressDraggable<PedidoModel>(
         onDragUpdate: (details) {
-          final screenWidth = MediaQuery.of(context).size.width;
-          final xPos = details.globalPosition.dx;
-          if (xPos > screenWidth - 300) {
-            kanbanCtrl.utils.scroll.animateTo(
-                kanbanCtrl.utils.scroll.offset + 50,
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.ease);
-          } else if (xPos < 300) {
-            kanbanCtrl.utils.scroll.animateTo(
-                kanbanCtrl.utils.scroll.offset - 50,
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.ease);
-          }
+          kanbanCtrl.onListenerSrollEnd(context, details.localPosition);
         },
+        onDragEnd: (details) {
+          kanbanCtrl.utils.cancelTimer();
+        },
+        onDragCompleted: () {
+          kanbanCtrl.utils.cancelTimer();
+        },
+
+        // onDragUpdate: (details) {
+        // final screenWidth = MediaQuery.of(context).size.width;
+        // final xPos = details.globalPosition.dx;
+        // if (xPos > screenWidth - 300) {
+        //   kanbanCtrl.utils.scroll.animateTo(
+        //       kanbanCtrl.utils.scroll.offset + 50,
+        //       duration: const Duration(milliseconds: 180),
+        //       curve: Curves.ease);
+        // } else if (xPos < 300) {
+        //   kanbanCtrl.utils.scroll.animateTo(
+        //       kanbanCtrl.utils.scroll.offset - 50,
+        //       duration: const Duration(milliseconds: 180),
+        //       curve: Curves.ease);
+        // }
+        // },
         delay: const Duration(milliseconds: 180),
         data: pedido,
         childWhenDragging: SizedBox(

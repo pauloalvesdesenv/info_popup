@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
@@ -20,6 +22,14 @@ class KanbanUtils {
   TextController search = TextController();
   ClienteModel? cliente;
   TextController clienteEC = TextController();
+  Timer? timer;
+
+  void cancelTimer() {
+    if (timer?.isActive ?? false) {
+      timer?.cancel();
+      timer = null;
+    }
+  }
 
   int getFilterSteps() {
     int qtde = 0;

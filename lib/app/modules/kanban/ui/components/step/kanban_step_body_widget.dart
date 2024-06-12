@@ -34,12 +34,16 @@ class KanbanStepBodyWidget extends StatelessWidget {
         crossAxisMargin: 2,
         interactive: true,
         radius: const Radius.circular(4),
+        trackRadius: const Radius.circular(8),
         thickness: 8,
         controller: step.scrollController,
         trackVisibility: true,
         thumbVisibility: true,
         child: ListView(
           padding: const EdgeInsets.only(right: 2),
+          physics: pedidos.isEmpty
+              ? const NeverScrollableScrollPhysics()
+              : const AlwaysScrollableScrollPhysics(),
           controller: step.scrollController,
           children: [
             _dragTargetWidget(step, pedidos, 0),

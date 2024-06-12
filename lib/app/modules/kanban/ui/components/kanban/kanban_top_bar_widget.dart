@@ -8,6 +8,7 @@ import 'package:aco_plus/app/modules/base/base_controller.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_filter_widget.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
+import 'package:aco_plus/app/modules/kanban/ui/components/kanban/shimmer/kanban_top_bar_shimmer_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_create_page.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
@@ -23,11 +24,7 @@ class KanbanTopBarWidget extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return StreamOut<KanbanUtils>(
-      loading: Container(
-        width: double.maxFinite,
-        height: double.maxFinite,
-        color: AppColors.primaryMain,
-      ),
+      loading: const KanbanTopBarShimmerWidget(),
       stream: kanbanCtrl.utilsStream.listen,
       builder: (_, utils) => AppBar(
         leading: IconButton(

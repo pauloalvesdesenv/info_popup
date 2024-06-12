@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -5,6 +8,7 @@ import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 final kanbanCtrl = StepController();
@@ -129,5 +133,44 @@ class StepController {
       {required PedidoModel pedido}) {
     final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
     utils.kanban[key]!.insert(index, pedido);
+  }
+
+  void onListenerSrollEnd(BuildContext context, Offset mouse) {
+    Alignment? align = _getAlignByPosition(context, mouse);
+    if (align == null && utils.timer != null) {
+      utils.cancelTimer();
+    } else if (align != null && utils.timer == null) {
+      _setTimerByAlign(align);
+    }
+  }
+
+  Alignment? _getAlignByPosition(BuildContext context, Offset mouse) {
+    const gap = 200;
+    final maxWidth =
+        (MediaQuery.of(context).size.width + utils.scroll.offset) - gap;
+    final minWidth = gap + utils.scroll.offset;
+    final dx = mouse.dx + utils.scroll.offset;
+    if (dx >= maxWidth) {
+      return Alignment.centerRight;
+    } else if (dx < minWidth) {
+      return Alignment.centerLeft;
+    } else {
+      return null;
+    }
+  }
+
+  void _setTimerByAlign(Alignment align) {
+    if (align == Alignment.centerRight) {
+      utils.timer = Timer.periodic(const Duration(milliseconds: 300),
+          (timer) => _updateScrollSteps(utils.scroll.offset + 100));
+    } else {
+      utils.timer = Timer.periodic(const Duration(milliseconds: 300),
+          (timer) => _updateScrollSteps(utils.scroll.offset - 100));
+    }
+  }
+
+  void _updateScrollSteps(double offset) {
+    utils.scroll.animateTo(offset,
+        curve: Curves.ease, duration: const Duration(milliseconds: 300));
   }
 }

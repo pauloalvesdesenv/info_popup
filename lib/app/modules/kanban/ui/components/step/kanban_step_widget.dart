@@ -19,20 +19,23 @@ class KanbanStepWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 300,
-      decoration: const BoxDecoration(
-        color: Color(0xFFF1F2F4),
-        borderRadius: BorderRadius.all(Radius.circular(8)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          KanbanStepTitleWidget(step, pedidos),
-          Expanded(
-            child: KanbanStepBodyWidget(utils, step, pedidos),
-          )
-        ],
+    return ClipRRect(
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      child: Container(
+        width: 300,
+        decoration: const BoxDecoration(
+          color: Color(0xFFF1F2F4),
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            KanbanStepTitleWidget(step, pedidos),
+            Expanded(
+              child: KanbanStepBodyWidget(utils, step, pedidos),
+            )
+          ],
+        ),
       ),
     );
   }

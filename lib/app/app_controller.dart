@@ -19,8 +19,12 @@ class AppController {
   Future<void> onInit() async {
     if (isInitialized) return;
     isInitialized = true;
-    FlutterNativeSplash.remove();
     await Service.initAplicationServices();
     await usuarioCtrl.getCurrentUser();
+    precacheImage(
+        const AssetImage('assets/images/kanban_background.png'), context);
+    Future.delayed(Duration(milliseconds: 200));
+    FlutterNativeSplash.remove();
+
   }
 }
