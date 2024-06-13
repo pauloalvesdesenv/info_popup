@@ -39,8 +39,9 @@ class _AppState extends State<App> {
               title: 'AÇO+',
               home: StreamOutNull<UsuarioModel?>(
                 stream: usuarioCtrl.usuarioStream.listen,
-                child: (_, data) =>
-                    data == null ? const SignUpPage() : const BasePage(),
+                child: (_, data) => data == null
+                    ? const SignUpPage()
+                    : const Portal(child: BasePage()),
               ))),
     );
   }

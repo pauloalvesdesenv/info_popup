@@ -1,5 +1,7 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:flutter/material.dart';
 
 class PedidoStepsWidget extends StatelessWidget {
@@ -16,6 +18,12 @@ class PedidoStepsWidget extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: Text('Etapa do Pedido', style: AppCss.largeBold)),
+          if (pedido.steps.length > 1)
+            InkWell(
+              onTap: () => kanbanCtrl.onUndoStep(pedido),
+              child: const Icon(Icons.swipe_left_alt_sharp),
+            ),
+          const W(8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
             decoration: BoxDecoration(

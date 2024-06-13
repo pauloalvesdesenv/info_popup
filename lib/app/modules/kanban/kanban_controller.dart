@@ -1,15 +1,21 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
+import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+const stepIdAguardandoProd = 'E2chjojxDVgeHa3i248t3Xl5O';
 
 final kanbanCtrl = StepController();
 
@@ -28,6 +34,7 @@ class StepController {
     final kanban = mountKanban();
     final calendar = _mountCalendar();
     utilsStream.add(KanbanUtils(kanban: kanban, calendar: calendar));
+    onMount();
   }
 
   void onMount() async {
@@ -44,6 +51,9 @@ class StepController {
     for (StepModel step in FirestoreClient.steps.data.toList()) {
       final pedidosStep = pedidos.where((e) => e.step.id == step.id).toList();
       pedidosStep.sort((a, b) => a.index.compareTo(b.index));
+      if (step.id == stepIdAguardandoProd) {
+        log('');
+      }
       kanban.addAll({step: pedidosStep});
     }
     return kanban;
@@ -112,6 +122,12 @@ class StepController {
   }
 
   void _onAddStep(PedidoModel pedido, StepModel step) {
+     pedido.histories.add(
+      PedidoHistoryModel.create(
+          data: step,
+          action: PedidoHistoryAction.update,
+          type: PedidoHistoryType.step),
+    );
     pedido.addStep(step);
     FirestoreClient.pedidos.dataStream.update();
     FirestoreClient.pedidos.update(pedido);
@@ -139,10 +155,13 @@ class StepController {
   void _onUpdatePedidosIndex(String stepId, int index) {
     final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
     List<PedidoModel> pedidos = utils.kanban[key]!;
+    final batch = FirebaseFirestore.instance.batch();
     for (int i = 0; i < pedidos.length; i++) {
       pedidos[i].index = i;
-      FirestoreClient.pedidos.update(pedidos[i]);
+      batch.update(FirestoreClient.pedidos.collection.doc(pedidos[i].id),
+          {'index': pedidos[i].index});
     }
+    batch.commit();
   }
 
   void onListenerSrollEnd(BuildContext context, Offset mouse) {
@@ -182,5 +201,14 @@ class StepController {
   void _updateScrollSteps(double offset) {
     utils.scroll.animateTo(offset,
         curve: Curves.ease, duration: const Duration(milliseconds: 300));
+  }
+
+  void onUndoStep(PedidoModel pedido) async {
+    final step = pedido.steps[pedido.steps.length - 2].step;
+    if (!await showConfirmDialog('Deseja voltar para etapa anterior?',
+        'Seu pedido será movido para ${step.name}')) return;
+    _onMovePedido(pedido, step, 0);
+    _onAddStep(pedido, step);
+    utilsStream.update();
   }
 }

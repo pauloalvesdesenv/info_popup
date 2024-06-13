@@ -16,6 +16,7 @@ import 'package:aco_plus/app/modules/pedido/ui/components/pedido_produtos_widget
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_status_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_steps_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_tags_widget.dart';
+import 'package:aco_plus/app/modules/pedido/ui/components/pedido_timeline_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_top_bar.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_users_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -36,7 +37,8 @@ class PedidoPage extends StatefulWidget {
   State<PedidoPage> createState() => _PedidoPageState();
 }
 
-class _PedidoPageState extends State<PedidoPage> {
+class _PedidoPageState extends State<PedidoPage>
+    with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     pedidoCtrl.onInitPage(widget.pedido);
@@ -47,6 +49,7 @@ class _PedidoPageState extends State<PedidoPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return StreamOut(
       stream: pedidoCtrl.pedidoStream.listen,
       builder: (_, pedido) =>
@@ -109,6 +112,8 @@ class _PedidoPageState extends State<PedidoPage> {
         PedidoChecksWidget(pedido),
         const Divisor(),
         PedidoCommentsWidget(pedido),
+        const Divisor(),
+        if (pedido.histories.isNotEmpty) PedidoTimelineWidget(pedido: pedido),
         if (!kIsWeb)
           KeyboardVisibilityBuilder(
               builder: (_, isVisible) =>
@@ -116,4 +121,7 @@ class _PedidoPageState extends State<PedidoPage> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/checklist/models/
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_step_model.dart';
@@ -78,30 +79,43 @@ class PedidoCreateModel {
     step = FirestoreClient.steps.getById(pedido.steps.first.step.id);
   }
 
-  PedidoModel toPedidoModel(PedidoModel? pedido) => PedidoModel(
-        id: id,
-        tipo: tipo!,
-        descricao: descricao.text,
-        statusess: [
-          PedidoStatusModel(
-              id: HashService.get,
-              status: PedidoStatus.produzindoCD,
-              createdAt: pedido?.statusess.first.createdAt ?? DateTime.now())
-        ],
-        localizador: localizador.text,
-        createdAt: pedido?.createdAt ?? DateTime.now(),
-        cliente: cliente!,
-        obra: obra!,
-        produtos: produtos
-            .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
-            .toList(),
-        deliveryAt: deliveryAt,
-        steps: pedido?.steps ??
-            [PedidoStepModel(id: id, step: step!, createdAt: DateTime.now())],
-        tags: pedido?.tags ?? [tipo!.tag],
-        checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
-        comments: pedido?.comments ?? [],
-        users: pedido?.users ?? [],
-        index: pedido?.index ?? 0,
-      );
+  PedidoModel toPedidoModel(PedidoModel? pedido) {
+    final pedidoStatusModel = PedidoStatusModel(
+        id: HashService.get,
+        status: PedidoStatus.produzindoCD,
+        createdAt: pedido?.statusess.first.createdAt ?? DateTime.now());
+    final pedidoStepModel =
+        PedidoStepModel(id: id, step: step!, createdAt: DateTime.now());
+    return PedidoModel(
+      id: id,
+      tipo: tipo!,
+      descricao: descricao.text,
+      statusess: [pedidoStatusModel],
+      localizador: localizador.text,
+      createdAt: pedido?.createdAt ?? DateTime.now(),
+      cliente: cliente!,
+      obra: obra!,
+      produtos: produtos
+          .map((e) => e.toPedidoProdutoModel(id, cliente!, obra!).copyWith())
+          .toList(),
+      deliveryAt: deliveryAt,
+      steps: pedido?.steps ?? [pedidoStepModel],
+      tags: pedido?.tags ?? [tipo!.tag],
+      checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
+      comments: pedido?.comments ?? [],
+      users: pedido?.users ?? [],
+      index: pedido?.index ?? 0,
+      histories: pedido?.histories ??
+          [
+            PedidoHistoryModel.create(
+                data: pedidoStatusModel.toMap(),
+                type: PedidoHistoryType.status,
+                action: PedidoHistoryAction.create),
+            PedidoHistoryModel.create(
+                data: pedidoStepModel.toMap(),
+                type: PedidoHistoryType.step,
+                action: PedidoHistoryAction.create)
+          ],
+    );
+  }
 }

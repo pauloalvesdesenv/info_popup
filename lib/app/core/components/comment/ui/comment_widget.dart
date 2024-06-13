@@ -1,3 +1,4 @@
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/components/app_avatar.dart';
 import 'package:aco_plus/app/core/components/comment/comment_model.dart';
 import 'package:aco_plus/app/core/components/h.dart';
@@ -5,6 +6,7 @@ import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:flutter/material.dart';
 
 class CommentWidget extends StatelessWidget {
@@ -58,6 +60,11 @@ class CommentWidget extends StatelessWidget {
                           'Deseja excluir o comentário?',
                           'Não será possível desfazer essa ação.')) {
                         onRemove.call(comment);
+                        pedidoCtrl.onAddHistory(
+                          data: comment,
+                          type: PedidoHistoryType.comment,
+                          action: PedidoHistoryAction.delete,
+                        );
                       }
                     },
                     child: Icon(

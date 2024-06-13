@@ -18,8 +18,12 @@ class PedidoChecksWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CheckListWidget(
+            pedido: pedido,
             items: pedido.checks,
-            onChanged: () => pedidoCtrl.updatePedidoFirestore(),
+            onChanged: () {
+
+              pedidoCtrl.updatePedidoFirestore();
+            },
           ),
         ],
       ),

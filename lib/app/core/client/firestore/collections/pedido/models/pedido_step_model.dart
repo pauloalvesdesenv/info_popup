@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -31,11 +32,16 @@ class PedidoStepModel {
   }
 
   factory PedidoStepModel.fromMap(Map<String, dynamic> map) {
-    return PedidoStepModel(
-      id: map['id'],
-      step: FirestoreClient.steps.getById(map['step']),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-    );
+    try {
+      return PedidoStepModel(
+        id: map['id'],
+        step: FirestoreClient.steps.getById(map['step']),
+        createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      );
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
   }
 
   String toJson() => json.encode(toMap());

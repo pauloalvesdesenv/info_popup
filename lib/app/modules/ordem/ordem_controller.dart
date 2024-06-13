@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_m
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
@@ -15,6 +16,7 @@ import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_produto_status_bottom.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
+import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -209,7 +211,7 @@ class OrdemController {
     }
   }
 
-  //PEDIDO
+  //ORDEM
   final AppStream<OrdemModel> ordemStream = AppStream<OrdemModel>();
   OrdemModel get ordem => ordemStream.value;
 
@@ -295,6 +297,10 @@ class OrdemController {
       status: status,
       createdAt: DateTime.now(),
     );
+    pedidoCtrl.onAddHistory(
+        data: statusItem,
+        action: PedidoHistoryAction.update,
+        type: PedidoHistoryType.status);
     pedido.statusess.add(statusItem);
     ordemStream.update();
     await FirestoreClient.pedidos.update(pedido);

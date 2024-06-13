@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:js_interop';
 
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -33,27 +34,25 @@ class StepModel {
     required this.isDefault,
   });
 
-  StepModel copyWith({
-    String? id,
-    String? name,
-    Color? color,
-    List<String>? fromStepsIds,
-    List<String>? toStepsIds,
-    List<UsuarioRole>? moveRoles,
-    DateTime? createdAt,
-    int? index,
-    bool? isDefault
-  }) {
+  StepModel copyWith(
+      {String? id,
+      String? name,
+      Color? color,
+      List<String>? fromStepsIds,
+      List<String>? toStepsIds,
+      List<UsuarioRole>? moveRoles,
+      DateTime? createdAt,
+      int? index,
+      bool? isDefault}) {
     return StepModel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      color: color ?? this.color,
-      fromStepsIds: fromStepsIds ?? this.fromStepsIds,
-      moveRoles: moveRoles ?? this.moveRoles,
-      createdAt: createdAt ?? this.createdAt,
-      index: index ?? this.index,
-      isDefault: isDefault ?? this.isDefault
-    );
+        id: id ?? this.id,
+        name: name ?? this.name,
+        color: color ?? this.color,
+        fromStepsIds: fromStepsIds ?? this.fromStepsIds,
+        moveRoles: moveRoles ?? this.moveRoles,
+        createdAt: createdAt ?? this.createdAt,
+        index: index ?? this.index,
+        isDefault: isDefault ?? this.isDefault);
   }
 
   Map<String, dynamic> toMap() {
@@ -69,20 +68,39 @@ class StepModel {
     };
   }
 
-  factory StepModel.fromMap(Map<String, dynamic> map) {
+  Map<String, dynamic> toHistoryMap() {
+    return {
+      'id': id,
+      'name': name,
+      'color': color.value,
+    };
+  }
+
+  factory StepModel.fromMap(Map<String, dynamic> map,
+      {bool isHistory = false}) {
+    if (isHistory) {
+      return StepModel(
+        id: map['id'] ?? '',
+        name: map['name'] ?? '',
+        index: 0,
+        color: Colors.tealAccent,
+        fromStepsIds: <String>[],
+        moveRoles: <UsuarioRole>[],
+        createdAt: DateTime.now(),
+        isDefault: false);
+    }
     return StepModel(
-      id: map['id'] ?? '',
-      name: map['name'] ?? '',
-      index: map['index'] ?? 0,
-      color: Color(map['color']),
-      fromStepsIds: map['fromStepsIds'] != null
-          ? List<String>.from(map['fromStepsIds'])
-          : <String>[],
-      moveRoles: List<UsuarioRole>.from(
-          map['moveRoles']?.map((x) => UsuarioRole.values[x])),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      isDefault: map['isDefault'] ?? false
-    );
+        id: map['id'] ?? '',
+        name: map['name'] ?? '',
+        index: map['index'] ?? 0,
+        color: Color(map['color']),
+        fromStepsIds: map['fromStepsIds'] != null
+            ? List<String>.from(map['fromStepsIds'])
+            : <String>[],
+        moveRoles: List<UsuarioRole>.from(
+            map['moveRoles']?.map((x) => UsuarioRole.values[x])),
+        createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+        isDefault: map['isDefault'] ?? false);
   }
 
   String toJson() => json.encode(toMap());

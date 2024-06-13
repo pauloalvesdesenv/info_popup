@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -21,12 +19,12 @@ class _KanbanPageState extends State<KanbanPage> {
   @override
   void initState() {
     kanbanCtrl.onInit().then((_) {
-      // FirestoreClient.pedidos.dataStream.controller.listen((e) {
-      //   kanbanCtrl.onMount();
-      // });
-      // FirestoreClient.steps.dataStream.controller.listen((e) {
-      //   kanbanCtrl.onMount();
-      // });
+      FirestoreClient.pedidos.dataStream.controller.listen((e) {
+        kanbanCtrl.onMount();
+      });
+      FirestoreClient.steps.dataStream.controller.listen((e) {
+        kanbanCtrl.onMount();
+      });
     });
     super.initState();
   }
@@ -39,9 +37,7 @@ class _KanbanPageState extends State<KanbanPage> {
       body: StreamOut(
         loading: const KanbanBodyShimmerWidget(),
         stream: kanbanCtrl.utilsStream.listen,
-        builder: (context, utils) => Listener(
-          child: KanbanBodyWidget(utils),
-        ),
+        builder: (context, utils) => KanbanBodyWidget(utils),
       ),
     );
   }

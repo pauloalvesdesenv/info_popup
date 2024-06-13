@@ -1,3 +1,4 @@
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
@@ -203,5 +204,12 @@ class PedidoController {
     if (step == null) return;
     if (pedido.steps.last.step == step) return;
     kanbanCtrl.onAccept(step, pedido, 0);
+  }
+
+  void onAddHistory({required dynamic data, required PedidoHistoryAction action, required PedidoHistoryType type}) {
+    pedido.histories.add(
+      PedidoHistoryModel.create(data: data, action: action, type: type),
+    );
+    // FirestoreClient.pedidos.update(pedido);
   }
 }

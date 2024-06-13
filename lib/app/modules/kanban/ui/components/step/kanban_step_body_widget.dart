@@ -45,10 +45,10 @@ class KanbanStepBodyWidget extends StatelessWidget {
               ? const NeverScrollableScrollPhysics()
               : const AlwaysScrollableScrollPhysics(),
           controller: step.scrollController,
+          cacheExtent: 200,
           children: [
             _dragTargetWidget(step, pedidos, 0),
             Builder(builder: (context) {
-              pedidos.sort((a, b) => a.index.compareTo(b.index));
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: SeparatedColumn(

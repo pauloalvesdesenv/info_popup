@@ -40,6 +40,21 @@ extension PedidoStatusExtension on PedidoStatus {
         return Colors.green;
     }
   }
+
+  IconData get icon {
+    switch (this) {
+      case PedidoStatus.produzindoCD:
+        return Icons.build;
+      case PedidoStatus.aguardandoProducaoCD:
+        return Icons.watch_later;
+      case PedidoStatus.aguardandoProducaoCDA:
+        return Icons.watch_later;
+      case PedidoStatus.produzindoCDA:
+        return Icons.build;
+      case PedidoStatus.pronto:
+        return Icons.check;
+    }
+  }
 }
 
 List<PedidoStatus> getPedidosStatusByPedido(PedidoModel pedido) =>

@@ -17,6 +17,10 @@ class PedidoCollection {
   AppStream<List<PedidoModel>> dataStream = AppStream<List<PedidoModel>>();
   List<PedidoModel> get data => dataStream.value;
 
+  AppStream<void> updateStream = AppStream<void>();
+
+  void notifyUpdate() => updateStream.update();
+
   CollectionReference<Map<String, dynamic>> get collection =>
       FirebaseFirestore.instance.collection(name);
 
@@ -93,6 +97,17 @@ class PedidoCollection {
   }
 
   Future<PedidoModel?> update(PedidoModel model) async {
+    try {
+      await collection.doc(model.id).update(model.toMap());
+      return model;
+    } catch (_, __) {
+      log(_.toString());
+      log(__.toString());
+      return null;
+    }
+  }
+
+  Future<PedidoModel?> updateBatch(PedidoModel model) async {
     try {
       await collection.doc(model.id).update(model.toMap());
       return model;

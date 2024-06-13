@@ -17,7 +17,9 @@ class KanbanBlackLensWidget extends StatelessWidget {
       child: !utils.isPedidoSelected
           ? const SizedBox()
           : InkWell(
-              onTap: () => kanbanCtrl.setPedido(null),
+              onTap: () {
+                kanbanCtrl.setPedido(null);
+              },
               child: Container(
                 height: double.maxFinite,
                 width: double.maxFinite,

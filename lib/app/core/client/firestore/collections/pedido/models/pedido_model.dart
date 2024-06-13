@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
@@ -15,6 +16,7 @@ import 'package:aco_plus/app/core/components/archive/archive_model.dart';
 import 'package:aco_plus/app/core/components/checklist/check_item_model.dart';
 import 'package:aco_plus/app/core/components/comment/comment_model.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
+import 'package:flutter/foundation.dart';
 
 class PedidoModel {
   final String id;
@@ -33,7 +35,9 @@ class PedidoModel {
   final List<CheckItemModel> checks;
   final List<CommentModel> comments;
   final List<UsuarioModel> users;
+  final List<PedidoHistoryModel> histories;
   int index;
+  final Key key = UniqueKey();
 
   StepModel get step => steps.last.step;
   PedidoStatus get status => statusess.last.status;
@@ -65,6 +69,7 @@ class PedidoModel {
     required this.comments,
     required this.users,
     required this.index,
+    required this.histories,
     this.archives = const [],
   });
 
@@ -140,6 +145,8 @@ class PedidoModel {
       'checks': checks.map((x) => x.toMap()).toList(),
       'comments': comments.map((x) => x.toMap()).toList(),
       'users': users.map((x) => x.id).toList(),
+      'index': index,
+      'histories': histories.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -180,6 +187,10 @@ class PedidoModel {
       users: List<UsuarioModel>.from(
           map['users']?.map((x) => FirestoreClient.usuarios.getById(x)) ?? []),
       index: map['index'] ?? 0,
+      histories: map['histories'] != null
+          ? List<PedidoHistoryModel>.from(
+              map['histories']?.map((x) => PedidoHistoryModel.fromMap(x)))
+          : [],
     );
   }
 
@@ -188,24 +199,24 @@ class PedidoModel {
   factory PedidoModel.fromJson(String source) =>
       PedidoModel.fromMap(json.decode(source));
 
-  PedidoModel copyWith({
-    String? id,
-    String? localizador,
-    String? descricao,
-    DateTime? createdAt,
-    ClienteModel? cliente,
-    ObraModel? obra,
-    List<PedidoProdutoModel>? produtos,
-    PedidoTipo? tipo,
-    List<PedidoStatusModel>? statusess,
-    DateTime? deliveryAt,
-    List<PedidoStepModel>? steps,
-    List<TagModel>? tags,
-    List<CheckItemModel>? checks,
-    List<CommentModel>? comments,
-    List<UsuarioModel>? users,
-    int? index,
-  }) {
+  PedidoModel copyWith(
+      {String? id,
+      String? localizador,
+      String? descricao,
+      DateTime? createdAt,
+      ClienteModel? cliente,
+      ObraModel? obra,
+      List<PedidoProdutoModel>? produtos,
+      PedidoTipo? tipo,
+      List<PedidoStatusModel>? statusess,
+      DateTime? deliveryAt,
+      List<PedidoStepModel>? steps,
+      List<TagModel>? tags,
+      List<CheckItemModel>? checks,
+      List<CommentModel>? comments,
+      List<UsuarioModel>? users,
+      int? index,
+      List<PedidoHistoryModel>? histories}) {
     return PedidoModel(
       id: id ?? this.id,
       comments: comments ?? this.comments,
@@ -223,6 +234,7 @@ class PedidoModel {
       tags: tags ?? this.tags,
       users: users ?? this.users,
       index: index ?? this.index,
+      histories: histories ?? this.histories,
     );
   }
 
