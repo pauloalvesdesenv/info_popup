@@ -78,7 +78,7 @@ class AppColorsSystem {
       ),
       error: const Color(0xFFdb2a36),
       success: const Color(0xFF31ac47),
-      pending: const Color(0xFFdbc114),
+      pending: Colors.orange,
     );
   }
 

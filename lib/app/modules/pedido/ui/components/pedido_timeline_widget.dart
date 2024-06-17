@@ -74,7 +74,7 @@ class _PedidoTimelineWidgetState extends State<PedidoTimelineWidget> {
                 child: Container(
                   color: Colors.grey[50],
                   width: double.maxFinite,
-                  height: 200,
+                  height: 300,
                   child: Stepper(
                       key:
                           Key((Random().nextDouble() * 200).toStringAsFixed(2)),

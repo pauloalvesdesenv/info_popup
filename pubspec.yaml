@@ -55,6 +55,7 @@ dependencies:
   flutter_mentions: ^2.0.1
   flutter_local_notifications: ^9.7.0
   popover: ^0.3.0+1
+  syncfusion_flutter_charts: ^24.2.7+1
 
 dev_dependencies:
   flutter_test:

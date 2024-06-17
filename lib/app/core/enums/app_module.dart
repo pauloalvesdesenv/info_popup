@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/modules/cliente/ui/clientes_page.dart';
+import 'package:aco_plus/app/modules/dashboard/ui/dashboard_page.dart';
 import 'package:aco_plus/app/modules/kanban/ui/kanban_page.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordens_page.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedidos_page.dart';
@@ -8,6 +9,7 @@ import 'package:aco_plus/app/modules/tag/ui/tags_page.dart';
 import 'package:flutter/material.dart';
 
 enum AppModule {
+  dashboard,
   kanban,
   pedidos,
   cliente,
@@ -20,6 +22,8 @@ enum AppModule {
 extension AppModuleExt on AppModule {
   Widget get widget {
     switch (this) {
+      case AppModule.dashboard:
+        return const DashboardPage();
       case AppModule.cliente:
         return const ClientesPage();
       case AppModule.pedidos:
@@ -39,6 +43,8 @@ extension AppModuleExt on AppModule {
 
   IconData get icon {
     switch (this) {
+      case AppModule.dashboard:
+        return Icons.dashboard_outlined;
       case AppModule.cliente:
         return Icons.group_outlined;
       case AppModule.pedidos:
@@ -58,6 +64,8 @@ extension AppModuleExt on AppModule {
 
   String get label {
     switch (this) {
+      case AppModule.dashboard:
+        return 'Dashboard';
       case AppModule.cliente:
         return 'Clientes';
       case AppModule.pedidos:

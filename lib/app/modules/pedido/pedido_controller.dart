@@ -52,7 +52,7 @@ class PedidoController {
     if (search.length < 3) return pedidos;
     List<PedidoModel> filtered = [];
     for (final pedido in pedidos) {
-      if (pedido.toString().toCompare.contains(search.toCompare)) {
+      if (pedido.localizador.toString().toCompare.contains(search.toCompare)) {
         filtered.add(pedido);
       }
     }
@@ -206,7 +206,10 @@ class PedidoController {
     kanbanCtrl.onAccept(step, pedido, 0);
   }
 
-  void onAddHistory({required dynamic data, required PedidoHistoryAction action, required PedidoHistoryType type}) {
+  void onAddHistory(
+      {required dynamic data,
+      required PedidoHistoryAction action,
+      required PedidoHistoryType type}) {
     pedido.histories.add(
       PedidoHistoryModel.create(data: data, action: action, type: type),
     );

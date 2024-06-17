@@ -108,11 +108,11 @@ class PedidoCreateModel {
       histories: pedido?.histories ??
           [
             PedidoHistoryModel.create(
-                data: pedidoStatusModel.toMap(),
+                data: pedidoStatusModel,
                 type: PedidoHistoryType.status,
                 action: PedidoHistoryAction.create),
             PedidoHistoryModel.create(
-                data: pedidoStepModel.toMap(),
+                data: pedidoStepModel,
                 type: PedidoHistoryType.step,
                 action: PedidoHistoryAction.create)
           ],
