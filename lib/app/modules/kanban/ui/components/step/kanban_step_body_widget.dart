@@ -88,7 +88,7 @@ class KanbanStepBodyWidget extends StatelessWidget {
                   ? EdgeInsets.symmetric(
                       vertical: 8, horizontal: isLast ? 8 : 0)
                   : null,
-              height: isHover || isLast ? 70 : 8,
+              height: isHover || isLast ? 70 : 16,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(8),

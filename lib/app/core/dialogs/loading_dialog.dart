@@ -1,3 +1,4 @@
+import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
@@ -30,6 +31,7 @@ class LoadingDialog extends StatelessWidget {
               valueColor: AlwaysStoppedAnimation(AppColors.primaryMain),
             ),
           ),
+          W(8),
           const Text('Carregando...'),
         ],
       ),

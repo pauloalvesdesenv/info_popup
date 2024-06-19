@@ -117,10 +117,15 @@ class _PedidosPageState extends State<PedidosPage> {
                                 label: 'Ordernar por',
                                 hasFilter: false,
                                 item: utils.sortType,
-                                itens: SortType.values,
+                                itens: const [
+                                  SortType.createdAt,
+                                  SortType.deliveryAt,
+                                  SortType.localizator,
+                                  SortType.client
+                                ],
                                 itemLabel: (e) => e.name,
                                 onSelect: (e) {
-                                  utils.sortType = e ?? SortType.alfabetic;
+                                  utils.sortType = e ?? SortType.localizator;
                                   pedidoCtrl.utilsStream.update();
                                 },
                               ),

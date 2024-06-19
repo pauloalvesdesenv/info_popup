@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 
 class PedidoUtils {
   final TextController search = TextController();
-  SortType sortType = SortType.alfabetic;
+  SortType sortType = SortType.localizator;
   SortOrder sortOrder = SortOrder.asc;
   List<StepModel> steps = [];
   bool showFilter = false;

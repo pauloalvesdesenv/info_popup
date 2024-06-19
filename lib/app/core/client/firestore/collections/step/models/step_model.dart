@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:js_interop';
 
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class StepModel {
@@ -17,6 +15,16 @@ class StepModel {
   int index;
   List<String> fromStepsIds;
   bool isDefault = false;
+  static StepModel notFound = StepModel(
+    createdAt: DateTime.now(),
+    fromStepsIds: [],
+    isDefault: false,
+    moveRoles: [],
+    color: Colors.transparent,
+    id: 'step-not-found',
+    name: 'step-not-found',
+    index: 100000000,
+  );
 
   List<StepModel> get fromSteps =>
       fromStepsIds.map((e) => FirestoreClient.steps.getById(e)).toList();
@@ -80,14 +88,14 @@ class StepModel {
       {bool isHistory = false}) {
     if (isHistory) {
       return StepModel(
-        id: map['id'] ?? '',
-        name: map['name'] ?? '',
-        index: 0,
-        color: Colors.tealAccent,
-        fromStepsIds: <String>[],
-        moveRoles: <UsuarioRole>[],
-        createdAt: DateTime.now(),
-        isDefault: false);
+          id: map['id'] ?? '',
+          name: map['name'] ?? '',
+          index: 0,
+          color: Colors.tealAccent,
+          fromStepsIds: <String>[],
+          moveRoles: <UsuarioRole>[],
+          createdAt: DateTime.now(),
+          isDefault: false);
     }
     return StepModel(
         id: map['id'] ?? '',
@@ -112,49 +120,4 @@ class StepModel {
   String toString() {
     return 'StepModel(id: $id, name: $name, color: $color, fromSteps: $fromSteps, moveRoles: $moveRoles, createdAt: $createdAt)';
   }
-}
-
-class TesteClass {
-  final List<String> fromStepsIds;
-  TesteClass({
-    required this.fromStepsIds,
-  });
-
-  TesteClass copyWith({
-    List<String>? fromStepsIds,
-  }) {
-    return TesteClass(
-      fromStepsIds: fromStepsIds ?? this.fromStepsIds,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'fromStepsIds': fromStepsIds,
-    };
-  }
-
-  factory TesteClass.fromMap(Map<String, dynamic> map) {
-    return TesteClass(
-      fromStepsIds: List<String>.from(map['fromStepsIds']),
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory TesteClass.fromJson(String source) =>
-      TesteClass.fromMap(json.decode(source));
-
-  @override
-  String toString() => 'TesteClass(fromStepsIds: $fromStepsIds)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is TesteClass && listEquals(other.fromStepsIds, fromStepsIds);
-  }
-
-  @override
-  int get hashCode => fromStepsIds.hashCode;
 }

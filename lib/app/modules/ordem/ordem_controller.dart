@@ -8,6 +8,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/dialogs/loading_dialog.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
@@ -116,7 +117,7 @@ class OrdemController {
 
     final result = form.toOrdemModel(null);
     await FirestoreClient.ordens.add(result);
-    await FirestoreClient.pedidos.fetchAllItens();
+    await FirestoreClient.pedidos.fetch();
     Navigator.pop(_);
 
     NotificationService.showPositive(
@@ -135,7 +136,7 @@ class OrdemController {
               : PedidoProdutoStatus.separado,
           createdAt: DateTime.now()));
     }
-    await FirestoreClient.pedidos.fetchAllItens();
+    await FirestoreClient.pedidos.fetch();
     ordem.produtos.removeWhere((e) => e.status.status.index == 0);
     final result = form.toOrdemModel(ordem);
     await FirestoreClient.ordens.update(result);
@@ -157,9 +158,10 @@ class OrdemController {
           id: HashService.get,
           status: PedidoProdutoStatus.separado,
           createdAt: DateTime.now()));
+      await FirestoreClient.pedidos
+          .update(FirestoreClient.pedidos.getById(pedidoProduto.pedidoId));
     }
     ordem.produtos.clear();
-    await FirestoreClient.pedidos.fetchAllItens();
     await FirestoreClient.ordens.delete(ordem);
     pop(_);
     NotificationService.showPositive(
@@ -173,8 +175,9 @@ class OrdemController {
         deleteMessage: 'Todos seus dados da ordem apagados do sistema',
         infoMessage:
             'Para excluir a ordem todos os produtos devem estar em "Aguardando Produção".',
-        conditional: !ordem.produtos.every(
-            (e) => e.status.status == PedidoProdutoStatus.aguardandoProducao),
+        conditional: !ordem.produtos.every((e) =>
+            e.status.status == PedidoProdutoStatus.aguardandoProducao ||
+            e.status.status == PedidoProdutoStatus.separado),
       );
 
   void onValid(OrdemModel? ordem) {
@@ -195,6 +198,11 @@ class OrdemController {
   void onSortPedidos(List<PedidoProdutoModel> pedidos) {
     bool isAsc = form.sortOrder == SortOrder.asc;
     switch (form.sortType) {
+      case SortType.localizator:
+        pedidos.sort((a, b) => isAsc
+            ? a.cliente.nome.compareTo(b.cliente.nome)
+            : b.cliente.nome.compareTo(a.cliente.nome));
+        break;
       case SortType.alfabetic:
         pedidos.sort((a, b) => isAsc
             ? a.cliente.nome.compareTo(b.cliente.nome)
@@ -268,6 +276,7 @@ class OrdemController {
     final produtoStatus = produto.statusess.last.status;
     final status = await showOrdemProdutoStatusBottom(produtoStatus);
     if (produtoStatus == status) return;
+    showLoadingDialog();
     final statusModel = PedidoProdutoStatusModel(
         id: HashService.get, status: status!, createdAt: DateTime.now());
     produto.statusess.add(statusModel);
@@ -281,6 +290,8 @@ class OrdemController {
     await FirestoreClient.pedidos.update(pedido);
     await onSetStatusPedido(produto);
     FirestoreClient.ordens.dataStream.update();
+    await FirestoreClient.ordens.fetch();
+    Navigator.pop(contextGlobal);
   }
 
   Future<void> onSetStatusPedido(PedidoProdutoModel produto) async {

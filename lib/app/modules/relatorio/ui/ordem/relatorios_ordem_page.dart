@@ -62,15 +62,15 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
           children: [
             _filterWidget(model),
             Divisor(color: Colors.grey[700]!, height: 1.5),
-            itemInfo('Total Geral', relatorioCtrl.getOrdemTotal().toKg(),
-                labelStyle: AppCss.mediumBold,
-                valueStyle: AppCss.mediumBold,
-                padding: const EdgeInsets.all(16)),
-            Divisor(
-              color: Colors.grey[700]!,
-            ),
             if (model.type == RelatorioOrdemType.STATUS &&
                 model.relatorio != null) ...[
+              itemInfo('Total Geral', relatorioCtrl.getOrdemTotal().toKg(),
+                  labelStyle: AppCss.mediumBold,
+                  valueStyle: AppCss.mediumBold,
+                  padding: const EdgeInsets.all(16)),
+              Divisor(
+                color: Colors.grey[700]!,
+              ),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(

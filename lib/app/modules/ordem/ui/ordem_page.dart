@@ -137,7 +137,7 @@ class _OrdemPageState extends State<OrdemPage> {
                         Expanded(
                             child: Text('Pronto', style: AppCss.mediumRegular)),
                         Text(
-                          '${ordem.qtdePronto().formatted}Kg (${(ordem.getPrcntgPronto() * 100).percent}%)',
+                          '${ordem.qtdePronto().toKg()} (${(ordem.getPrcntgPronto() * 100).percent}%)',
                         )
                       ],
                     ),

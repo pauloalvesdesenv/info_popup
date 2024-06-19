@@ -4,7 +4,6 @@ import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 
 class StepCollection {
   static final StepCollection _instance = StepCollection._();
@@ -78,18 +77,11 @@ class StepCollection {
     });
   }
 
-  StepModel getById(String id) =>
-      data.firstWhereOrNull((e) => e.id == id) ??
-      StepModel(
-        createdAt: DateTime.now(),
-        fromStepsIds: [],
-        isDefault: false,
-        moveRoles: [],
-        color: Colors.transparent,
-        id: 'step-not-found',
-        name: 'step-not-found',
-        index: 100000000,
-      );
+  StepModel getById(String id) {
+    if (!dataStream.controller.hasValue) return StepModel.notFound;
+    final step = data.firstWhereOrNull((e) => e.id == id);
+    return step ?? StepModel.notFound;
+  }
 
   Future<StepModel?> add(StepModel model) async {
     try {

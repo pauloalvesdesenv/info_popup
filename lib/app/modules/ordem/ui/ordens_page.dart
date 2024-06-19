@@ -68,6 +68,7 @@ class _OrdensPageState extends State<OrdensPage> {
           builder: (_, utils) {
             final ordens =
                 ordemCtrl.getOrdemesFiltered(utils.search.text, __).toList();
+            ordens.sort((a, b) => b.createdAt.compareTo(a.createdAt));
             return Column(
               children: [
                 Padding(
