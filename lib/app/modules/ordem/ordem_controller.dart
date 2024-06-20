@@ -77,11 +77,11 @@ class OrdemController {
     return pedidos;
   }
 
-  List<OrdemModel> getOrdemesFiltered(String search, List<OrdemModel> ordens) {
+  List<OrdemModel> getOrdensFiltered(String search, List<OrdemModel> ordens) {
     if (search.length < 3) return ordens;
     List<OrdemModel> filtered = [];
     for (final ordem in ordens) {
-      if (ordem.toString().toCompare.contains(search.toCompare)) {
+      if (ordem.id.toString().toCompare.contains(search.toCompare)) {
         filtered.add(ordem);
       }
     }

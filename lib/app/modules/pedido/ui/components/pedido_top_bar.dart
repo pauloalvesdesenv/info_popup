@@ -49,6 +49,15 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
               onTap: () async =>
                   push(context, PedidoCreatePage(pedido: pedido)),
               child: Icon(
+                Icons.archive,
+                color: AppColors.white,
+                size: 20,
+              )),
+          const W(12),
+          InkWell(
+              onTap: () async =>
+                  push(context, PedidoCreatePage(pedido: pedido)),
+              child: Icon(
                 Icons.edit,
                 color: AppColors.white,
                 size: 20,
@@ -70,12 +79,15 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: AppColors.primaryMain,
         actions: [
           IconButton(
+              onPressed: () => pedidoCtrl.onArchive(context, pedido),
+              icon: Icon(Icons.archive, color: AppColors.white)),
+          IconButton(
               onPressed: () async =>
                   push(context, PedidoCreatePage(pedido: pedido)),
               icon: Icon(Icons.edit, color: AppColors.white)),
           IconButton(
               onPressed: () async => pedidoCtrl.onDelete(context, pedido),
-              icon: Icon(Icons.delete, color: AppColors.white))
+              icon: Icon(Icons.delete, color: AppColors.white)),
         ],
       );
 }

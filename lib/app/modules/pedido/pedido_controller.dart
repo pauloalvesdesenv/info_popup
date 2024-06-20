@@ -5,6 +5,8 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
+import 'package:aco_plus/app/core/dialogs/loading_dialog.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
@@ -46,7 +48,7 @@ class PedidoController {
         pedido != null ? PedidoCreateModel.edit(pedido) : PedidoCreateModel());
   }
 
-  List<PedidoModel> getPedidoesFiltered(
+  List<PedidoModel> getPedidosFiltered(
       String search, List<PedidoModel> pedidos) {
     pedidos = utils.steps.isEmpty
         ? pedidos
@@ -149,6 +151,13 @@ class PedidoController {
     await FirestoreClient.pedidos.update(pedido);
   }
 
+  void onChangePedidoStep(PedidoModel pedido) async {
+    final step = await showPedidoStepBottom(pedido);
+    if (step == null) return;
+    if (pedido.steps.last.step.id == step.id) return;
+    kanbanCtrl.onAccept(step, pedido, 0);
+  }
+
   Future<void> onVerifyPedidoStatus() async {
     final ordens = FirestoreClient.ordens.data;
     for (var pedido in FirestoreClient.pedidos.data) {
@@ -215,13 +224,6 @@ class PedidoController {
     FirestoreClient.pedidos.update(pedido);
   }
 
-  Future<void> onChangePedidoStep(PedidoModel pedido) async {
-    final step = await showPedidoStepBottom(pedido);
-    if (step == null) return;
-    if (pedido.steps.last.step == step) return;
-    kanbanCtrl.onAccept(step, pedido, 0);
-  }
-
   void onAddHistory(
       {required dynamic data,
       required PedidoHistoryAction action,
@@ -230,5 +232,33 @@ class PedidoController {
       PedidoHistoryModel.create(data: data, action: action, type: type),
     );
     // FirestoreClient.pedidos.update(pedido);
+  }
+
+  Future<void> onArchive(_, PedidoModel pedido) async {
+    if (!await showConfirmDialog('Deseja archivar esse pedidos?',
+        'O pedido ficará disponível na lista de arquivados')) return;
+    showLoadingDialog();
+    pedido.isArchived = !pedido.isArchived;
+    await FirestoreClient.pedidos.update(pedido);
+    await FirestoreClient.pedidos.fetch();
+    Navigator.pop(contextGlobal);
+    Navigator.pop(_);
+    NotificationService.showPositive('Pedido Arquivado!',
+        'Acesse a lista de arquivados para visualizar o pedido',
+        position: NotificationPosition.bottom);
+  }
+
+  Future<void> onUnArchivePedido(_, PedidoModel pedido) async {
+    if (await showConfirmDialog('Deseja desarquivar o pedido?',
+        'O pedido voltará para a lista de pedidos')) {
+      pedido.isArchived = false;
+      showLoadingDialog();
+      await FirestoreClient.pedidos.update(pedido);
+      await FirestoreClient.pedidos.fetch();
+      Navigator.pop(contextGlobal);
+      Navigator.pop(_);
+      NotificationService.showPositive('Pedido Desarquivado!',
+          'Acesse a lista de pedidos para visualizar o pedido');
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
@@ -7,6 +8,10 @@ import 'package:aco_plus/app/core/models/text_controller.dart';
 
 class OrdemUtils {
   final TextController search = TextController();
+  List<PedidoProdutoStatus> status = [
+    PedidoProdutoStatus.aguardandoProducao,
+    PedidoProdutoStatus.produzindo
+  ];
 }
 
 class OrdemCreateModel {

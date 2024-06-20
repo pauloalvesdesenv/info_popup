@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
+import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:flutter/material.dart';
 
 class PedidoStepsWidget extends StatelessWidget {
@@ -24,13 +25,16 @@ class PedidoStepsWidget extends StatelessWidget {
               child: const Icon(Icons.swipe_left_alt_sharp),
             ),
           const W(8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-            decoration: BoxDecoration(
-                color: pedido.step.color.withOpacity(0.4),
-                borderRadius: BorderRadius.circular(4)),
-            child:
-                Text(pedido.step.name, style: AppCss.mediumRegular.setSize(12)),
+          InkWell(
+            onTap: () => pedidoCtrl.onChangePedidoStep(pedido),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              decoration: BoxDecoration(
+                  color: pedido.step.color.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(4)),
+              child: Text(pedido.step.name,
+                  style: AppCss.mediumRegular.setSize(12)),
+            ),
           )
         ],
       ),

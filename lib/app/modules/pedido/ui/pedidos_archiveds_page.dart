@@ -1,9 +1,7 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_drop_down_list.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
@@ -18,24 +16,18 @@ import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
-import 'package:aco_plus/app/core/utils/global_resource.dart';
-import 'package:aco_plus/app/modules/base/base_controller.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
-import 'package:aco_plus/app/modules/pedido/ui/pedido_create_page.dart';
-import 'package:aco_plus/app/modules/pedido/ui/pedido_page.dart';
-import 'package:aco_plus/app/modules/pedido/ui/pedidos_archiveds_page.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
-import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 
-class PedidosPage extends StatefulWidget {
-  const PedidosPage({super.key});
+class PedidosArchivedsPage extends StatefulWidget {
+  const PedidosArchivedsPage({super.key});
 
   @override
-  State<PedidosPage> createState() => _PedidosPageState();
+  State<PedidosArchivedsPage> createState() => _PedidoArchivedsPageState();
 }
 
-class _PedidosPageState extends State<PedidosPage> {
+class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
   @override
   void initState() {
     pedidoCtrl.onInit();
@@ -45,25 +37,15 @@ class _PedidosPageState extends State<PedidosPage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      drawer: const AppDrawer(),
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => baseCtrl.key.currentState!.openDrawer(),
-          icon: Icon(
-            Icons.menu,
-            color: AppColors.white,
-          ),
-        ),
-        title:
-            Text('Pedidos', style: AppCss.largeBold.setColor(AppColors.white)),
+        title: Text('Pedidos Arquivados',
+            style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          IconButton(
-              onPressed: () => push(context, const PedidosArchivedsPage()),
-              icon: const Icon(Icons.archive_outlined)),
           IconButton(
               onPressed: () {
                 setState(() {
-                  pedidoCtrl.utils.showFilter = !pedidoCtrl.utils.showFilter;
+                  pedidoCtrl.utils.showFilterArchived =
+                      !pedidoCtrl.utils.showFilterArchived;
                   pedidoCtrl.utilsStream.update();
                 });
               },
@@ -71,13 +53,6 @@ class _PedidosPageState extends State<PedidosPage> {
                 Icons.sort,
                 color: AppColors.white,
               )),
-          if (usuario.permission.pedido.contains(UserPermissionType.create))
-            IconButton(
-                onPressed: () => push(context, const PedidoCreatePage()),
-                icon: Icon(
-                  Icons.add,
-                  color: AppColors.white,
-                ))
         ],
         backgroundColor: AppColors.primaryMain,
       ),
@@ -86,14 +61,14 @@ class _PedidosPageState extends State<PedidosPage> {
         builder: (_, pedidos) => StreamOut<PedidoUtils>(
           stream: pedidoCtrl.utilsStream.listen,
           builder: (_, utils) {
-            pedidos = pedidos.where((e) => !e.isArchived).toList();
+            pedidos = pedidos.where((e) => e.isArchived).toList();
             pedidos = pedidoCtrl
-                .getPedidosFiltered(utils.search.text, pedidos)
+                .getPedidosFiltered(utils.searchArchived.text, pedidos)
                 .toList();
             pedidoCtrl.onSortPedidos(pedidos);
             return Column(
               children: [
-                if (utils.showFilter)
+                if (utils.showFilterArchived)
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -157,7 +132,8 @@ class _PedidosPageState extends State<PedidosPage> {
                   ),
                 Expanded(
                   child: pedidos.isEmpty
-                      ? const EmptyData()
+                      ? const SizedBox(
+                          width: double.maxFinite, child: EmptyData())
                       : RefreshIndicator(
                           onRefresh: () async =>
                               await FirestoreClient.pedidos.fetch(),
@@ -178,89 +154,93 @@ class _PedidosPageState extends State<PedidosPage> {
   }
 
   Widget _itemPedidoWidget(PedidoModel pedido) {
-    return InkWell(
-      onTap: () =>
-          push(PedidoPage(pedido: pedido, reason: PedidoInitReason.page)),
-      child: Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.neutralLight,
-                ),
-              ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        pedido.localizador,
-                        style: AppCss.mediumBold,
-                      ),
-                      Text(
-                        '${pedido.cliente.nome} - ${pedido.obra.descricao}',
-                      ),
-                      Text(
-                        pedido.produtos
-                            .map((e) =>
-                                '${'${e.produto.descricao} - ${e.qtde}'}Kg')
-                            .join(', '),
-                        style: AppCss.minimumRegular
-                            .setSize(11)
-                            .setColor(AppColors.black),
-                      ),
-                      if (pedido.deliveryAt != null)
-                        Text(
-                          'Previsão de Entrega: ${pedido.deliveryAt.text()}',
-                          style: AppCss.minimumRegular
-                              .setSize(13)
-                              .setColor(AppColors.neutralDark)
-                              .copyWith(fontWeight: FontWeight.bold),
-                        ),
-                    ],
+    return Container(
+      color: Colors.grey.withOpacity(0.1),
+      child: InkWell(
+        onTap: () => pedidoCtrl.onUnArchivePedido(context, pedido),
+        child: Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppColors.neutralLight,
                   ),
                 ),
-                const W(8),
-                _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
-                    pedido.getPrcntgAguardandoProducao()),
-                const W(16),
-                _progressChartWidget(PedidoProdutoStatus.produzindo,
-                    pedido.getPrcntgProduzindo()),
-                const W(16),
-                _progressChartWidget(
-                    PedidoProdutoStatus.pronto, pedido.getPrcntgPronto()),
-                const W(16),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 14,
-                  color: AppColors.neutralMedium,
-                ),
-              ],
-            ),
-          ),
-          if (pedido.steps.isNotEmpty)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                margin: const EdgeInsets.all(0.5),
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                decoration: BoxDecoration(
-                  color: pedido.step.color.withOpacity(0.15),
-                ),
-                child: Text(
-                  pedido.steps.last.step.name,
-                  style:
-                      AppCss.minimumBold.setSize(9).setColor(Colors.grey[800]!),
-                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          pedido.localizador,
+                          style: AppCss.mediumBold,
+                        ),
+                        Text(
+                          '${pedido.cliente.nome} - ${pedido.obra.descricao}',
+                        ),
+                        Text(
+                          pedido.produtos
+                              .map((e) =>
+                                  '${'${e.produto.descricao} - ${e.qtde}'}Kg')
+                              .join(', '),
+                          style: AppCss.minimumRegular
+                              .setSize(11)
+                              .setColor(AppColors.black),
+                        ),
+                        if (pedido.deliveryAt != null)
+                          Text(
+                            'Previsão de Entrega: ${pedido.deliveryAt.text()}',
+                            style: AppCss.minimumRegular
+                                .setSize(13)
+                                .setColor(AppColors.neutralDark)
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const W(8),
+                  _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
+                      pedido.getPrcntgAguardandoProducao()),
+                  const W(16),
+                  _progressChartWidget(PedidoProdutoStatus.produzindo,
+                      pedido.getPrcntgProduzindo()),
+                  const W(16),
+                  _progressChartWidget(
+                      PedidoProdutoStatus.pronto, pedido.getPrcntgPronto()),
+                  const W(16),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: AppColors.neutralMedium,
+                  ),
+                ],
               ),
             ),
-        ],
+            if (pedido.steps.isNotEmpty)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  margin: const EdgeInsets.all(0.5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: pedido.step.color.withOpacity(0.15),
+                  ),
+                  child: Text(
+                    pedido.steps.last.step.name,
+                    style: AppCss.minimumBold
+                        .setSize(9)
+                        .setColor(Colors.grey[800]!),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

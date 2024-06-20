@@ -46,7 +46,7 @@ class StepController {
   }
 
   Map<StepModel, List<PedidoModel>> mountKanban() {
-    final pedidos = FirestoreClient.pedidos.data.toList();
+    final pedidos = FirestoreClient.pedidos.data.where((e) => !e.isArchived).toList();
     final kanban = <StepModel, List<PedidoModel>>{};
     for (StepModel step in FirestoreClient.steps.data.toList()) {
       final pedidosStep = pedidos.where((e) => e.step.id == step.id).toList();
@@ -68,7 +68,7 @@ class StepController {
   Map<String, List<PedidoModel>> _mountCalendar() {
     final calendar = <String, List<PedidoModel>>{};
     final keys = FirestoreClient.pedidos.data
-        .where((e) => e.deliveryAt != null)
+        .where((e) => e.deliveryAt != null && !e.isArchived)
         .map((e) => e.deliveryAt!)
         .toSet();
     for (DateTime key in keys) {

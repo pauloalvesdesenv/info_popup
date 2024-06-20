@@ -3,10 +3,12 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
+import 'package:aco_plus/app/core/components/app_drop_down_list.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/empty_data.dart';
+import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
@@ -66,18 +68,41 @@ class _OrdensPageState extends State<OrdensPage> {
         builder: (_, __) => StreamOut<OrdemUtils>(
           stream: ordemCtrl.utilsStream.listen,
           builder: (_, utils) {
-            final ordens =
-                ordemCtrl.getOrdemesFiltered(utils.search.text, __).toList();
+            List<OrdemModel> ordens =
+                ordemCtrl.getOrdensFiltered(utils.search.text, __).toList();
             ordens.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+            if (utils.status.isNotEmpty) {
+              ordens =
+                  ordens.where((e) => utils.status.contains(e.status)).toList();
+            }
             return Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: AppField(
-                    hint: 'Pesquisar',
-                    controller: utils.search,
-                    suffixIcon: Icons.search,
-                    onChanged: (_) => ordemCtrl.utilsStream.update(),
+                  child: Column(
+                    children: [
+                      AppField(
+                        hint: 'Pesquisar',
+                        controller: utils.search,
+                        suffixIcon: Icons.search,
+                        onChanged: (_) => ordemCtrl.utilsStream.update(),
+                      ),
+                      const H(16),
+                      AppDropDownList<PedidoProdutoStatus>(
+                        label: 'Ordernar por',
+                        addeds: utils.status,
+                        itens: const [
+                          PedidoProdutoStatus.aguardandoProducao,
+                          PedidoProdutoStatus.produzindo,
+                          PedidoProdutoStatus.pronto
+                        ],
+                        itemLabel: (e) => e.label,
+                        itemColor: (e) => e.color,
+                        onChanged: () {
+                          ordemCtrl.utilsStream.update();
+                        },
+                      )
+                    ],
                   ),
                 ),
                 Expanded(

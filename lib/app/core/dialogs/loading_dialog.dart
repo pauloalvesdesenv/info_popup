@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 Future<bool> showLoadingDialog() async =>
     await showDialog<bool>(
+      barrierDismissible: true,
       context: contextGlobal,
       builder: (_) => const LoadingDialog(),
     ) ??
@@ -31,8 +32,8 @@ class LoadingDialog extends StatelessWidget {
               valueColor: AlwaysStoppedAnimation(AppColors.primaryMain),
             ),
           ),
-          W(8),
-          const Text('Carregando...'),
+          const W(8),
+          Text('Carregando...', style: AppCss.mediumRegular),
         ],
       ),
     );

@@ -39,6 +39,7 @@ class PedidoModel {
   final List<PedidoHistoryModel> histories;
   int index;
   final Key key = UniqueKey();
+  bool isArchived = false;
 
   StepModel get step => steps.last.step;
   PedidoStatus get status => statusess.last.status;
@@ -71,6 +72,7 @@ class PedidoModel {
     required this.users,
     required this.index,
     required this.histories,
+    required this.isArchived,
     this.archives = const [],
   });
 
@@ -148,6 +150,7 @@ class PedidoModel {
       'users': users.map((x) => x.id).toList(),
       'index': index,
       'histories': histories.map((x) => x.toMap()).toList(),
+      'isArchived': isArchived,
     };
   }
 
@@ -194,6 +197,7 @@ class PedidoModel {
             ? List<PedidoHistoryModel>.from(
                 map['histories']?.map((x) => PedidoHistoryModel.fromMap(x)))
             : [],
+        isArchived: map['isArchived'] ?? false,
       );
     } catch (e) {
       log('Erro ao realizar conversão de pedido');
@@ -206,24 +210,26 @@ class PedidoModel {
   factory PedidoModel.fromJson(String source) =>
       PedidoModel.fromMap(json.decode(source));
 
-  PedidoModel copyWith(
-      {String? id,
-      String? localizador,
-      String? descricao,
-      DateTime? createdAt,
-      ClienteModel? cliente,
-      ObraModel? obra,
-      List<PedidoProdutoModel>? produtos,
-      PedidoTipo? tipo,
-      List<PedidoStatusModel>? statusess,
-      DateTime? deliveryAt,
-      List<PedidoStepModel>? steps,
-      List<TagModel>? tags,
-      List<CheckItemModel>? checks,
-      List<CommentModel>? comments,
-      List<UsuarioModel>? users,
-      int? index,
-      List<PedidoHistoryModel>? histories}) {
+  PedidoModel copyWith({
+    String? id,
+    String? localizador,
+    String? descricao,
+    DateTime? createdAt,
+    ClienteModel? cliente,
+    ObraModel? obra,
+    List<PedidoProdutoModel>? produtos,
+    PedidoTipo? tipo,
+    List<PedidoStatusModel>? statusess,
+    DateTime? deliveryAt,
+    List<PedidoStepModel>? steps,
+    List<TagModel>? tags,
+    List<CheckItemModel>? checks,
+    List<CommentModel>? comments,
+    List<UsuarioModel>? users,
+    int? index,
+    List<PedidoHistoryModel>? histories,
+    bool? isArchived,
+  }) {
     return PedidoModel(
       id: id ?? this.id,
       comments: comments ?? this.comments,
@@ -242,6 +248,7 @@ class PedidoModel {
       users: users ?? this.users,
       index: index ?? this.index,
       histories: histories ?? this.histories,
+      isArchived: isArchived ?? this.isArchived,
     );
   }
 

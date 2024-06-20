@@ -69,6 +69,16 @@ class OrdemModel {
     return pronto / total;
   }
 
+  PedidoProdutoStatus get status {
+    if (qtdePronto() == quantideTotal()) {
+      return PedidoProdutoStatus.pronto;
+    } else if (qtdeProduzindo() > 0) {
+      return PedidoProdutoStatus.produzindo;
+    } else {
+      return PedidoProdutoStatus.aguardandoProducao;
+    }
+  }
+
   OrdemModel({
     required this.id,
     required this.createdAt,
