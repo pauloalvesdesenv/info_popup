@@ -1,8 +1,8 @@
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UsuarioCollection {
   static final UsuarioCollection _instance = UsuarioCollection._();
@@ -29,7 +29,8 @@ class UsuarioCollection {
     if (_isStarted && lock) return;
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
-    final countries = data.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
+    final countries =
+        data.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
     countries.sort((a, b) => a.nome.compareTo(b.nome));
     dataStream.add(countries);
   }
@@ -69,34 +70,30 @@ class UsuarioCollection {
             : collection)
         .snapshots()
         .listen((e) {
-      final countries = e.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
-      countries.sort((a, b) => a.nome.compareTo(b.nome));
-      dataStream.add(countries);
+      final data =
+          e.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
+      data.sort((a, b) => a.nome.compareTo(b.nome));
+      dataStream.add(data);
     });
   }
 
-  UsuarioModel getById(String id) => data.singleWhere((e) => e.id == id);
-
-  Future<UsuarioModel?> add(UsuarioModel model) async {
+  UsuarioModel getById(String id) {
     try {
-      await collection.doc(model.id).set(model.toMap());
-      return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
+      return data.singleWhere((e) => e.id == id);
+    } catch (e) {
+      log('erro ao pegar id = $id');
+      rethrow;
     }
   }
 
+  Future<UsuarioModel?> add(UsuarioModel model) async {
+    await collection.doc(model.id).set(model.toMap());
+    return model;
+  }
+
   Future<UsuarioModel?> update(UsuarioModel model) async {
-    try {
-      await collection.doc(model.id).update(model.toMap());
-      return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
+    await collection.doc(model.id).update(model.toMap());
+    return model;
   }
 
   Future<void> delete(UsuarioModel model) async {

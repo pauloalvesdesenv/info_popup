@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/tag/models/tag_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
@@ -82,25 +81,13 @@ class TagCollection {
   TagModel getById(String id) => data.singleWhere((e) => e.id == id);
 
   Future<TagModel?> add(TagModel model) async {
-    try {
-      await collection.doc(model.id).set(model.toMap());
+    await collection.doc(model.id).set(model.toMap());
       return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
   }
 
   Future<TagModel?> update(TagModel model) async {
-    try {
-      await collection.doc(model.id).update(model.toMap());
+    await collection.doc(model.id).update(model.toMap());
       return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
   }
 
   Future<void> delete(TagModel model) async {

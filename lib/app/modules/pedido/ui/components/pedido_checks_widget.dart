@@ -21,7 +21,6 @@ class PedidoChecksWidget extends StatelessWidget {
             pedido: pedido,
             items: pedido.checks,
             onChanged: () {
-
               pedidoCtrl.updatePedidoFirestore();
             },
           ),

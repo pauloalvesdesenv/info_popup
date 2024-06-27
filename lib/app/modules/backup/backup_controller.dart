@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
@@ -71,28 +70,23 @@ class BackupController {
   }
 
   Future<void> onRestoreBackup() async {
-    try {
-      final file = await FilePicker.platform.pickFiles();
-      if (file == null) return;
+    final file = await FilePicker.platform.pickFiles();
+    if (file == null) return;
 
-      final backup = json.decode(utf8.decode(file.files.first.bytes!));
-      await onRestoreCollection(
-          FirestoreClient.usuarios.collection, backup['usuarios']);
-      await onRestoreCollection(
-          FirestoreClient.clientes.collection, backup['clientes']);
-      await onRestoreCollection(
-          FirestoreClient.produtos.collection, backup['produtos']);
-      await onRestoreCollection(
-          FirestoreClient.steps.collection, backup['steps']);
-      await onRestoreCollection(
-          FirestoreClient.tags.collection, backup['tags']);
-      await onRestoreCollection(
-          FirestoreClient.pedidos.collection, backup['pedidos']);
-      await onRestoreCollection(
-          FirestoreClient.ordens.collection, backup['ordens']);
-    } catch (e) {
-      log(e.toString());
-    }
+    final backup = json.decode(utf8.decode(file.files.first.bytes!));
+    await onRestoreCollection(
+        FirestoreClient.usuarios.collection, backup['usuarios']);
+    await onRestoreCollection(
+        FirestoreClient.clientes.collection, backup['clientes']);
+    await onRestoreCollection(
+        FirestoreClient.produtos.collection, backup['produtos']);
+    await onRestoreCollection(
+        FirestoreClient.steps.collection, backup['steps']);
+    await onRestoreCollection(FirestoreClient.tags.collection, backup['tags']);
+    await onRestoreCollection(
+        FirestoreClient.pedidos.collection, backup['pedidos']);
+    await onRestoreCollection(
+        FirestoreClient.ordens.collection, backup['ordens']);
   }
 
   Future<void> onRestoreCollection(

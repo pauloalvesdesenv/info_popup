@@ -54,6 +54,7 @@ class CommentsWidget extends StatelessWidget {
                   ),
                 );
                 pedidoCtrl.onAddHistory(
+                  pedido: pedidoCtrl.pedido,
                   data: items.last,
                   type: PedidoHistoryType.comment,
                   action: PedidoHistoryAction.create,

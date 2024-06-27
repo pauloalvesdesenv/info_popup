@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
@@ -80,25 +79,13 @@ class OrdemCollection {
   OrdemModel getById(String id) => data.singleWhere((e) => e.id == id);
 
   Future<OrdemModel?> add(OrdemModel model) async {
-    try {
-      await collection.doc(model.id).set(model.toMap());
+    await collection.doc(model.id).set(model.toMap());
       return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
   }
 
   Future<OrdemModel?> update(OrdemModel model) async {
-    try {
-      await collection.doc(model.id).update(model.toMap());
+    await collection.doc(model.id).update(model.toMap());
       return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
   }
 
   Future<void> delete(OrdemModel model) async {

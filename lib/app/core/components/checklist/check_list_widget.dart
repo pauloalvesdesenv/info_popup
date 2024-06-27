@@ -85,6 +85,7 @@ class _CheckListWidgetState extends State<CheckListWidget> {
           item.isCheck = !item.isCheck;
           if (widget.pedido != null) {
             pedidoCtrl.onAddHistory(
+              pedido:  pedidoCtrl.pedido,
               data: item,
               type: PedidoHistoryType.check,
               action: PedidoHistoryAction.update,
@@ -133,6 +134,7 @@ class _CheckListWidgetState extends State<CheckListWidget> {
                     widget.items.remove(item);
                     if (widget.pedido != null) {
                       pedidoCtrl.onAddHistory(
+              pedido:  pedidoCtrl.pedido,
                         data: item,
                         type: PedidoHistoryType.check,
                         action: PedidoHistoryAction.delete,
@@ -209,6 +211,7 @@ class _CheckListWidgetState extends State<CheckListWidget> {
       widget.items.add(item);
       _titleEC.controller.clear();
       pedidoCtrl.onAddHistory(
+              pedido:  pedidoCtrl.pedido,
         data: item,
         type: PedidoHistoryType.check,
         action: PedidoHistoryAction.create,

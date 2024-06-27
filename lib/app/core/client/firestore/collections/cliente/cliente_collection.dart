@@ -1,8 +1,6 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ClienteCollection {
   static final ClienteCollection _instance = ClienteCollection._();
@@ -29,7 +27,8 @@ class ClienteCollection {
     if (_isStarted && lock) return;
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
-    final countries = data.docs.map((e) => ClienteModel.fromMap(e.data())).toList();
+    final countries =
+        data.docs.map((e) => ClienteModel.fromMap(e.data())).toList();
     countries.sort((a, b) => a.nome.compareTo(b.nome));
     dataStream.add(countries);
   }
@@ -69,7 +68,8 @@ class ClienteCollection {
             : collection)
         .snapshots()
         .listen((e) {
-      final countries = e.docs.map((e) => ClienteModel.fromMap(e.data())).toList();
+      final countries =
+          e.docs.map((e) => ClienteModel.fromMap(e.data())).toList();
       countries.sort((a, b) => a.nome.compareTo(b.nome));
       dataStream.add(countries);
     });
@@ -78,25 +78,13 @@ class ClienteCollection {
   ClienteModel getById(String id) => data.singleWhere((e) => e.id == id);
 
   Future<ClienteModel?> add(ClienteModel model) async {
-    try {
-      await collection.doc(model.id).set(model.toMap());
-      return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
+    await collection.doc(model.id).set(model.toMap());
+    return model;
   }
 
   Future<ClienteModel?> update(ClienteModel model) async {
-    try {
-      await collection.doc(model.id).update(model.toMap());
-      return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
+    await collection.doc(model.id).update(model.toMap());
+    return model;
   }
 
   Future<void> delete(ClienteModel model) async {

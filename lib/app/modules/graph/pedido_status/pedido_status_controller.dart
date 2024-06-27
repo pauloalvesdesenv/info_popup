@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
@@ -28,8 +27,7 @@ class PedidoStatusController {
   SfCircularChart getCartesianChart(
     PedidoStatusGraphModel filter,
   ) {
-    try {
-      List<PedidoModel> pedidos = FirestoreClient.pedidos.data
+    List<PedidoModel> pedidos = FirestoreClient.pedidos.data
           .map((e) => e.copyWith(
               produtos: e.produtos.map((e) => e.copyWith()).toList()))
           .toList();
@@ -83,9 +81,5 @@ class PedidoStatusController {
           ),
         ],
       );
-    } catch (e) {
-      log(e.toString());
-      rethrow;
-    }
   }
 }

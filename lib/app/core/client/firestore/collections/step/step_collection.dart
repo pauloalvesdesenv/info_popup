@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
@@ -84,25 +83,13 @@ class StepCollection {
   }
 
   Future<StepModel?> add(StepModel model) async {
-    try {
-      await collection.doc(model.id).set(model.toMap());
-      return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
+    await collection.doc(model.id).set(model.toMap());
+    return model;
   }
 
   Future<StepModel?> update(StepModel model) async {
-    try {
-      await collection.doc(model.id).update(model.toMap());
+    await collection.doc(model.id).update(model.toMap());
       return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
   }
 
   Future<void> delete(StepModel model) async {

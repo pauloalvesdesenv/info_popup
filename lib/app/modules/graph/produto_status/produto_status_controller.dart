@@ -80,7 +80,6 @@
 //         ],
 //       );
 //     } catch (e) {
-//       log(e.toString());
 //       rethrow;
 //     }
 //   }

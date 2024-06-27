@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -86,36 +84,18 @@ class PedidoCollection {
       getById(pedidoId).produtos.firstWhere((e) => e.id == produtoId);
 
   Future<PedidoModel?> add(PedidoModel model) async {
-    try {
-      await collection.doc(model.id).set(model.toMap());
-      return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
+    await collection.doc(model.id).set(model.toMap());
+    return model;
   }
 
   Future<PedidoModel?> update(PedidoModel model) async {
-    try {
-      await collection.doc(model.id).update(model.toMap());
-      return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
+    await collection.doc(model.id).update(model.toMap());
+    return model;
   }
 
   Future<PedidoModel?> updateBatch(PedidoModel model) async {
-    try {
-      await collection.doc(model.id).update(model.toMap());
-      return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
+    await collection.doc(model.id).update(model.toMap());
+    return model;
   }
 
   Future<void> delete(PedidoModel model) async {

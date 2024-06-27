@@ -10,7 +10,7 @@ class EnderecoModel {
   String bairro = '';
   String localidade = '';
   String estado = '';
-  String numero = '';
+String numero = '';
   String complemento = '';
   double lat = 0.0;
   double lon = 0.0;

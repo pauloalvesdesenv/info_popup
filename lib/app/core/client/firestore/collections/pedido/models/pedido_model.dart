@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
@@ -155,54 +154,48 @@ class PedidoModel {
   }
 
   factory PedidoModel.fromMap(Map<String, dynamic> map) {
-    try {
-      return PedidoModel(
-        localizador: map['localizador'] ?? '',
-        descricao: map['descricao'] ?? '',
-        id: map['id'] ?? '',
-        createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-        deliveryAt: map['deliveryAt'] != null
-            ? DateTime.fromMillisecondsSinceEpoch(map['deliveryAt'])
-            : null,
-        cliente: ClienteModel.fromMap(map['cliente']),
-        obra: ObraModel.fromMap(map['obra']),
-        tipo: PedidoTipo.values[map['tipo']],
-        statusess: List<PedidoStatusModel>.from(
-            map['status']?.map((x) => PedidoStatusModel.fromMap(x)) ?? []),
-        produtos: List<PedidoProdutoModel>.from(
-            map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x)) ?? []),
-        archives: List<ArchiveModel>.from(
-            map['archives']?.map((x) => ArchiveModel.fromMap(x)) ?? []),
-        checks: List<CheckItemModel>.from(
-            map['checks']?.map((x) => CheckItemModel.fromMap(x)) ?? []),
-        comments: List<CommentModel>.from(
-            map['comments']?.map((x) => CommentModel.fromMap(x)) ?? []),
-        steps: map['steps'] != null && map['steps'].isNotEmpty
-            ? List<PedidoStepModel>.from(
-                map['steps']?.map((x) => PedidoStepModel.fromMap(x)))
-            : [
-                PedidoStepModel(
-                    id: HashService.get,
-                    step: FirestoreClient.steps.data.first,
-                    createdAt: DateTime.now()),
-              ],
-        tags: map['tags'] != null
-            ? List<TagModel>.from(map['tags']?.map((x) => TagModel.fromMap(x)))
-            : [],
-        users: List<UsuarioModel>.from(
-            map['users']?.map((x) => FirestoreClient.usuarios.getById(x)) ??
-                []),
-        index: map['index'] ?? 0,
-        histories: map['histories'] != null
-            ? List<PedidoHistoryModel>.from(
-                map['histories']?.map((x) => PedidoHistoryModel.fromMap(x)))
-            : [],
-        isArchived: map['isArchived'] ?? false,
-      );
-    } catch (e) {
-      log('Erro ao realizar conversão de pedido');
-      rethrow;
-    }
+    return PedidoModel(
+      localizador: map['localizador'] ?? '',
+      descricao: map['descricao'] ?? '',
+      id: map['id'] ?? '',
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      deliveryAt: map['deliveryAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['deliveryAt'])
+          : null,
+      cliente: ClienteModel.fromMap(map['cliente']),
+      obra: ObraModel.fromMap(map['obra']),
+      tipo: PedidoTipo.values[map['tipo']],
+      statusess: List<PedidoStatusModel>.from(
+          map['status']?.map((x) => PedidoStatusModel.fromMap(x)) ?? []),
+      produtos: List<PedidoProdutoModel>.from(
+          map['produtos']?.map((x) => PedidoProdutoModel.fromMap(x)) ?? []),
+      archives: List<ArchiveModel>.from(
+          map['archives']?.map((x) => ArchiveModel.fromMap(x)) ?? []),
+      checks: List<CheckItemModel>.from(
+          map['checks']?.map((x) => CheckItemModel.fromMap(x)) ?? []),
+      comments: List<CommentModel>.from(
+          map['comments']?.map((x) => CommentModel.fromMap(x)) ?? []),
+      steps: map['steps'] != null && map['steps'].isNotEmpty
+          ? List<PedidoStepModel>.from(
+              map['steps']?.map((x) => PedidoStepModel.fromMap(x)))
+          : [
+              PedidoStepModel(
+                  id: HashService.get,
+                  step: FirestoreClient.steps.data.first,
+                  createdAt: DateTime.now()),
+            ],
+      tags: map['tags'] != null
+          ? List<TagModel>.from(map['tags']?.map((x) => TagModel.fromMap(x)))
+          : [],
+      users: List<UsuarioModel>.from(
+          map['users']?.map((x) => FirestoreClient.usuarios.getById(x)) ?? []),
+      index: map['index'] ?? 0,
+      histories: map['histories'] != null
+          ? List<PedidoHistoryModel>.from(
+              map['histories']?.map((x) => PedidoHistoryModel.fromMap(x)))
+          : [],
+      isArchived: map['isArchived'] ?? false,
+    );
   }
 
   String toJson() => json.encode(toMap());

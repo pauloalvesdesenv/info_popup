@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/client/http/fcm/fcm_provider.dart';
 import 'package:aco_plus/app/core/models/service_model.dart';
@@ -13,20 +11,15 @@ import 'package:flutter/services.dart';
 class FirebaseService implements Service {
   @override
   Future<void> initialize() async {
-    try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-      await FirestoreClient.init();
-      initFirebaseMessaging().then((e) {
-        if (usuarioCtrl.usuarioStream.value != null) {
-          FCMProvider.putToken();
-        }
-      });
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-    }
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await FirestoreClient.init();
+    initFirebaseMessaging().then((e) {
+      if (usuarioCtrl.usuarioStream.value != null) {
+        FCMProvider.putToken();
+      }
+    });
   }
 
   static Future<String> uploadFile({

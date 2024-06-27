@@ -61,6 +61,7 @@ class CommentWidget extends StatelessWidget {
                           'Não será possível desfazer essa ação.')) {
                         onRemove.call(comment);
                         pedidoCtrl.onAddHistory(
+              pedido:  pedidoCtrl.pedido,
                           data: comment,
                           type: PedidoHistoryType.comment,
                           action: PedidoHistoryAction.delete,

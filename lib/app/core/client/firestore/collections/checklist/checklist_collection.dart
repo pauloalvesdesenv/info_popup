@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/checklist/models/checklist_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
@@ -12,7 +11,8 @@ class ChecklistCollection {
   factory ChecklistCollection() => _instance;
   String name = 'checklist';
 
-  AppStream<List<ChecklistModel>> dataStream = AppStream<List<ChecklistModel>>();
+  AppStream<List<ChecklistModel>> dataStream =
+      AppStream<List<ChecklistModel>>();
   List<ChecklistModel> get data => dataStream.value;
 
   CollectionReference<Map<String, dynamic>> get collection =>
@@ -70,7 +70,8 @@ class ChecklistCollection {
             : collection)
         .snapshots()
         .listen((e) {
-      final countries = e.docs.map((e) => ChecklistModel.fromMap(e.data())).toList();
+      final countries =
+          e.docs.map((e) => ChecklistModel.fromMap(e.data())).toList();
       countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
       dataStream.add(countries);
     });
@@ -79,25 +80,13 @@ class ChecklistCollection {
   ChecklistModel getById(String id) => data.singleWhere((e) => e.id == id);
 
   Future<ChecklistModel?> add(ChecklistModel model) async {
-    try {
-      await collection.doc(model.id).set(model.toMap());
-      return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
+    await collection.doc(model.id).set(model.toMap());
+    return model;
   }
 
   Future<ChecklistModel?> update(ChecklistModel model) async {
-    try {
-      await collection.doc(model.id).update(model.toMap());
+    await collection.doc(model.id).update(model.toMap());
       return model;
-    } catch (_, __) {
-      log(_.toString());
-      log(__.toString());
-      return null;
-    }
   }
 
   Future<void> delete(ChecklistModel model) async {

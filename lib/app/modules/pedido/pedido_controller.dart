@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
@@ -131,8 +129,16 @@ class PedidoController {
   }
 
   //PEDIDO
-  final AppStream<PedidoModel> pedidoStream = AppStream<PedidoModel>();
+  AppStream<PedidoModel> pedidoStream = AppStream<PedidoModel>();
   PedidoModel get pedido => pedidoStream.value;
+
+  void setPedido(PedidoModel? pedido) {
+    if (pedido != null) {
+      pedidoStream.add(pedido);
+    } else {
+      pedidoStream = AppStream<PedidoModel>();
+    }
+  }
 
   void onInitPage(PedidoModel pedido) {
     pedidoStream.add(pedido);
@@ -188,34 +194,30 @@ class PedidoController {
 
   void onSortPedidos(List<PedidoModel> pedidos) {
     bool isAsc = utils.sortOrder == SortOrder.asc;
-    try {
-      switch (utils.sortType) {
-        case SortType.localizator:
-          pedidos.sort((a, b) => isAsc
-              ? a.localizador.compareTo(b.localizador)
-              : b.localizador.compareTo(a.localizador));
-          break;
-        case SortType.alfabetic:
-          pedidos.sort((a, b) => isAsc
-              ? a.cliente.nome.compareTo(b.cliente.nome)
-              : b.cliente.nome.compareTo(a.cliente.nome));
-          break;
-        case SortType.deliveryAt:
-          pedidos.sort((a, b) => isAsc
-              ? (a.deliveryAt ?? DateTime.now())
-                  .compareTo((b.deliveryAt ?? DateTime.now()))
-              : (b.deliveryAt ?? DateTime.now())
-                  .compareTo((a.deliveryAt ?? DateTime.now())));
-          break;
-        case SortType.createdAt:
-          pedidos.sort((a, b) => isAsc
-              ? a.createdAt.compareTo(b.createdAt)
-              : b.createdAt.compareTo(a.createdAt));
-          break;
-        default:
-      }
-    } catch (e) {
-      log('teste');
+    switch (utils.sortType) {
+      case SortType.localizator:
+        pedidos.sort((a, b) => isAsc
+            ? a.localizador.compareTo(b.localizador)
+            : b.localizador.compareTo(a.localizador));
+        break;
+      case SortType.alfabetic:
+        pedidos.sort((a, b) => isAsc
+            ? a.cliente.nome.compareTo(b.cliente.nome)
+            : b.cliente.nome.compareTo(a.cliente.nome));
+        break;
+      case SortType.deliveryAt:
+        pedidos.sort((a, b) => isAsc
+            ? (a.deliveryAt ?? DateTime.now())
+                .compareTo((b.deliveryAt ?? DateTime.now()))
+            : (b.deliveryAt ?? DateTime.now())
+                .compareTo((a.deliveryAt ?? DateTime.now())));
+        break;
+      case SortType.createdAt:
+        pedidos.sort((a, b) => isAsc
+            ? a.createdAt.compareTo(b.createdAt)
+            : b.createdAt.compareTo(a.createdAt));
+        break;
+      default:
     }
   }
 
@@ -224,14 +226,15 @@ class PedidoController {
     FirestoreClient.pedidos.update(pedido);
   }
 
-  void onAddHistory(
-      {required dynamic data,
-      required PedidoHistoryAction action,
-      required PedidoHistoryType type}) {
+  void onAddHistory({
+    required PedidoModel pedido,
+    required dynamic data,
+    required PedidoHistoryAction action,
+    required PedidoHistoryType type,
+  }) {
     pedido.histories.add(
       PedidoHistoryModel.create(data: data, action: action, type: type),
     );
-    // FirestoreClient.pedidos.update(pedido);
   }
 
   Future<void> onArchive(_, PedidoModel pedido) async {

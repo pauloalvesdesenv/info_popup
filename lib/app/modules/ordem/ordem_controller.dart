@@ -309,6 +309,7 @@ class OrdemController {
       createdAt: DateTime.now(),
     );
     pedidoCtrl.onAddHistory(
+        pedido: pedido,
         data: statusItem,
         action: PedidoHistoryAction.update,
         type: PedidoHistoryType.status);

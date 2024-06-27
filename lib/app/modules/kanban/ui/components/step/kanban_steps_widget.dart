@@ -1,7 +1,5 @@
-import 'dart:developer';
 
 import 'package:aco_plus/app/core/components/w.dart';
-import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
 import 'package:aco_plus/app/modules/kanban/ui/components/step/kanban_step_widget.dart';
 import 'package:flutter/material.dart';

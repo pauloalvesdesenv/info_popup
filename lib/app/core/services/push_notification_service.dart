@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -18,30 +17,26 @@ final _menssaging = FirebaseMessaging.instance;
 String? deviceToken;
 
 Future<void> initFirebaseMessaging() async {
-  try {
-    await _menssaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-    deviceToken = await getDeviceToken();
-    await onOpenNotification();
-    await setupFlutterNotifications();
-    // await _menssaging.subscribeToTopic(kDebugMode ? 'debug' : 'release');
-    // FirebaseMessaging.onBackgroundMessage((message) async => showFlutterNotification(message));
-    FirebaseMessaging.onMessage.listen((message) {
-      showFlutterNotification(message);
-    });
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      _handleClickNotification(jsonEncode(message.data));
-    });
-  } catch (e) {
-    log(e.toString());
-  }
+  await _menssaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+  deviceToken = await getDeviceToken();
+  await onOpenNotification();
+  await setupFlutterNotifications();
+  // await _menssaging.subscribeToTopic(kDebugMode ? 'debug' : 'release');
+  // FirebaseMessaging.onBackgroundMessage((message) async => showFlutterNotification(message));
+  FirebaseMessaging.onMessage.listen((message) {
+    showFlutterNotification(message);
+  });
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    _handleClickNotification(jsonEncode(message.data));
+  });
 }
 
 Future<String?> getDeviceToken() async {
@@ -133,7 +128,6 @@ Future<void> onOpenNotification() async {
 Future selectNotificationIOS(
     int id, String? title, String? body, String? payload) async {
   if (payload == null) return;
-  log('select_notification_ios');
 }
 
 Future selectNotification(String? payload) async {
@@ -143,5 +137,4 @@ Future selectNotification(String? payload) async {
 
 void _handleClickNotification(String payload) {
   final data = jsonDecode(payload);
-  log(data.toString());
 }
