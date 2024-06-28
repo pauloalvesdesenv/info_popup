@@ -1,5 +1,3 @@
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/checklist/check_item_model.dart';
 import 'package:aco_plus/app/core/components/h.dart';
@@ -7,19 +5,20 @@ import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
-import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:flutter/material.dart';
 
 class CheckListWidget extends StatefulWidget {
   final List<CheckItemModel> items;
-  final void Function() onChanged;
-  final PedidoModel? pedido;
+  final void Function(CheckItemModel) onChanged;
+  final void Function(CheckItemModel) onAdd;
+  final void Function(CheckItemModel) onRemove;
 
   const CheckListWidget({
+    super.key,
     required this.items,
     required this.onChanged,
-    this.pedido,
-    super.key,
+    required this.onAdd,
+    required this.onRemove,
   });
 
   @override
@@ -65,7 +64,7 @@ class _CheckListWidgetState extends State<CheckListWidget> {
                       AppCss.mediumRegular.copyWith(color: Colors.grey[700])),
               const W(8),
               Text(
-                  '(${(widget.items.where((e) => e.isCheck).length ~/ widget.items.length) * 100}%)',
+                  '(${((widget.items.where((e) => e.isCheck).toList().length / widget.items.length) * 100).toStringAsFixed(0)}%)',
                   style: AppCss.mediumRegular.copyWith(color: Colors.grey[700]))
             ]
           ],
@@ -81,18 +80,8 @@ class _CheckListWidgetState extends State<CheckListWidget> {
   Widget _itemWidget(CheckItemModel item) {
     return InkWell(
       onTap: () {
-        setState(() {
-          item.isCheck = !item.isCheck;
-          if (widget.pedido != null) {
-            pedidoCtrl.onAddHistory(
-              pedido:  pedidoCtrl.pedido,
-              data: item,
-              type: PedidoHistoryType.check,
-              action: PedidoHistoryAction.update,
-            );
-          }
-          widget.onChanged();
-        });
+        item.isCheck = !item.isCheck;
+        widget.onChanged.call(item);
       },
       child: Container(
         height: 40,
@@ -129,20 +118,7 @@ class _CheckListWidgetState extends State<CheckListWidget> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14),
               child: InkWell(
-                onTap: () {
-                  setState(() {
-                    widget.items.remove(item);
-                    if (widget.pedido != null) {
-                      pedidoCtrl.onAddHistory(
-              pedido:  pedidoCtrl.pedido,
-                        data: item,
-                        type: PedidoHistoryType.check,
-                        action: PedidoHistoryAction.delete,
-                      );
-                    }
-                    widget.onChanged();
-                  });
-                },
+                onTap: () => widget.onRemove.call(item),
                 child: Container(
                   margin: const EdgeInsets.only(left: 8),
                   width: 20,
@@ -176,16 +152,12 @@ class _CheckListWidgetState extends State<CheckListWidget> {
             hint: 'Adicione um item',
             controller: _titleEC,
             onChanged: (_) => setState(() {}),
-            onEditingComplete: () {
-              _onAdd();
-            },
+            onEditingComplete: () => _onAdd(),
           ),
         ),
         const W(8),
         InkWell(
-          onTap: () {
-            _onAdd();
-          },
+          onTap: () => _onAdd(),
           child: Container(
             width: 48,
             height: 48,
@@ -205,18 +177,8 @@ class _CheckListWidgetState extends State<CheckListWidget> {
   }
 
   void _onAdd() {
-    setState(() {
-      if (_titleEC.text.isEmpty) return;
-      final item = CheckItemModel(title: _titleEC.text, isCheck: false);
-      widget.items.add(item);
-      _titleEC.controller.clear();
-      pedidoCtrl.onAddHistory(
-              pedido:  pedidoCtrl.pedido,
-        data: item,
-        type: PedidoHistoryType.check,
-        action: PedidoHistoryAction.create,
-      );
-      widget.onChanged();
-    });
+    if (_titleEC.text.isEmpty) return;
+    widget.onAdd.call(CheckItemModel(title: _titleEC.text, isCheck: false));
+    _titleEC.controller.clear();
   }
 }

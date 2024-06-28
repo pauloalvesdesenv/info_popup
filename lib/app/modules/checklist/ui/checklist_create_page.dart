@@ -73,7 +73,13 @@ class _ChecklistCreatePageState extends State<ChecklistCreatePage> {
         const H(16),
         CheckListWidget(
           items: form.checklist,
-          onChanged: () {
+          onChanged: (item) => checklistCtrl.formStream.update(),
+          onAdd: (item) {
+            form.checklist.add(item);
+            checklistCtrl.formStream.update();
+          },
+          onRemove: (item) {
+            form.checklist.remove(item);
             checklistCtrl.formStream.update();
           },
         ),
