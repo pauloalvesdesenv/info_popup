@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_m
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_drop_down_list.dart';
@@ -120,8 +121,18 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
               label: 'Status',
               addeds: model.status,
               itens: PedidoProdutoStatus.values,
-              itemLabel: (e) => e.label ?? 'Selecione',
+              itemLabel: (e) => e.label,
               itemColor: (e) => e.color.withOpacity(0.4),
+              onChanged: () {
+                relatorioCtrl.pedidoViewModelStream.add(model);
+                relatorioCtrl.onCreateRelatorioPedido();
+              }),
+          const H(16),
+          AppDropDownList<ProdutoModel>(
+              label: 'Bitolas',
+              addeds: model.produtos,
+              itens: FirestoreClient.produtos.data,
+              itemLabel: (e) => e.descricao,
               onChanged: () {
                 relatorioCtrl.pedidoViewModelStream.add(model);
                 relatorioCtrl.onCreateRelatorioPedido();

@@ -161,6 +161,11 @@ class RelatorioPedidoPdfPage {
           ),
           pw.SizedBox(height: 8),
           _itemInfo(
+              'Bitolas', relatorio.produtos.map((e) => e.descricao).join(', ')),
+          PdfDivisor.build(
+            color: Colors.grey[200],
+          ),
+          _itemInfo(
               'Data Criação Relatório',
               DateFormat("dd/MM/yyyy' ás 'HH:mm")
                   .format(relatorio.createdAt)

@@ -99,38 +99,35 @@ class _AppDropDownList<T> extends State<AppDropDownList<T>> {
                 : SizedBox(
                     width: double.maxFinite,
                     child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: 4,
+                      runSpacing: 4,
                       children: widget.addeds
                           .map((e) => IntrinsicWidth(
-                                child: Container(
-                                  margin: const EdgeInsets.only(right: 8),
-                                  child: AppContainer(
-                                    padding: const [6, 4],
-                                    radius: 4,
-                                    color: widget.itemColor?.call(e) ??
-                                        AppColors.primaryMedium,
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          widget.itemLabel.call(e),
-                                          style: const TextStyle(
-                                              color: Color(0xFF000014)),
+                                child: AppContainer(
+                                  padding: const [6, 4],
+                                  radius: 4,
+                                  color: widget.itemColor?.call(e) ??
+                                      AppColors.primaryMedium,
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        widget.itemLabel.call(e),
+                                        style: const TextStyle(
+                                            color: Color(0xFF000014)),
+                                      ),
+                                      const W(4),
+                                      InkWell(
+                                        onTap: () {
+                                          widget.addeds.remove(e);
+                                          widget.onChanged.call();
+                                        },
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Color(0xFF000014),
+                                          size: 20,
                                         ),
-                                        const W(4),
-                                        InkWell(
-                                          onTap: () {
-                                            widget.addeds.remove(e);
-                                            widget.onChanged.call();
-                                          },
-                                          child: const Icon(
-                                            Icons.close,
-                                            color: Color(0xFF000014),
-                                            size: 20,
-                                          ),
-                                        )
-                                      ],
-                                    ),
+                                      )
+                                    ],
                                   ),
                                 ),
                               ))

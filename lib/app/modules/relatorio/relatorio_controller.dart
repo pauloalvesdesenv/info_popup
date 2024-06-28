@@ -56,6 +56,23 @@ class PedidoController {
             e.cliente.id == pedidoViewModel.cliente?.id)
         .toList();
 
+    //remove produtos dos pedidos que nao estao na lista de produtos do filtro(view model)
+    if (pedidoViewModel.produtos.isNotEmpty) {
+      for (PedidoModel pedido in pedidos) {
+        List<PedidoProdutoModel> produtos =
+            pedido.produtos.map((e) => e.copyWith()).toList();
+        pedido.produtos.clear();
+
+        for (PedidoProdutoModel produto in produtos) {
+          if (pedidoViewModel.produtos
+              .map((e) => e.id)
+              .contains(produto.produto.id)) {
+            pedido.produtos.add(produto);
+          }
+        }
+      }
+    }
+
     onSortPedidos(pedidos);
 
     final model = RelatorioPedidoModel(
@@ -63,6 +80,7 @@ class PedidoController {
       pedidoViewModel.status,
       pedidos,
       pedidoViewModel.tipo,
+      pedidoViewModel.produtos,
     );
 
     pedidoViewModel.relatorio = model;

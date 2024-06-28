@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -44,11 +42,16 @@ class _PedidoPageState extends State<PedidoPage>
     super.initState();
   }
 
+  @override
+  void dispose() {
+    pedidoCtrl.setPedido(null);
+    super.dispose();
+  }
+
   bool get isKanban => widget.reason == PedidoInitReason.kanban;
 
   @override
   Widget build(BuildContext context) {
-    log('PedidoPage.build');
     super.build(context);
     return StreamOut(
       stream: pedidoCtrl.pedidoStream.listen,

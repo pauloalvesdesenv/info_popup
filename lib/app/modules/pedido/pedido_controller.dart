@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/dialogs/loading_dialog.dart';
@@ -235,6 +236,13 @@ class PedidoController {
     pedido.histories.add(
       PedidoHistoryModel.create(data: data, action: action, type: type),
     );
+  }
+
+  void setPedidoUsuarios(PedidoModel pedido, List<UsuarioModel> usuarios) {
+    pedido.users.clear();
+    pedido.users.addAll(usuarios);
+    pedidoStream.add(pedido);
+    FirestoreClient.pedidos.update(pedido);
   }
 
   Future<void> onArchive(_, PedidoModel pedido) async {
