@@ -285,17 +285,19 @@ class OrdemController {
     final status = await showOrdemProdutoStatusBottom(produtoStatus);
     if (status == null || produtoStatus == status) return;
     showLoadingDialog();
-    final statusModel = PedidoProdutoStatusModel.create(status!);
+    final statusModel = PedidoProdutoStatusModel.create(status);
     final pedido = FirestoreClient.pedidos.getById(produto.pedidoId);
     pedido.produtos[pedido.iOfProductById(produto.id)].statusess
         .add(statusModel);
-    ordemStream.update();
-    await FirestoreClient.ordens.update(ordem);
     await FirestoreClient.pedidos.update(pedido);
+    await FirestoreClient.ordens.fetch();
+    final result = FirestoreClient.ordens.getById(ordem.id);
+    ordemStream.add(result);
+    await FirestoreClient.ordens.update(ordem);
     await onSetStatusPedido(produto);
     await automatizacaoCtrl.onSetStepByPedidoStatus(ordem.pedidos);
-    FirestoreClient.ordens.dataStream.update();
     await FirestoreClient.ordens.fetch();
+    FirestoreClient.ordens.dataStream.update();
     Navigator.pop(contextGlobal);
   }
 

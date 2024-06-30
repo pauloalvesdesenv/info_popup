@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -16,13 +20,25 @@ class KanbanPage extends StatefulWidget {
 }
 
 class _KanbanPageState extends State<KanbanPage> {
+
+  late StreamSubscription<List<PedidoModel>> pedidoStream;
+  late StreamSubscription<List<StepModel>> stepStream;
+
+  @override
+  void dispose() {
+    pedidoStream.cancel();
+    stepStream.cancel();
+    super.dispose();
+  }
+
+
   @override
   void initState() {
     kanbanCtrl.onInit().then((_) {
-      FirestoreClient.pedidos.dataStream.controller.listen((e) {
+      pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
         kanbanCtrl.onMount();
       });
-      FirestoreClient.steps.dataStream.controller.listen((e) {
+      stepStream= FirestoreClient.steps.dataStream.listen.listen((e) {
         kanbanCtrl.onMount();
       });
     });

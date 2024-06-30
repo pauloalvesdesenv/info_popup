@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
@@ -19,16 +22,24 @@ class PedidoEtapaWidget extends StatefulWidget {
 class _GrapOrdemhTotalWidgetState extends State<PedidoEtapaWidget> {
   late List<GraphModel> data;
 
+  late StreamSubscription<List<PedidoModel>> pedidoStream;
+
   @override
   void initState() {
     pedidoEtapaCtrl.filterStream.add(PedidoEtapaGraphModel());
     data = pedidoEtapaCtrl.getCartesianChart(pedidoEtapaCtrl.filter);
-    FirestoreClient.pedidos.dataStream.listen.listen((e) {
+    pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
       setState(() {
         data = pedidoEtapaCtrl.getCartesianChart(pedidoEtapaCtrl.filter);
       });
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    pedidoStream.cancel();
+    super.dispose();
   }
 
   @override

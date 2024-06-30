@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/extensions/double_ext.dart';
@@ -19,16 +22,26 @@ class ProdutoProduzidoWidget extends StatefulWidget {
 class _GrapOrdemhTotalWidgetState extends State<ProdutoProduzidoWidget> {
   late List<BarSeries<ProdutoProduzidoModel, DateTime>> data;
 
+  late StreamSubscription<List<PedidoModel>> pedidoStream;
+
   @override
   void initState() {
     data = produtoProduzidoCtrl.getSource();
-    FirestoreClient.pedidos.dataStream.listen.listen((e) {
+    pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
       setState(() {
         data = produtoProduzidoCtrl.getSource();
       });
     });
     super.initState();
   }
+
+
+  @override
+  void dispose() {
+    pedidoStream.cancel();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
