@@ -224,52 +224,22 @@ class _PedidosPageState extends State<PedidosPage> {
                   ),
                 ),
                 const W(8),
-                IntrinsicWidth(
-                  child: Stack(
-                    alignment: Alignment.center,
+                ColorFiltered(
+                  colorFilter: pedido.isAguardandoEntradaProducao()
+                      ? ColorFilter.mode(Colors.grey[200]!, BlendMode.srcIn)
+                      : const ColorFilter.mode(
+                          Colors.transparent, BlendMode.color),
+                  child: Row(
                     children: [
-                      ColorFiltered(
-                        colorFilter: pedido.isAguardandoEntradaProducao()
-                            ? ColorFilter.mode(
-                                Colors.grey[200]!, BlendMode.srcIn)
-                            : const ColorFilter.mode(
-                                Colors.transparent, BlendMode.color),
-                        child: Row(
-                          children: [
-                            _progressChartWidget(
-                                PedidoProdutoStatus.aguardandoProducao,
-                                pedido.getPrcntgAguardandoProducao()),
-                            const W(16),
-                            _progressChartWidget(PedidoProdutoStatus.produzindo,
-                                pedido.getPrcntgProduzindo()),
-                            const W(16),
-                            _progressChartWidget(PedidoProdutoStatus.pronto,
-                                pedido.getPrcntgPronto()),
-                          ],
-                        ),
-                      ),
-                      if (pedido.isAguardandoEntradaProducao())
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 3),
-                          decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(4)),
-                          child: IntrinsicWidth(
-                            child: Row(
-                              children: [
-                                Text('AGUARDANDO ENTRADA',
-                                    style: AppCss.mediumRegular.setSize(12)),
-                                if (pedido.isChangeStatusAvailable) ...{
-                                  const W(2),
-                                  Icon(Icons.keyboard_arrow_down,
-                                      size: 16,
-                                      color: AppColors.black.withOpacity(0.6))
-                                }
-                              ],
-                            ),
-                          ),
-                        )
+                      _progressChartWidget(
+                          PedidoProdutoStatus.aguardandoProducao,
+                          pedido.getPrcntgAguardandoProducao()),
+                      const W(16),
+                      _progressChartWidget(PedidoProdutoStatus.produzindo,
+                          pedido.getPrcntgProduzindo()),
+                      const W(16),
+                      _progressChartWidget(
+                          PedidoProdutoStatus.pronto, pedido.getPrcntgPronto()),
                     ],
                   ),
                 ),

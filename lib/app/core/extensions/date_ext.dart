@@ -1,7 +1,10 @@
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:intl/intl.dart';
 
+  DateTime dayNow() => DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 extension DateExt on DateTime {
+
+
   String ddMMyyyy() => DateFormat('dd/MM/yyyy').format(this);
 
   bool isSameDay(DateTime date) =>

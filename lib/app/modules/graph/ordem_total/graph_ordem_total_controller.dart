@@ -1,12 +1,9 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
-import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/graph/core/graph_model.dart';
 import 'package:aco_plus/app/modules/graph/ordem_total/graph_ordem_total_model.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 final graphOrdemTotalCtrl = GrahpOrdemTotalController();
 
@@ -22,7 +19,7 @@ class GrahpOrdemTotalController {
       AppStream<GraphOrdemTotalModel>.seed(GraphOrdemTotalModel());
   GraphOrdemTotalModel get filter => filterStream.value;
 
-  SfCircularChart getCirucularChart(GraphOrdemTotalModel filter) {
+  List<GraphModel> getCirucularChart(GraphOrdemTotalModel filter) {
     List<OrdemModel> ordens = FirestoreClient.ordens.data
         .map((o) => o.copyWith(
             produto: o.produto.copyWith(),
@@ -53,35 +50,6 @@ class GrahpOrdemTotalController {
       }
     }
 
-    return SfCircularChart(
-      tooltipBehavior: TooltipBehavior(
-        enable: true,
-        format: 'point.x : point.y Pedido(s)',
-      ),
-      enableMultiSelection: true,
-      onDataLabelRender: (dataLabelArgs) {
-        dataLabelArgs.textStyle =
-            AppCss.smallBold.setColor(dataLabelArgs.color);
-      },
-      legend: const Legend(
-        isVisible: true,
-        overflowMode: LegendItemOverflowMode.wrap,
-        position: LegendPosition.bottom,
-      ),
-      series: <CircularSeries<GraphModel, String>>[
-        PieSeries<GraphModel, String>(
-          dataSource: source,
-          name: 'Ordens',
-          dataLabelMapper: (GraphModel data, _) => data.vol.toKg(),
-          pointColorMapper: (GraphModel data, _) => data.color,
-          xValueMapper: (GraphModel data, _) => data.label,
-          yValueMapper: (GraphModel data, _) => data.length,
-          dataLabelSettings: const DataLabelSettings(
-            isVisible: true,
-            labelPosition: ChartDataLabelPosition.outside,
-          ),
-        ),
-      ],
-    );
+    return source;
   }
 }

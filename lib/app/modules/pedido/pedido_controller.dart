@@ -51,7 +51,6 @@ class PedidoController {
 
   List<PedidoModel> getPedidosFiltered(
       String search, List<PedidoModel> pedidos) {
-    return [pedidos.firstWhere((e) => e.localizador.contains('PAULO'))];
     pedidos = utils.steps.isEmpty
         ? pedidos
         : pedidos.where((e) => e.step.id == utils.steps.last.id).toList();

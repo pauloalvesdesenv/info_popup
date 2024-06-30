@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 
 enum PedidoProdutoStatus { separado, aguardandoProducao, produzindo, pronto }
 
-List<PedidoProdutoStatus> pedidoProdutoStatusValues = PedidoProdutoStatus.values.sublist(1);
+List<PedidoProdutoStatus> pedidoProdutoStatusValues =
+    PedidoProdutoStatus.values.sublist(1);
 
 extension PedidoProdutoStatusExt on PedidoProdutoStatus {
   String get label {
@@ -40,6 +41,13 @@ class PedidoProdutoStatusModel {
   PedidoProdutoStatus status;
   final DateTime createdAt;
 
+  PedidoProdutoStatus getStatusMinified() {
+    if (status == PedidoProdutoStatus.separado) {
+      return PedidoProdutoStatus.aguardandoProducao;
+    }
+    return status;
+  }
+
   PedidoProdutoStatus getStatusView() {
     if (status == PedidoProdutoStatus.separado) {
       return PedidoProdutoStatus.aguardandoProducao;
@@ -53,11 +61,12 @@ class PedidoProdutoStatusModel {
     required this.createdAt,
   });
 
-  factory PedidoProdutoStatusModel.create(PedidoProdutoStatus status) => PedidoProdutoStatusModel(
-    id: HashService.get,
-    createdAt: DateTime.now(),
-    status: status,
-  );
+  factory PedidoProdutoStatusModel.create(PedidoProdutoStatus status) =>
+      PedidoProdutoStatusModel(
+        id: HashService.get,
+        createdAt: DateTime.now(),
+        status: status,
+      );
 
   Map<String, dynamic> toMap() {
     return {

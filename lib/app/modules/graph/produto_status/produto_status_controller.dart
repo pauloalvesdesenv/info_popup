@@ -1,86 +1,87 @@
-// import 'dart:developer';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/extensions/double_ext.dart';
+import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/graph/produto_status/produto_status_model.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
-// import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
-// import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-// import 'package:aco_plus/app/core/extensions/double_ext.dart';
-// import 'package:aco_plus/app/core/models/app_stream.dart';
-// import 'package:aco_plus/app/core/utils/app_css.dart';
-// import 'package:aco_plus/app/modules/graph/core/graph_model.dart';
-// import 'package:aco_plus/app/modules/graph/produto_status/produto_status_model.dart';
-// import 'package:syncfusion_flutter_charts/charts.dart';
+final produtoStatusCtrl = ProdutoStatusController();
 
-// final produtoStatusCtrl = ProdutoStatusController();
+class ProdutoStatusController {
+  static final ProdutoStatusController _instance = ProdutoStatusController._();
 
-// class ProdutoStatusController {
-//   static final ProdutoStatusController _instance = ProdutoStatusController._();
+  ProdutoStatusController._();
 
-//   ProdutoStatusController._();
+  factory ProdutoStatusController() => _instance;
 
-//   factory ProdutoStatusController() => _instance;
 
-//   final AppStream<ProdutoStatusGraphModel> filterStream =
-//       AppStream<ProdutoStatusGraphModel>.seed(ProdutoStatusGraphModel());
-//   ProdutoStatusGraphModel get filter => filterStream.value;
+  List<ColumnSeries<ProdutoStatusGraphModel, String>> getSource(){
+    return [
+          PedidoProdutoStatus.aguardandoProducao,
+          PedidoProdutoStatus.produzindo,
+          PedidoProdutoStatus.pronto
+        ]
+            .map((status) => ColumnSeries<ProdutoStatusGraphModel, String>(
+                  dataSource: getSourceByStatus(status),
+                  name: status.label,
+                  xValueMapper: (ProdutoStatusGraphModel data, _) =>
+                      data.produto.descricao,
+                  yValueMapper: (ProdutoStatusGraphModel data, _) => data.qtde,
+                  color: status.color,
+                  pointColorMapper: (ProdutoStatusGraphModel data, _) =>
+                      data.status.color,
+                  dataLabelSettings: const DataLabelSettings(
+                      isVisible: true,
+                      labelPosition: ChartDataLabelPosition.outside),
+                ))
+            .toList();
+  }
 
-//   // PEDIDOS QUE ENTRARAM QUE COMEÇARAM A PRODUÇÃO HOJE
-//   // PEDIDOS QUE FORAM FINALIZADOS HOJE
-//   SfCircularChart getCartesianChart(
-//     ProdutoStatusGraphModel filter,
-//   ) {
-//     try {
-//       List<ProdutoModel> produtos =
-//           FirestoreClient.produtos.data.map((e) => e.copyWith()).toList();
+  List<ProdutoStatusGraphModel> getSourceByStatus(PedidoProdutoStatus status) {
+    final ordens =
+        FirestoreClient.ordens.data.map((e) => e.copyWith()).toList();
 
-//       List<GraphModel> source = [];
+    List<PedidoProdutoModel> pedidosProdutos = [];
+    for (var ordem in ordens) {
+      for (var produto in ordem.produtos) {
+        if (produto.status.getStatusMinified() == status) {
+          pedidosProdutos.add(produto.copyWith());
+        }
+      }
+    }
 
-//       for (var status in PedidoProdutoStatus.values) {
-//         double volFinal = 0.0;
-//         double lengthFinal = 0.0;
-//         for (ProdutoModel produto
-//             in produtos.where((e) => e.status == status).toList()) {
-//           volFinal += produto.produtos.length;
-//           lengthFinal++;
-//         }
-//         if (volFinal > 0) {
-//           source.add(GraphModel(
-//               vol: volFinal,
-//               label: status.label,
-//               length: lengthFinal,
-//               color: status.color));
-//         }
-//       }
+    List<ProdutoStatusGraphModel> graph = [];
+    for (ProdutoModel produto
+        in FirestoreClient.produtos.data.map((e) => e.copyWith())) {
+      for (PedidoProdutoModel pedido
+          in pedidosProdutos.where((e) => e.produto.id == produto.id)) {
+        if (graph.any((e) => e.produto.id == produto.id)) {
+          graph.firstWhere((e) => e.produto.id == produto.id).qtde +=
+              pedido.qtde;
+        } else {
+          graph.add(ProdutoStatusGraphModel(
+            status: pedido.status.getStatusMinified(),
+            produto: produto,
+            qtde: pedido.qtde,
+          ));
+        }
+      }
+    }
 
-//       return SfCircularChart(
-//         tooltipBehavior: TooltipBehavior(
-//           enable: true,
-//           format: 'point.x : point.y Produto(s)',
-//         ),
-//         enableMultiSelection: true,
-//         onDataLabelRender: (dataLabelArgs) {
-//           dataLabelArgs.textStyle =
-//               AppCss.smallBold.setColor(dataLabelArgs.color);
-//         },
-//         legend: const Legend(
-//           isVisible: true,
-//           overflowMode: LegendItemOverflowMode.wrap,
-//           position: LegendPosition.bottom,
-//         ),
-//         series: <CircularSeries<GraphModel, String>>[
-//           PieSeries<GraphModel, String>(
-//             dataSource: source,
-//             name: 'Produtos',
-//             dataLabelMapper: (GraphModel data, _) => data.vol.toKg(),
-//             pointColorMapper: (GraphModel data, _) => data.color,
-//             xValueMapper: (GraphModel data, _) => data.label,
-//             yValueMapper: (GraphModel data, _) => data.length,
-//             dataLabelSettings: const DataLabelSettings(
-//               isVisible: true,
-//             ),
-//           ),
-//         ],
-//       );
-//     } catch (e) {
-//       rethrow;
-//     }
-//   }
-// }
+    for (var produto
+        in FirestoreClient.produtos.data.map((e) => e.copyWith())) {
+      if (!graph.map((e) => e.produto.id).contains(produto.id)) {
+        graph.add(ProdutoStatusGraphModel(
+          status: status,
+          produto: produto,
+          qtde: 0,
+        ));
+      }
+    }
+
+    return graph;
+  }
+}
