@@ -18,7 +18,7 @@ class PedidoStepsWidget extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Expanded(child: Text('Etapa do Pedido', style: AppCss.largeBold)),
+          Expanded(child: Text('Etapa', style: AppCss.largeBold)),
           if (pedido.steps.length > 1)
             InkWell(
               onTap: () => kanbanCtrl.onUndoStep(pedido),

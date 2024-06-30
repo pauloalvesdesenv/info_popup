@@ -92,7 +92,7 @@ class PedidoHistoryModel {
   String get title {
     switch (type) {
       case PedidoHistoryType.status:
-        return 'Status alterado para ${data.status}';
+        return 'Status alterado';
       case PedidoHistoryType.step:
         return 'Etapa Alterada';
       case PedidoHistoryType.comment:
@@ -107,15 +107,22 @@ class PedidoHistoryModel {
   String get description {
     switch (type) {
       case PedidoHistoryType.status:
-        return 'Status alterado para ${data.status}';
+        return 'Status alterado para ${(data.status as PedidoStatus).label}';
       case PedidoHistoryType.step:
         return '${usuario.nome} alterou a etapa\npara ${data.name}';
       case PedidoHistoryType.comment:
         return '${usuario.nome} ${action.verb2} um comentário';
       case PedidoHistoryType.check:
-        return '${usuario.nome} marcou o item ${data.title} como ${data.isCheck ? 'feito' : 'não feito'}';
+        switch (action) {
+          case PedidoHistoryAction.create:
+            return '${usuario.nome} criou o item ${data.title}';
+          case PedidoHistoryAction.update:
+            return '${usuario.nome} marcou o item ${data.title} como ${data.isCheck ? 'feito' : 'não feito'}';
+          case PedidoHistoryAction.delete:
+            return '${usuario.nome} deletou o item ${data.title}';
+        }
       case PedidoHistoryType.archive:
-        return '${usuario.nome}  ${action.verb1} o pedido';
+        return '${usuario.nome} ${action.verb1} o pedido';
     }
   }
 
@@ -141,7 +148,8 @@ class PedidoHistoryModel {
       'createdAt': createdAt.millisecondsSinceEpoch,
       'usuario': usuario.toMap(),
       'action': action.index,
-      'data': data is StepModel ? (data as StepModel).toHistoryMap() : data.toMap(),
+      'data':
+          data is StepModel ? (data as StepModel).toHistoryMap() : data.toMap(),
     };
   }
 

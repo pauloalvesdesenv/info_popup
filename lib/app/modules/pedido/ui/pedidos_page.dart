@@ -91,85 +91,83 @@ class _PedidosPageState extends State<PedidosPage> {
                 .getPedidosFiltered(utils.search.text, pedidos)
                 .toList();
             pedidoCtrl.onSortPedidos(pedidos);
-            return Column(
-              children: [
-                if (utils.showFilter)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        AppField(
-                          hint: 'Pesquisar',
-                          controller: utils.search,
-                          suffixIcon: Icons.search,
-                          onChanged: (_) => pedidoCtrl.utilsStream.update(),
-                        ),
-                        const H(16),
-                        AppDropDownList<StepModel>(
-                          label: 'Etapas',
-                          itemColor: (e) => e.color,
-                          itens: FirestoreClient.steps.data,
-                          addeds: utils.steps,
-                          itemLabel: (e) => e.name,
-                          onChanged: () {
-                            pedidoCtrl.utilsStream.update();
-                          },
-                        ),
-                        const H(16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: AppDropDown<SortType>(
-                                label: 'Ordernar por',
-                                hasFilter: false,
-                                item: utils.sortType,
-                                itens: const [
-                                  SortType.createdAt,
-                                  SortType.deliveryAt,
-                                  SortType.localizator,
-                                  SortType.client
-                                ],
-                                itemLabel: (e) => e.name,
-                                onSelect: (e) {
-                                  utils.sortType = e ?? SortType.localizator;
-                                  pedidoCtrl.utilsStream.update();
-                                },
-                              ),
-                            ),
-                            const W(16),
-                            Expanded(
-                              child: AppDropDown<SortOrder>(
-                                hasFilter: false,
-                                label: 'Ordernar',
-                                item: utils.sortOrder,
-                                itens: SortOrder.values,
-                                itemLabel: (e) => e.name,
-                                onSelect: (e) {
-                                  utils.sortOrder = e ?? SortOrder.asc;
-                                  pedidoCtrl.utilsStream.update();
-                                },
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                Expanded(
-                  child: pedidos.isEmpty
-                      ? const EmptyData()
-                      : RefreshIndicator(
-                          onRefresh: () async =>
-                              await FirestoreClient.pedidos.fetch(),
-                          child: ListView.separated(
-                            itemCount: pedidos.length,
-                            separatorBuilder: (_, i) => const Divisor(),
-                            itemBuilder: (_, i) =>
-                                _itemPedidoWidget(pedidos[i]),
+            return RefreshIndicator(
+              onRefresh: () async => await FirestoreClient.pedidos.fetch(),
+              child: ListView(
+                children: [
+                  if (utils.showFilter)
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          AppField(
+                            hint: 'Pesquisar',
+                            controller: utils.search,
+                            suffixIcon: Icons.search,
+                            onChanged: (_) => pedidoCtrl.utilsStream.update(),
                           ),
+                          const H(16),
+                          AppDropDownList<StepModel>(
+                            label: 'Etapas',
+                            itemColor: (e) => e.color,
+                            itens: FirestoreClient.steps.data,
+                            addeds: utils.steps,
+                            itemLabel: (e) => e.name,
+                            onChanged: () {
+                              pedidoCtrl.utilsStream.update();
+                            },
+                          ),
+                          const H(16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: AppDropDown<SortType>(
+                                  label: 'Ordernar por',
+                                  hasFilter: false,
+                                  item: utils.sortType,
+                                  itens: const [
+                                    SortType.createdAt,
+                                    SortType.deliveryAt,
+                                    SortType.localizator,
+                                    SortType.client
+                                  ],
+                                  itemLabel: (e) => e.name,
+                                  onSelect: (e) {
+                                    utils.sortType = e ?? SortType.localizator;
+                                    pedidoCtrl.utilsStream.update();
+                                  },
+                                ),
+                              ),
+                              const W(16),
+                              Expanded(
+                                child: AppDropDown<SortOrder>(
+                                  hasFilter: false,
+                                  label: 'Ordernar',
+                                  item: utils.sortOrder,
+                                  itens: SortOrder.values,
+                                  itemLabel: (e) => e.name,
+                                  onSelect: (e) {
+                                    utils.sortOrder = e ?? SortOrder.asc;
+                                    pedidoCtrl.utilsStream.update();
+                                  },
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  pedidos.isEmpty
+                      ? const EmptyData()
+                      : ListView.separated(
+                          itemCount: pedidos.length,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          separatorBuilder: (_, i) => const Divisor(),
+                          itemBuilder: (_, i) => _itemPedidoWidget(pedidos[i]),
                         ),
-                ),
-              ],
+                ],
+              ),
             );
           },
         ),
@@ -226,14 +224,55 @@ class _PedidosPageState extends State<PedidosPage> {
                   ),
                 ),
                 const W(8),
-                _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
-                    pedido.getPrcntgAguardandoProducao()),
-                const W(16),
-                _progressChartWidget(PedidoProdutoStatus.produzindo,
-                    pedido.getPrcntgProduzindo()),
-                const W(16),
-                _progressChartWidget(
-                    PedidoProdutoStatus.pronto, pedido.getPrcntgPronto()),
+                IntrinsicWidth(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ColorFiltered(
+                        colorFilter: pedido.isAguardandoEntradaProducao()
+                            ? ColorFilter.mode(
+                                Colors.grey[200]!, BlendMode.srcIn)
+                            : const ColorFilter.mode(
+                                Colors.transparent, BlendMode.color),
+                        child: Row(
+                          children: [
+                            _progressChartWidget(
+                                PedidoProdutoStatus.aguardandoProducao,
+                                pedido.getPrcntgAguardandoProducao()),
+                            const W(16),
+                            _progressChartWidget(PedidoProdutoStatus.produzindo,
+                                pedido.getPrcntgProduzindo()),
+                            const W(16),
+                            _progressChartWidget(PedidoProdutoStatus.pronto,
+                                pedido.getPrcntgPronto()),
+                          ],
+                        ),
+                      ),
+                      if (pedido.isAguardandoEntradaProducao())
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(4)),
+                          child: IntrinsicWidth(
+                            child: Row(
+                              children: [
+                                Text('AGUARDANDO ENTRADA',
+                                    style: AppCss.mediumRegular.setSize(12)),
+                                if (pedido.isChangeStatusAvailable) ...{
+                                  const W(2),
+                                  Icon(Icons.keyboard_arrow_down,
+                                      size: 16,
+                                      color: AppColors.black.withOpacity(0.6))
+                                }
+                              ],
+                            ),
+                          ),
+                        )
+                    ],
+                  ),
+                ),
                 const W(16),
                 Icon(
                   Icons.arrow_forward_ios,

@@ -75,49 +75,49 @@ class _OrdensPageState extends State<OrdensPage> {
               ordens =
                   ordens.where((e) => utils.status.contains(e.status)).toList();
             }
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      AppField(
-                        hint: 'Pesquisar',
-                        controller: utils.search,
-                        suffixIcon: Icons.search,
-                        onChanged: (_) => ordemCtrl.utilsStream.update(),
-                      ),
-                      const H(16),
-                      AppDropDownList<PedidoProdutoStatus>(
-                        label: 'Ordernar por',
-                        addeds: utils.status,
-                        itens: const [
-                          PedidoProdutoStatus.aguardandoProducao,
-                          PedidoProdutoStatus.produzindo,
-                          PedidoProdutoStatus.pronto
-                        ],
-                        itemLabel: (e) => e.label,
-                        itemColor: (e) => e.color,
-                        onChanged: () {
-                          ordemCtrl.utilsStream.update();
-                        },
-                      )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ordens.isEmpty
-                      ? const EmptyData()
-                      : RefreshIndicator(
-                          onRefresh: () async => FirestoreClient.ordens.fetch(),
-                          child: ListView.separated(
-                            itemCount: ordens.length,
-                            separatorBuilder: (_, i) => const Divisor(),
-                            itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
-                          ),
+            return RefreshIndicator(
+              onRefresh: () async => FirestoreClient.ordens.fetch(),
+              child: ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        AppField(
+                          hint: 'Pesquisar',
+                          controller: utils.search,
+                          suffixIcon: Icons.search,
+                          onChanged: (_) => ordemCtrl.utilsStream.update(),
                         ),
-                ),
-              ],
+                        const H(16),
+                        AppDropDownList<PedidoProdutoStatus>(
+                          label: 'Ordernar por',
+                          addeds: utils.status,
+                          itens: const [
+                            PedidoProdutoStatus.aguardandoProducao,
+                            PedidoProdutoStatus.produzindo,
+                            PedidoProdutoStatus.pronto
+                          ],
+                          itemLabel: (e) => e.label,
+                          itemColor: (e) => e.color,
+                          onChanged: () {
+                            ordemCtrl.utilsStream.update();
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                  ordens.isEmpty
+                      ? const EmptyData()
+                      : ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: ordens.length,
+                          separatorBuilder: (_, i) => const Divisor(),
+                          itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
+                        )
+                ],
+              ),
             );
           },
         ),

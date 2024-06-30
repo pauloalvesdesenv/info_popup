@@ -12,10 +12,12 @@ import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/automatizacao/automatizacao_controller.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_status_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_step_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -49,6 +51,7 @@ class PedidoController {
 
   List<PedidoModel> getPedidosFiltered(
       String search, List<PedidoModel> pedidos) {
+    return [pedidos.firstWhere((e) => e.localizador.contains('PAULO'))];
     pedidos = utils.steps.isEmpty
         ? pedidos
         : pedidos.where((e) => e.step.id == utils.steps.last.id).toList();
@@ -149,11 +152,8 @@ class PedidoController {
     final status = await showPedidoStatusBottom(pedido);
     if (status == null) return;
     if (pedido.statusess.last.status == status) return;
-    pedido.statusess.add(PedidoStatusModel(
-      id: HashService.get,
-      status: status,
-      createdAt: DateTime.now(),
-    ));
+    pedido.statusess.add(PedidoStatusModel.create(status));
+    await automatizacaoCtrl.onSetStepByPedidoStatus([pedido]);
     pedidoStream.update();
     await FirestoreClient.pedidos.update(pedido);
   }
@@ -167,6 +167,7 @@ class PedidoController {
 
   Future<void> onVerifyPedidoStatus() async {
     final ordens = FirestoreClient.ordens.data;
+    final batch = FirebaseFirestore.instance.batch();
     for (var pedido in FirestoreClient.pedidos.data) {
       for (var produtoPedido in pedido.produtos) {
         bool hasInOrder = false;
@@ -189,8 +190,10 @@ class PedidoController {
               createdAt: DateTime.now()));
         }
       }
-      await FirestoreClient.pedidos.update(pedido);
+      batch.update(
+          FirestoreClient.pedidos.collection.doc(pedido.id), pedido.toMap());
     }
+    await batch.commit();
   }
 
   void onSortPedidos(List<PedidoModel> pedidos) {

@@ -14,9 +14,12 @@ class PedidoProdutosWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children:
-          pedido.produtos.map((produto) => _produtoWidget(produto)).toList(),
+    return IgnorePointer(
+      ignoring: pedido.isAguardandoEntradaProducao(),
+      child: Column(
+        children:
+            pedido.produtos.map((produto) => _produtoWidget(produto)).toList(),
+      ),
     );
   }
 
@@ -28,19 +31,23 @@ class PedidoProdutosWidget extends StatelessWidget {
             children: [
               Text('${produto.produto.nome} - ${produto.produto.descricao}'),
               const W(16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                decoration: BoxDecoration(
-                    color: produto.statusess.last
-                        .getStatusView()
-                        .color
-                        .withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(4)),
-                child: Text(produto.statusess.last.getStatusView().label,
-                    style: AppCss.mediumRegular.setSize(12)),
-              )
+              if (!pedido.isAguardandoEntradaProducao())
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                      color: produto.statusess.last
+                          .getStatusView()
+                          .color
+                          .withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(4)),
+                  child: Text(produto.statusess.last.getStatusView().label,
+                      style: AppCss.mediumRegular.setSize(12)),
+                )
             ],
           ),
+          trailing:
+              pedido.isAguardandoEntradaProducao() ? const SizedBox() : null,
           childrenPadding: const EdgeInsets.all(16),
           subtitle: Text(
             '${produto.qtde}Kg',

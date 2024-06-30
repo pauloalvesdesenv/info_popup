@@ -44,7 +44,8 @@ class StepController {
   }
 
   Map<StepModel, List<PedidoModel>> mountKanban() {
-    final pedidos = FirestoreClient.pedidos.data.where((e) => !e.isArchived).toList();
+    final pedidos =
+        FirestoreClient.pedidos.data.where((e) => !e.isArchived).toList();
     final kanban = <StepModel, List<PedidoModel>>{};
     for (StepModel step in FirestoreClient.steps.data.toList()) {
       final pedidosStep = pedidos.where((e) => e.step.id == step.id).toList();
@@ -85,18 +86,15 @@ class StepController {
     utilsStream.update();
   }
 
-  void onAccept(
-    StepModel step,
-    PedidoModel pedido,
-    int index,
-  ) async {
-    if (!onWillAccept(pedido, step)) return;
+  void onAccept(StepModel step, PedidoModel pedido, int index,
+      {bool auto = false}) async {
+    if (!onWillAccept(pedido, step, auto: auto)) return;
     _onMovePedido(pedido, step, index);
     _onAddStep(pedido, step);
     utilsStream.update();
   }
 
-  bool onWillAccept(PedidoModel pedido, StepModel step) {
+  bool onWillAccept(PedidoModel pedido, StepModel step, {bool auto = false}) {
     if (pedido.step.id != step.id) {
       final isStepAvailable =
           step.fromSteps.map((e) => e.id).contains(pedido.step.id);
@@ -106,18 +104,20 @@ class StepController {
         return false;
       }
     }
-    final isUserAvailable = step.moveRoles.contains(usuario.role) &&
-        pedido.step.moveRoles.contains(usuario.role);
-    if (!isUserAvailable) {
-      NotificationService.showNegative('Operação não permitida',
-          'Usuário não tem permissão para alterar essa etapa');
-      return false;
+    if (!auto) {
+      final isUserAvailable = step.moveRoles.contains(usuario.role) &&
+          pedido.step.moveRoles.contains(usuario.role);
+      if (!isUserAvailable) {
+        NotificationService.showNegative('Operação não permitida',
+            'Usuário não tem permissão para alterar essa etapa');
+        return false;
+      }
     }
     return true;
   }
 
   void _onAddStep(PedidoModel pedido, StepModel step) {
-     pedido.histories.add(
+    pedido.histories.add(
       PedidoHistoryModel.create(
           data: step,
           action: PedidoHistoryAction.update,

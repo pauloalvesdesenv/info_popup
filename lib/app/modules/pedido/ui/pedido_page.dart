@@ -102,14 +102,23 @@ class _PedidoPageState extends State<PedidoPage>
         const Divisor(),
         PedidoStatusWidget(pedido),
         const Divisor(),
-        PedidoCorteDobraWidget(pedido),
-        const Divisor(),
-        PedidoProdutosWidget(pedido),
-        const Divisor(),
-        if (pedido.tipo == PedidoTipo.cda) ...[
-          PedidoArmacaoWidget(pedido),
-          const Divisor()
+        if (pedido.isAguardandoEntradaProducao()) ...[
+          PedidoProdutosWidget(pedido),
+          const Divisor(),
         ],
+        if (!pedido.isAguardandoEntradaProducao())
+          Column(
+            children: [
+              PedidoCorteDobraWidget(pedido),
+              const Divisor(),
+              PedidoProdutosWidget(pedido),
+              const Divisor(),
+              if (pedido.tipo == PedidoTipo.cda) ...[
+                PedidoArmacaoWidget(pedido),
+                const Divisor()
+              ],
+            ],
+          ),
         PedidoAnexosWidget(pedido),
         const Divisor(),
         PedidoChecksWidget(pedido),

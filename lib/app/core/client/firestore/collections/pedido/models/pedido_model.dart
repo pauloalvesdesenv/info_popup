@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aco_plus/app/core/client/firestore/collections/automatizacao/automatizacao_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
@@ -44,14 +45,50 @@ class PedidoModel {
   PedidoStatus get status => statusess.last.status;
 
   bool get isChangeStatusAvailable =>
+      !isAguardandoEntradaProducao() &&
       tipo == PedidoTipo.cda &&
       [
         PedidoStatus.aguardandoProducaoCDA,
         PedidoStatus.produzindoCDA,
         PedidoStatus.pronto
-      ].contains(statusess.last.status);
+      ].contains(status);
 
   void addStep(step) => steps.add(PedidoStepModel.create(step));
+
+  bool isAguardandoEntradaProducao() {
+    if (step.index >= automatizacaoConfig.produtoPedidoSeparado.step.index) {
+      return false;
+    }
+    return true;
+  }
+
+  List<PedidoStatusModel> getArmacaoStatusses() {
+    final statusessFiltered = <PedidoStatusModel>[];
+    final status = statusess
+        .where((e) =>
+            e.status == PedidoStatus.produzindoCD ||
+            e.status == PedidoStatus.aguardandoProducaoCD)
+        .toList()
+        .first;
+    for (var status in statusess) {
+      if (status.status != PedidoStatus.produzindoCD &&
+          status.status != PedidoStatus.aguardandoProducaoCD) {
+        statusessFiltered.add(status.copyWith());
+      }
+    }
+    statusessFiltered.add(status.copyWith());
+    statusessFiltered.sort((b, a) => a.createdAt.compareTo(b.createdAt));
+    for (var status in statusessFiltered) {
+      if (status.status == PedidoStatus.produzindoCD) {
+        status.status = PedidoStatus.aguardandoProducaoCD;
+      }
+    }
+    return statusessFiltered;
+  }
+
+  int iOfProductById(String id) {
+    return produtos.indexWhere((element) => element.id == id);
+  }
 
   PedidoModel({
     required this.id,

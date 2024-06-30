@@ -12,9 +12,9 @@ enum AppModule {
   dashboard,
   kanban,
   pedidos,
-  cliente,
   ordens,
   relatorios,
+  cliente,
   steps,
   tags,
 }

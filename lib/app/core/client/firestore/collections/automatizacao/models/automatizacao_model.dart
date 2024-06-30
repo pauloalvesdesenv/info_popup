@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/automatizacao/mod
 
 class AutomatizacaoModel {
   final AutomatizacaoItemModel criacaoPedido;
+  final AutomatizacaoItemModel produtoPedidoSeparado;
   final AutomatizacaoItemModel produzindoCDPedido;
   final AutomatizacaoItemModel prontoCDPedido;
   final AutomatizacaoItemModel aguardandoArmacaoPedido;
@@ -12,6 +13,7 @@ class AutomatizacaoModel {
 
   List<AutomatizacaoItemModel> get itens => [
         criacaoPedido,
+        produtoPedidoSeparado,
         produzindoCDPedido,
         prontoCDPedido,
         aguardandoArmacaoPedido,
@@ -21,6 +23,7 @@ class AutomatizacaoModel {
 
   AutomatizacaoModel({
     required this.criacaoPedido,
+    required this.produtoPedidoSeparado,
     required this.produzindoCDPedido,
     required this.prontoCDPedido,
     required this.aguardandoArmacaoPedido,
@@ -30,6 +33,7 @@ class AutomatizacaoModel {
 
   AutomatizacaoModel copyWith({
     AutomatizacaoItemModel? criacaoPedido,
+    AutomatizacaoItemModel? produtoPedidoSeparado,
     AutomatizacaoItemModel? produzindoCDPedido,
     AutomatizacaoItemModel? prontoCDPedido,
     AutomatizacaoItemModel? aguardandoArmacaoPedido,
@@ -38,6 +42,8 @@ class AutomatizacaoModel {
   }) {
     return AutomatizacaoModel(
       criacaoPedido: criacaoPedido ?? this.criacaoPedido,
+      produtoPedidoSeparado:
+          produtoPedidoSeparado ?? this.produtoPedidoSeparado,
       produzindoCDPedido: produzindoCDPedido ?? this.produzindoCDPedido,
       prontoCDPedido: prontoCDPedido ?? this.prontoCDPedido,
       aguardandoArmacaoPedido:
@@ -51,6 +57,7 @@ class AutomatizacaoModel {
   Map<String, dynamic> toMap() {
     return {
       'criacaoPedido': criacaoPedido.toMap(),
+      'produtoPedidoSeparado': produtoPedidoSeparado.toMap(),
       'produzindoCDPedido': produzindoCDPedido.toMap(),
       'prontoCDPedido': prontoCDPedido.toMap(),
       'aguardandoArmacaoPedido': aguardandoArmacaoPedido.toMap(),
@@ -62,6 +69,8 @@ class AutomatizacaoModel {
   factory AutomatizacaoModel.fromMap(Map<String, dynamic> map) {
     return AutomatizacaoModel(
       criacaoPedido: AutomatizacaoItemModel.fromMap(map['criacaoPedido']),
+      produtoPedidoSeparado:
+          AutomatizacaoItemModel.fromMap(map['produtoPedidoSeparado']),
       produzindoCDPedido:
           AutomatizacaoItemModel.fromMap(map['produzindoCDPedido']),
       prontoCDPedido: AutomatizacaoItemModel.fromMap(map['prontoCDPedido']),

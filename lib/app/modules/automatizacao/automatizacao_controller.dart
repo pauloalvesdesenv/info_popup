@@ -1,9 +1,11 @@
-import 'package:aco_plus/app/core/client/firestore/collections/automatizacao/models/automatizacao_model.dart';
-import 'package:aco_plus/app/core/extensions/string_ext.dart';
-import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/automatizacao/automatizacao_collection.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 
 final automatizacaoCtrl = AutomatizacaoController();
-AutomatizacaoModel get automatizacao => automatizacaoCtrl.automatizacao!;
 
 class AutomatizacaoController {
   static final AutomatizacaoController _instance = AutomatizacaoController._();
@@ -12,73 +14,47 @@ class AutomatizacaoController {
 
   factory AutomatizacaoController() => _instance;
 
-  final AppStream<AutomatizacaoModel?> automatizacaoStream =
-      AppStream<AutomatizacaoModel?>.seed(null);
-  AutomatizacaoModel? get automatizacao => automatizacaoStream.value;
+  Future<void> onSetStepByPedidoStatus(List<PedidoModel> pedidos) async {
+    for (PedidoModel pedido in pedidos) {
+      StepModel? step;
+      switch (pedido.status) {
+        case PedidoStatus.aguardandoProducaoCD:
+          step = automatizacaoConfig.produtoPedidoSeparado.step;
+          break;
+        case PedidoStatus.produzindoCD:
+          step = automatizacaoConfig.produzindoCDPedido.step;
+          break;
+        case PedidoStatus.aguardandoProducaoCDA:
+          step = automatizacaoConfig.aguardandoArmacaoPedido.step;
+          break;
+        case PedidoStatus.produzindoCDA:
+          step = automatizacaoConfig.produzindoArmacaoPedido.step;
+          break;
+        case PedidoStatus.pronto:
+          switch (pedido.tipo) {
+            case PedidoTipo.cd:
+              step = automatizacaoConfig.prontoCDPedido.step;
+              break;
+            case PedidoTipo.cda:
+              step = automatizacaoConfig.prontoArmacaoPedido.step;
+            default:
+          }
+          if (step != null) {
+            if (pedido.step.index >= step.index) {
+              step = null;
+            }
+          }
 
-  void onInit() {
-    // utilsStream.add(AutomatizacaoUtils());
-    // FirestoreClient.automatizacaos.fetch();
-  }
+          break;
+        default:
+      }
 
-  // final AppStream<AutomatizacaoCreateModel> formStream = AppStream<AutomatizacaoCreateModel>();
-  // AutomatizacaoCreateModel get form => formStream.value;
-
-  void init(AutomatizacaoModel? automatizacao) {
-    // formStream.add(automatizacao != null
-    //     ? AutomatizacaoCreateModel.edit(automatizacao)
-    //     : AutomatizacaoCreateModel());
-  }
-
-  List<AutomatizacaoModel> getAutomatizacaoesFiltered(
-      String search, List<AutomatizacaoModel> automatizacaos) {
-    if (search.length < 3) return automatizacaos;
-    List<AutomatizacaoModel> filtered = [];
-    for (final automatizacao in automatizacaos) {
-      if (automatizacao.toString().toCompare.contains(search.toCompare)) {
-        filtered.add(automatizacao);
+      if (step != null) {
+        if (!kanbanCtrl.utilsStream.controller.hasValue) {
+          await kanbanCtrl.onInit();
+        }
+        kanbanCtrl.onAccept(step, pedido, 0, auto: true);
       }
     }
-    return filtered;
-  }
-
-  Future<void> onConfirm(_, AutomatizacaoModel? automatizacao) async {
-    // try {
-    //   onValid();
-    //   final newAutomatizacao = form.toAutomatizacaoModel(automatizacao);
-    //   if (form.isEdit) {
-    //     await FirestoreClient.automatizacaos.update(newAutomatizacao);
-    //   } else {
-    //     await FirestoreClient.automatizacaos.add(newAutomatizacao);
-    //   }
-    //   if (newAutomatizacao.isDefault) {
-    //     await FirestoreClient.automatizacaos.setDefault(newAutomatizacao.id);
-    //   }
-    //   pop(_);
-    //   NotificationService.showPositive(
-    //       'Automatizacao ${form.isEdit ? 'Editado' : 'Adicionado'}',
-    //       'Operação realizada com sucesso',
-    //       position: NotificationPosition.bottom);
-    //   await FirestoreClient.automatizacaos.fetch();
-    // } catch (e) {
-    //   NotificationService.showNegative('Erro', e.toString(),
-    //       position: NotificationPosition.bottom);
-    // }
-  }
-
-  Future<void> onDelete(_, AutomatizacaoModel automatizacao) async {
-    // if (await _isDeleteUnavailable(automatizacao)) return;
-    // await FirestoreClient.automatizacaos.delete(automatizacao);
-    // pop(_);
-    // NotificationService.showPositive(
-    //     'Automatizacao Excluido', 'Operação realizada com sucesso',
-    //     position: NotificationPosition.bottom);
-    // await FirestoreClient.automatizacaos.fetch();
-  }
-
-  void onValid() {
-    // if (form.name.text.isEmpty) {
-    //   throw Exception('Nome não pode ser vazio');
-    // }
   }
 }

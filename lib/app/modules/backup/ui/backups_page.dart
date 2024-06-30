@@ -47,7 +47,9 @@ class _BackupsPageState extends State<BackupsPage> {
       ),
       body: StreamOut<List<BackupModel>>(
         stream: backupCtrl.backupsStream.listen,
-        builder: (_, backups) => Column(
+        builder: (_, backups) {
+          backups = backups.reversed.toList();
+          return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
@@ -62,7 +64,8 @@ class _BackupsPageState extends State<BackupsPage> {
               ),
             ),
           ],
-        ),
+        );
+        },
       ),
     );
   }

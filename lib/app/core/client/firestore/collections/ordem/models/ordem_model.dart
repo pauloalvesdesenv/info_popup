@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
@@ -13,6 +14,12 @@ class OrdemModel {
   DateTime? endAt;
   List<PedidoProdutoModel> produtos;
   bool selected = true;
+
+  List<PedidoModel> get pedidos {
+    final pedidosIds =
+        produtos.map((e) => e.pedido).map((e) => e.id).toSet().toList();
+    return pedidosIds.map((e) => FirestoreClient.pedidos.getById(e)).toList();
+  }
 
   double get qtdeTotal => produtos.fold(
       0, (previousValue, element) => previousValue + element.qtde);

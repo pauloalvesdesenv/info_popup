@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:flutter/material.dart';
 
 enum PedidoProdutoStatus { separado, aguardandoProducao, produzindo, pronto }
@@ -51,6 +52,12 @@ class PedidoProdutoStatusModel {
     required this.status,
     required this.createdAt,
   });
+
+  factory PedidoProdutoStatusModel.create(PedidoProdutoStatus status) => PedidoProdutoStatusModel(
+    id: HashService.get,
+    createdAt: DateTime.now(),
+    status: status,
+  );
 
   Map<String, dynamic> toMap() {
     return {

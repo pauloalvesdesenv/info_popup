@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 
 class PedidoStatusModel {
   final String id;
@@ -11,6 +12,12 @@ class PedidoStatusModel {
     required this.status,
     required this.createdAt,
   });
+
+  factory PedidoStatusModel.create(PedidoStatus status) => PedidoStatusModel(
+        id: HashService.get,
+        createdAt: DateTime.now(),
+        status: status,
+      );
 
   Map<String, dynamic> toMap() {
     return {
