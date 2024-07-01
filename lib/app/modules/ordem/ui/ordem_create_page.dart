@@ -134,33 +134,49 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                   ],
                 ),
               ),
-              if (form.isEdit)
-                for (var produto
-                    in ordemCtrl.getPedidosPorProdutoEdit(widget.ordem!))
-                  _itemProduto(
-                    produto: produto,
-                    check: produto.selected,
-                    onTap: () {
-                      produto.selected = !produto.selected;
-                      ordemCtrl.formStream.update();
-                    },
-                    isEnable: produto.status.status.index <= 1,
-                  ),
-              if (form.produto != null)
-                for (var produto
-                    in ordemCtrl.getPedidosPorProduto(form.produto!))
-                  _itemProduto(
-                      isEnable: true,
-                      produto: produto,
-                      check: form.produtos.contains(produto),
-                      onTap: () {
-                        if (form.produtos.contains(produto)) {
-                          form.produtos.remove(produto);
-                        } else {
-                          form.produtos.add(produto);
-                        }
-                        ordemCtrl.formStream.update();
-                      }),
+              Builder(
+                builder: (context) {
+                  List<PedidoProdutoModel> produtosAddeds = [
+                    if (form.isEdit)
+                      ...ordemCtrl.getPedidosPorProdutoEdit(widget.ordem!),
+                  ];
+                  List<PedidoProdutoModel> produtosSepairs = [];
+                  if (form.produto != null) {
+                    produtosSepairs =
+                        ordemCtrl.getPedidosPorProduto(form.produto!);
+                    produtosAddeds.removeWhere(
+                        (e) => produtosAddeds.map((e) => e.id).contains(e.id));
+                  }
+
+                  return Column(
+                    children: [
+                      for (PedidoProdutoModel produto in produtosAddeds)
+                        _itemProduto(
+                          produto: produto,
+                          check: produto.selected,
+                          onTap: () {
+                            produto.selected = !produto.selected;
+                            ordemCtrl.formStream.update();
+                          },
+                          isEnable: produto.status.status.index <= 1,
+                        ),
+                      for (PedidoProdutoModel produto in produtosSepairs)
+                        _itemProduto(
+                            isEnable: true,
+                            produto: produto,
+                            check: form.produtos.contains(produto),
+                            onTap: () {
+                              if (form.produtos.contains(produto)) {
+                                form.produtos.remove(produto);
+                              } else {
+                                form.produtos.add(produto);
+                              }
+                              ordemCtrl.formStream.update();
+                            })
+                    ],
+                  );
+                },
+              )
             ],
           ),
         ),

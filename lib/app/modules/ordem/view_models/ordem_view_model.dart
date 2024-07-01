@@ -12,6 +12,7 @@ class OrdemUtils {
     PedidoProdutoStatus.aguardandoProducao,
     PedidoProdutoStatus.produzindo
   ];
+  ProdutoModel? produto;
 }
 
 class OrdemCreateModel {

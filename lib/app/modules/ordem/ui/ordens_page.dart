@@ -1,8 +1,10 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drawer.dart';
+import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_drop_down_list.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -75,6 +77,11 @@ class _OrdensPageState extends State<OrdensPage> {
               ordens =
                   ordens.where((e) => utils.status.contains(e.status)).toList();
             }
+            if (utils.produto != null) {
+              ordens = ordens
+                  .where((e) => e.produto.id == utils.produto!.id)
+                  .toList();
+            }
             return RefreshIndicator(
               onRefresh: () async => FirestoreClient.ordens.fetch(),
               child: ListView(
@@ -90,6 +97,18 @@ class _OrdensPageState extends State<OrdensPage> {
                           onChanged: (_) => ordemCtrl.utilsStream.update(),
                         ),
                         const H(16),
+                        AppDropDown<ProdutoModel?>(
+                          label: 'Bitola',
+                          item: utils.produto,
+                          itens: FirestoreClient.produtos.data.toList(),
+                          itemLabel: (e) =>
+                              e != null ? e.descricao : 'Selecione um produto',
+                          onSelect: (e) {
+                            utils.produto = e;
+                            ordemCtrl.utilsStream.update();
+                          },
+                        ),
+                        const H(16),
                         AppDropDownList<PedidoProdutoStatus>(
                           label: 'Ordernar por',
                           addeds: utils.status,
@@ -103,7 +122,7 @@ class _OrdensPageState extends State<OrdensPage> {
                           onChanged: () {
                             ordemCtrl.utilsStream.update();
                           },
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -112,6 +131,7 @@ class _OrdensPageState extends State<OrdensPage> {
                       : ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
+                          cacheExtent: 200,
                           itemCount: ordens.length,
                           separatorBuilder: (_, i) => const Divisor(),
                           itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
@@ -194,3 +214,4 @@ class _OrdensPageState extends State<OrdensPage> {
     );
   }
 }
+//ALLAN SILVA 007 / OP1057 / 12.55

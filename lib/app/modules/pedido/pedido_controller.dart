@@ -1,5 +1,7 @@
+import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
@@ -142,6 +144,12 @@ class PedidoController {
     } else {
       pedidoStream = AppStream<PedidoModel>();
     }
+  }
+
+  OrdemModel? getOrdemByProduto(PedidoProdutoModel produto) {
+    return FirestoreClient.ordens.data.firstWhere(
+      (e) => e.produtos.any((p) => p.id == produto.id),
+    );
   }
 
   void onInitPage(PedidoModel pedido) {

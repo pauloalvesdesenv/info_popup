@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum ArchiveType { pdf, image, video, undefined }
+enum ArchiveType { pdf, image, video, other, undefined }
 
 extension ArchiveTypeExtension on ArchiveType {
   String get name {
@@ -11,6 +11,8 @@ extension ArchiveTypeExtension on ArchiveType {
         return 'Imagem';
       case ArchiveType.video:
         return 'Vídeo';
+      case ArchiveType.other:
+        return 'Outros';
       default:
         return 'Desconhecido';
     }
@@ -24,6 +26,8 @@ extension ArchiveTypeExtension on ArchiveType {
         return Icons.image;
       case ArchiveType.video:
         return Icons.video_library;
+      case ArchiveType.other:
+        return Icons.file_present_rounded;
       default:
         return Icons.error;
     }

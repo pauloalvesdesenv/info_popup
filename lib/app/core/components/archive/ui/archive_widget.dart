@@ -1,6 +1,7 @@
 import 'package:aco_plus/app/core/components/archive/archive_model.dart';
 import 'package:aco_plus/app/core/components/archive/archive_type.dart';
 import 'package:aco_plus/app/core/components/archive/ui/archive_type_widgets/archive_image_widget.dart';
+import 'package:aco_plus/app/core/components/archive/ui/archive_type_widgets/archive_other_widget.dart';
 import 'package:aco_plus/app/core/components/archive/ui/archive_type_widgets/archive_pdf_widget.dart';
 import 'package:aco_plus/app/core/components/archive/ui/archive_type_widgets/archive_video_widget.dart';
 import 'package:aco_plus/app/core/components/h.dart';
@@ -84,7 +85,7 @@ class ArchiveWidget extends StatelessWidget {
       case ArchiveType.pdf:
         child = ArchivePDFWidget(archive, inList: inList);
       default:
-        child = const SizedBox();
+        child =  ArchiveOtherWidget(archive);
     }
     return InkWell(
       onTap: () => DownloadFileURLService.call(archive.url!),

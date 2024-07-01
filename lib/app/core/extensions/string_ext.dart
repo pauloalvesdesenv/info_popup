@@ -84,7 +84,7 @@ extension StringExt on String {
       case 'video/mov':
         return ArchiveType.video;
       default:
-        throw Exception();
+        return ArchiveType.other;
     }
   }
 

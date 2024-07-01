@@ -6,6 +6,7 @@ import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:flutter/material.dart';
 
 class PedidoProdutosWidget extends StatelessWidget {
@@ -31,6 +32,26 @@ class PedidoProdutosWidget extends StatelessWidget {
             children: [
               Text('${produto.produto.nome} - ${produto.produto.descricao}'),
               const W(16),
+              if (produto.status.status.index >=
+                  PedidoProdutoStatus.aguardandoProducao.index) ...[
+                Builder(builder: (context) {
+                  final ordem = pedidoCtrl.getOrdemByProduto(produto);
+                  if (ordem == null) return const SizedBox();
+                  return Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: Text(ordem.id,
+                        style: AppCss.mediumRegular.copyWith(
+                            fontSize: 12,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold)),
+                  );
+                }),
+                const W(4),
+              ],
               if (!pedido.isAguardandoEntradaProducao())
                 Container(
                   padding:
@@ -92,3 +113,4 @@ class PedidoProdutosWidget extends StatelessWidget {
     );
   }
 }
+// 10mm - 195.52

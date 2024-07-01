@@ -163,6 +163,7 @@ class _PedidosPageState extends State<PedidosPage> {
                           itemCount: pedidos.length,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
+                          cacheExtent: 200,
                           separatorBuilder: (_, i) => const Divisor(),
                           itemBuilder: (_, i) => _itemPedidoWidget(pedidos[i]),
                         ),
