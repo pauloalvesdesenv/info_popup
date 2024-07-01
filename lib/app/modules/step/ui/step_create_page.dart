@@ -14,6 +14,7 @@ import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/step/step_controller.dart';
+import 'package:aco_plus/app/modules/step/step_shipping_view_model.dart';
 import 'package:aco_plus/app/modules/step/step_view_model.dart';
 import 'package:flutter/material.dart';
 
@@ -103,14 +104,37 @@ class _StepCreatePageState extends State<StepCreatePage> {
               stepCtrl.formStream.add(form);
             }),
         const H(16),
+        // AppCheckbox(
+        //   label: 'Padrão ao criar pedido',
+        //   value: form.isDefault,
+        //   onChanged: (e) {
+        //     form.isDefault = e;
+        //     stepCtrl.formStream.update();
+        //   },
+        // ),
+        // const H(16),
         AppCheckbox(
-          label: 'Padrão ao criar pedido',
-          value: form.isDefault,
+          value: form.isShipping,
+          label: 'Acompanhamento do Cliente',
           onChanged: (e) {
-            form.isDefault = e;
+            form.isShipping = e;
+            if (form.isShipping) {
+              form.shipping = StepShippingCreateModel();
+            } else {
+              form.shipping = null;
+            }
             stepCtrl.formStream.update();
           },
         ),
+        if (form.isShipping) ...[
+          const H(16),
+          AppField(
+            label: 'Texto de Acompanhamento',
+            controller: form.shipping!.description,
+            onChanged: (_) => stepCtrl.formStream.update(),
+          ),
+          const H(16),
+        ],
         const H(24),
         if (form.isEdit)
           TextButton.icon(

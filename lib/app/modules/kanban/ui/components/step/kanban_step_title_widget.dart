@@ -75,9 +75,18 @@ class KanbanStepTitleWidget extends StatelessWidget {
           ),
           PopupMenuItem(
             onTap: () {
-              pedidos.sort((a, b) => [a.deliveryAt, b.deliveryAt].contains(null)
-                  ? a.deliveryAt!.compareTo(b.deliveryAt!)
-                  : 0);
+              pedidos.sort((a, b) {
+                if (a.deliveryAt == null && b.deliveryAt == null) {
+                  return 0;
+                } else if (a.deliveryAt == null) {
+                  return 1;
+                } else if (b.deliveryAt == null) {
+                  return -1;
+                } else {
+                  return a.deliveryAt!
+                      .compareTo(b.deliveryAt!); // Comparação normal
+                }
+              });
               for (var i = 0; i < pedidos.length; i++) {
                 pedidos[i].index = i;
               }

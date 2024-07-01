@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/router/route_config.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_theme.dart';
 import 'package:aco_plus/app/modules/base/base_page.dart';
@@ -31,18 +32,35 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return Portal(
       child: OverlaySupport(
-          child: MaterialApp(
-              color: AppColors.primaryMain,
-              theme: AppTheme.theme,
-              debugShowCheckedModeBanner: false,
-              navigatorKey: _appController.key,
-              title: 'AÇO+',
-              home: StreamOutNull<UsuarioModel?>(
-                stream: usuarioCtrl.usuarioStream.listen,
-                child: (_, data) => data == null
-                    ? const SignUpPage()
-                    : const Portal(child: BasePage()),
-              ))),
+          child: MaterialApp.router(
+        color: AppColors.primaryMain,
+        theme: AppTheme.theme,
+        debugShowCheckedModeBanner: false,
+        title: 'AÇO+',
+        routeInformationParser: RouteConfig.config.routeInformationParser,
+        routeInformationProvider: RouteConfig.config.routeInformationProvider,
+        routerDelegate: RouteConfig.config.routerDelegate,
+        // navigatorKey: _appController.key,
+        // home: StreamOutNull<UsuarioModel?>(
+        //   stream: usuarioCtrl.usuarioStream.listen,
+        //   child: (_, data) => data == null
+        //       ? const SignUpPage()
+        //       : const Portal(child: BasePage()),
+        // ),
+      )),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamOutNull<UsuarioModel?>(
+      stream: usuarioCtrl.usuarioStream.listen,
+      child: (_, data) =>
+          data == null ? const SignUpPage() : const Portal(child: BasePage()),
     );
   }
 }

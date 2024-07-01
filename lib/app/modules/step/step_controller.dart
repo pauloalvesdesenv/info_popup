@@ -96,6 +96,11 @@ class StepController {
     if (form.name.text.isEmpty) {
       throw Exception('Nome não pode ser vazio');
     }
-    
+  }
+
+  List<int> getSteps(int? pos) {
+    final positions = [0, 1, 2, 3, 4, 5, 6];
+    positions.sort((a, b) => a.compareTo(b));
+    return positions;
   }
 }

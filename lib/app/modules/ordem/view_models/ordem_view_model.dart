@@ -39,7 +39,7 @@ class OrdemCreateModel {
   OrdemModel toOrdemModel(OrdemModel? ordem) {
     return OrdemModel(
       id: id,
-      createdAt: DateTime.now(),
+      createdAt: ordem?.createdAt ?? DateTime.now(),
       produto: produto!,
       produtos: [
         ...produtos.where((e) => e.selected).toList(),

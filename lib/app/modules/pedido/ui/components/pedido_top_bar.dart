@@ -7,6 +7,7 @@ import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_create_page.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
   final PedidoModel pedido;
@@ -46,6 +47,14 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           const Spacer(),
           InkWell(
+              onTap: () async => context
+                  .push('/acompanhamento/pedidos/0VO0BCbtfKlAkAVzqtpZd0V8m'),
+              child: Icon(
+                Icons.local_shipping,
+                color: AppColors.white,
+              )),
+          const W(12),
+          InkWell(
               onTap: () async =>
                   push(context, PedidoCreatePage(pedido: pedido)),
               child: Icon(
@@ -78,6 +87,11 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
             style: AppCss.largeBold.setColor(AppColors.white)),
         backgroundColor: AppColors.primaryMain,
         actions: [
+          const W(12),
+          IconButton(
+              onPressed: () => context
+                  .push('/acompanhamento/pedidos/0VO0BCbtfKlAkAVzqtpZd0V8m'),
+              icon: Icon(Icons.local_shipping, color: AppColors.white)),
           IconButton(
               onPressed: () => pedidoCtrl.onArchive(context, pedido),
               icon: Icon(Icons.archive, color: AppColors.white)),

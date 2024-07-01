@@ -89,6 +89,8 @@ class PedidoHistoryModel {
     }
   }
 
+  
+
   String get title {
     switch (type) {
       case PedidoHistoryType.status:

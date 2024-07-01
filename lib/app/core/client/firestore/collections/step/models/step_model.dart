@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_shipping_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
@@ -15,6 +16,9 @@ class StepModel {
   int index;
   List<String> fromStepsIds;
   bool isDefault = false;
+  bool isShipping = false;
+  StepShippingModel? shipping;
+
   static StepModel notFound = StepModel(
     createdAt: DateTime.now(),
     fromStepsIds: [],
@@ -24,6 +28,8 @@ class StepModel {
     id: 'step-not-found',
     name: 'step-not-found',
     index: 100000000,
+    isShipping: false,
+    shipping: null,
   );
 
   List<StepModel> get fromSteps =>
@@ -40,27 +46,35 @@ class StepModel {
     required this.createdAt,
     required this.index,
     required this.isDefault,
+    required this.isShipping,
+    required this.shipping,
   });
 
-  StepModel copyWith(
-      {String? id,
-      String? name,
-      Color? color,
-      List<String>? fromStepsIds,
-      List<String>? toStepsIds,
-      List<UsuarioRole>? moveRoles,
-      DateTime? createdAt,
-      int? index,
-      bool? isDefault}) {
+  StepModel copyWith({
+    String? id,
+    String? name,
+    Color? color,
+    List<String>? fromStepsIds,
+    List<String>? toStepsIds,
+    List<UsuarioRole>? moveRoles,
+    DateTime? createdAt,
+    int? index,
+    bool? isDefault,
+    bool? isShipping,
+    StepShippingModel? shipping,
+  }) {
     return StepModel(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        color: color ?? this.color,
-        fromStepsIds: fromStepsIds ?? this.fromStepsIds,
-        moveRoles: moveRoles ?? this.moveRoles,
-        createdAt: createdAt ?? this.createdAt,
-        index: index ?? this.index,
-        isDefault: isDefault ?? this.isDefault);
+      id: id ?? this.id,
+      name: name ?? this.name,
+      color: color ?? this.color,
+      fromStepsIds: fromStepsIds ?? this.fromStepsIds,
+      moveRoles: moveRoles ?? this.moveRoles,
+      createdAt: createdAt ?? this.createdAt,
+      index: index ?? this.index,
+      isDefault: isDefault ?? this.isDefault,
+      isShipping: isShipping ?? this.isShipping,
+      shipping: shipping ?? this.shipping,
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -72,7 +86,9 @@ class StepModel {
       'moveRoles': moveRoles.map((x) => x.index).toList(),
       'createdAt': createdAt.millisecondsSinceEpoch,
       'index': index,
-      'isDefault': isDefault
+      'isDefault': isDefault,
+      'isShipping': isShipping,
+      'shipping': shipping?.toMap(),
     };
   }
 
@@ -95,20 +111,27 @@ class StepModel {
           fromStepsIds: <String>[],
           moveRoles: <UsuarioRole>[],
           createdAt: DateTime.now(),
-          isDefault: false);
+          isDefault: false,
+          isShipping: false,
+          shipping: null);
     }
     return StepModel(
-        id: map['id'] ?? '',
-        name: map['name'] ?? '',
-        index: map['index'] ?? 0,
-        color: Color(map['color']),
-        fromStepsIds: map['fromStepsIds'] != null
-            ? List<String>.from(map['fromStepsIds'])
-            : <String>[],
-        moveRoles: List<UsuarioRole>.from(
-            map['moveRoles']?.map((x) => UsuarioRole.values[x])),
-        createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-        isDefault: map['isDefault'] ?? false);
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      index: map['index'] ?? 0,
+      color: Color(map['color']),
+      fromStepsIds: map['fromStepsIds'] != null
+          ? List<String>.from(map['fromStepsIds'])
+          : <String>[],
+      moveRoles: List<UsuarioRole>.from(
+          map['moveRoles']?.map((x) => UsuarioRole.values[x])),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      isDefault: map['isDefault'] ?? false,
+      isShipping: map['isShipping'] ?? false,
+      shipping: map['shipping'] != null
+          ? StepShippingModel.fromMap(map['shipping'])
+          : null,
+    );
   }
 
   String toJson() => json.encode(toMap());

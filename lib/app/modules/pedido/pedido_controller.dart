@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
@@ -273,5 +274,21 @@ class PedidoController {
       NotificationService.showPositive('Pedido Desarquivado!',
           'Acesse a lista de pedidos para visualizar o pedido');
     }
+  }
+
+  List<PedidoHistoryModel> getHistoricoAcompanhamento(PedidoModel pedido) {
+    List<PedidoHistoryModel> histories = pedido.histories.reversed
+        .where((e) => e.type == PedidoHistoryType.step)
+        .toList();
+
+    histories.where((e) => e.data.isShipping).toList();
+
+    return histories;
+  }
+
+  int getIndexStep(PedidoHistoryModel history) {
+    final stepHistory = history.data as StepModel;
+    final step = FirestoreClient.steps.getById(stepHistory.id);
+    return step.index;
   }
 }

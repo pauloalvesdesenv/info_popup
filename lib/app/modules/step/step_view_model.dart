@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
+import 'package:aco_plus/app/modules/step/step_shipping_view_model.dart';
 import 'package:flutter/material.dart';
 
 class StepUtils {
@@ -18,6 +19,8 @@ class StepCreateModel {
   List<UsuarioRole> moveRoles = [];
   DateTime createdAt = DateTime.now();
   bool isDefault = false;
+  bool isShipping = false;
+  StepShippingCreateModel? shipping;
 
   late bool isEdit;
 
@@ -34,6 +37,10 @@ class StepCreateModel {
     moveRoles = etapa.moveRoles;
     createdAt = etapa.createdAt;
     isDefault = etapa.isDefault;
+    isShipping = etapa.isShipping;
+    shipping = etapa.shipping != null
+        ? StepShippingCreateModel.edit(etapa.shipping!)
+        : null;
   }
 
   StepModel toStepModel(StepModel? etapa) => StepModel(
@@ -45,5 +52,7 @@ class StepCreateModel {
         createdAt: createdAt,
         index: etapa?.index ?? FirestoreClient.steps.data.length,
         isDefault: isDefault,
+        isShipping: isShipping,
+        shipping: shipping?.toStepShippingModel(),
       );
 }
