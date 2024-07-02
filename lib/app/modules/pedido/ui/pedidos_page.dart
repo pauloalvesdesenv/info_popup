@@ -88,15 +88,20 @@ class _PedidosPageState extends State<PedidosPage> {
           builder: (_, utils) {
             pedidos = pedidos.where((e) => !e.isArchived).toList();
             pedidos = pedidoCtrl
-                .getPedidosFiltered(utils.search.text, pedidos)
+                .getPedidosFiltered(
+                    utils.search.text,
+                    FirestoreClient.pedidos.data
+                        .map((e) => e.copyWith())
+                        .toList())
                 .toList();
             pedidoCtrl.onSortPedidos(pedidos);
             return RefreshIndicator(
               onRefresh: () async => await FirestoreClient.pedidos.fetch(),
               child: ListView(
                 children: [
-                  if (utils.showFilter)
-                    Padding(
+                  Visibility(
+                    visible: utils.showFilter,
+                    child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
@@ -157,6 +162,7 @@ class _PedidosPageState extends State<PedidosPage> {
                         ],
                       ),
                     ),
+                  ),
                   pedidos.isEmpty
                       ? const EmptyData()
                       : ListView.separated(

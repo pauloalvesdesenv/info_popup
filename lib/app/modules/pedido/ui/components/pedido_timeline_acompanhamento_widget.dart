@@ -64,10 +64,9 @@ class _PedidoTimelinAcompanhamentoeWidgetState
                         final StepModel step = e.data as StepModel;
                         return Step(
                           content: const SizedBox(),
-                          label: Text(step.shipping?.description ?? step.name),
                           isActive: histories.indexOf(e) == 0,
-                          title: Text(e.title),
-                          subtitle: Text(e.createdAt.textHour(),
+                          title: Text(step.shipping?.description ?? step.name),
+                          subtitle: Text(step.createdAt.textHour(),
                               style: AppCss.smallRegular.setSize(12)),
                         );
                       }).toList()),

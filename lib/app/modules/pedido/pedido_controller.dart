@@ -171,6 +171,7 @@ class PedidoController {
     if (step == null) return;
     if (pedido.steps.last.step.id == step.id) return;
     kanbanCtrl.onAccept(step, pedido, 0);
+    pedidoStream.update();
   }
 
   Future<void> onVerifyPedidoStatus() async {
@@ -247,6 +248,7 @@ class PedidoController {
     pedido.histories.add(
       PedidoHistoryModel.create(data: data, action: action, type: type),
     );
+    FirestoreClient.pedidos.update(pedido);
   }
 
   void setPedidoUsuarios(PedidoModel pedido, List<UsuarioModel> usuarios) {

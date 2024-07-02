@@ -13,8 +13,11 @@ void main() async {
   // };
   // PlatformDispatcher.instance.onError = (error, stack) {
   //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-  //   return true;
+  //   return true;qw
   // };
   await Service.initAplicationServices();
   runApp(const App());
 }
+
+
+//uvI3LybCdJKE7ivo14JDIdHtP

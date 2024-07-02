@@ -65,7 +65,6 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
         title: Text('${pedidoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Pedido',
             style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-
           if ((widget.pedido != null &&
                   usuario.permission.pedido
                       .contains(UserPermissionType.update)) ||
@@ -290,77 +289,6 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
             pedidoCtrl.formStream.update();
           },
         ),
-        // TypeAheadField(
-        //   builder: (_, __, ___) => AppField(
-        //     controllerObj: __,
-        //     focusObj: ___,
-        //     label: 'Cliente',
-        //   ),
-        //   controller: form.clienteEC.controller,
-        //   focusNode: form.clienteEC.focus,
-        //   suggestionsCallback: (pattern) async {
-        //     if (pattern.length < 2) return [];
-        //     final list = FirestoreClient.clientes.data
-        //         .where((e) =>
-        //             e.toString().toCompare.contains(pattern.toCompare))
-        //         .toList();
-        //     return [null, ...list];
-        //   },
-        //   hideOnEmpty: true,
-
-        //   // noItemsFoundBuilder: (context) => const Padding(
-        //   //   padding: EdgeInsets.all(16),
-        //   //   child: Text('Nenhum controlador encontrado'),
-        //   // ),
-        //   itemBuilder: (context, cliente) => Container(
-        //     color: Colors.white,
-        //     padding: const EdgeInsets.all(8),
-        //     child: Text(
-        //       cliente?.nome ?? 'ADICIONAR CLIENTE',
-        //       style: AppCss.mediumRegular,
-        //     ),
-        //   ),
-        //   onSelected: (e) async {
-        //     if (e?.id == 'add') {
-        //       final created = await showClienteCreateSimplifyBottom();
-        //       if (created != null) {
-        //         form.clienteAdd = created;
-        //         form.cliente = created;
-        //         form.obra = form.cliente!.obras.first;
-        //         pedidoCtrl.formStream.update();
-        //       }
-        //     } else {
-        //       form.clienteEC.controller.text = e.nome;
-        //       form.cliente = e;
-        //     }
-        //     pedidoCtrl.formStream.update();
-        //   },
-        // ),
-        // AppDropDown<ClienteModel?>(
-        //   label: 'Cliente',
-        //   disable: form.isEdit,
-        //   item: form.cliente,
-        //   itens: [
-        //     ClienteAdd(),
-        //     if (form.clienteAdd != null) form.clienteAdd,
-        //     ...FirestoreClient.clientes.data
-        //   ],
-        //   itemLabel: (e) => e?.nome ?? 'ADICIONAR CLIENTE',
-        //   onSelect: (e) async {
-        //     if (e?.id == 'add') {
-        //       final created = await showClienteCreateSimplifyBottom();
-        //       if (created != null) {
-        //         form.clienteAdd = created;
-        //         form.cliente = created;
-        //         form.obra = form.cliente!.obras.first;
-        //         pedidoCtrl.formStream.update();
-        //       }
-        //     } else {
-        //       form.cliente = e;
-        //     }
-        //     pedidoCtrl.formStream.update();
-        //   },
-        // ),
         const H(16),
         AppDropDown<ObraModel?>(
           label: 'Obra',
@@ -409,9 +337,15 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
           item: form.deliveryAt,
           onChanged: (_) {
             form.deliveryAt = _;
-            form.tileController.collapse();
-            Future.delayed(const Duration(milliseconds: 300))
-                .then((value) => form.produto.produtoEC.focus.requestFocus());
+            // if (form.deliveryAt != null) {
+            //   form.tileController.collapse();
+            //   Future.delayed(const Duration(milliseconds: 300))
+            //       .then((value) => form.produto.produtoEC.focus.requestFocus());
+            // }
+            if (form.deliveryAt != null) {
+              Future.delayed(const Duration(milliseconds: 300))
+                  .then((value) => form.produto.produtoEC.focus.requestFocus());
+            }
             pedidoCtrl.formStream.update();
           },
         ),

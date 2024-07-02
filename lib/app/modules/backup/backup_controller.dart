@@ -57,6 +57,8 @@ class BackupController {
         FirestoreClient.pedidos.data.map((e) => e.toMap()).toList());
     onAddCollection(backup, 'ordens',
         FirestoreClient.ordens.data.map((e) => e.toMap()).toList());
+    onAddCollection(
+        backup, 'automatizacao', [FirestoreClient.automatizacao.data.toMap()]);
     final bytes = utf8.encode(json.encode(backup));
     final name =
         'backup_${DateFormat('dd_MM_yyyy_hh_mm_ss').format(DateTime.now())}.json';
@@ -87,6 +89,8 @@ class BackupController {
         FirestoreClient.pedidos.collection, backup['pedidos']);
     await onRestoreCollection(
         FirestoreClient.ordens.collection, backup['ordens']);
+    await onRestoreCollection(
+        FirestoreClient.automatizacao.collection, backup['automatizacao']);
   }
 
   Future<void> onRestoreCollection(

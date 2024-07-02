@@ -97,6 +97,8 @@ class StepModel {
       'id': id,
       'name': name,
       'color': color.value,
+      'isShipping': isShipping,
+      'shipping': shipping?.toMap(),
     };
   }
 

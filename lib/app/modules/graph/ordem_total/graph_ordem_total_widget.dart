@@ -30,18 +30,18 @@ class _GrapOrdemhTotalWidgetState extends State<GraphOrdemTotalWidget> {
     data = graphOrdemTotalCtrl.getCirucularChart(graphOrdemTotalCtrl.filter);
     pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
       setState(() {
-        data = graphOrdemTotalCtrl.getCirucularChart(graphOrdemTotalCtrl.filter);
+        data =
+            graphOrdemTotalCtrl.getCirucularChart(graphOrdemTotalCtrl.filter);
       });
     });
     super.initState();
   }
 
-   @override
+  @override
   void dispose() {
     pedidoStream.cancel();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
