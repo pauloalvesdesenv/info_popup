@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class DatePickerField extends StatelessWidget {
   final String label;
   final DateTime? item;
-  final Function(DateTime) onChanged;
+  final Function(DateTime?) onChanged;
   final bool required;
 
   const DatePickerField(
@@ -19,14 +19,18 @@ class DatePickerField extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        final now = DateTime.now();
-        final first = now;
-        final lats = now.add(const Duration(days: 365));
-        FocusManager.instance.primaryFocus?.unfocus();
-        final result = await showDatePicker(
-            context: context, firstDate: first, lastDate: lats);
-        if (result == null) return;
-        onChanged.call(result);
+        if (item != null) {
+          onChanged.call(null);
+        } else {
+          final now = DateTime.now();
+          final first = now.subtract(const Duration(days: 365));
+          final lats = now.add(const Duration(days: 365));
+          FocusManager.instance.primaryFocus?.unfocus();
+          final result = await showDatePicker(
+              context: context, firstDate: first, lastDate: lats);
+          if (result == null) return;
+          onChanged.call(result);
+        }
       },
       child: IgnorePointer(
         ignoring: true,
@@ -36,7 +40,7 @@ class DatePickerField extends StatelessWidget {
           hint: '00/00/0000',
           type: TextInputType.number,
           controller: item.textEC(),
-          suffixIcon: Icons.calendar_month,
+          suffixIcon: item != null ? Icons.close : Icons.calendar_month,
         ),
       ),
     );

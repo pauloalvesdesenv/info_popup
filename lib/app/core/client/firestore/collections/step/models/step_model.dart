@@ -104,16 +104,19 @@ class StepModel {
       {bool isHistory = false}) {
     if (isHistory) {
       return StepModel(
-          id: map['id'] ?? '',
-          name: map['name'] ?? '',
-          index: 0,
-          color: Colors.tealAccent,
-          fromStepsIds: <String>[],
-          moveRoles: <UsuarioRole>[],
-          createdAt: DateTime.now(),
-          isDefault: false,
-          isShipping: false,
-          shipping: null);
+        id: map['id'] ?? '',
+        name: map['name'] ?? '',
+        index: 0,
+        color: Colors.tealAccent,
+        fromStepsIds: <String>[],
+        moveRoles: <UsuarioRole>[],
+        createdAt: DateTime.now(),
+        isDefault: false,
+        isShipping: map['isShipping'] ?? false,
+        shipping: map['shipping'] != null
+          ? StepShippingModel.fromMap(map['shipping'])
+          : null,
+      );
     }
     return StepModel(
       id: map['id'] ?? '',

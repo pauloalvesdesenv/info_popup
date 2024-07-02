@@ -289,7 +289,10 @@ class PedidoController {
         .where((e) => e.type == PedidoHistoryType.step)
         .toList();
 
-    histories.where((e) => e.data.isShipping).toList();
+    histories = histories.where((e) {
+      final data = e.data as StepModel?;
+      return data?.isShipping ?? false;
+    }).toList();
 
     return histories;
   }

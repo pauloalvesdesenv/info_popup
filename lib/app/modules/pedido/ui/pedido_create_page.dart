@@ -65,7 +65,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
         title: Text('${pedidoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Pedido',
             style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          
+
           if ((widget.pedido != null &&
                   usuario.permission.pedido
                       .contains(UserPermissionType.update)) ||

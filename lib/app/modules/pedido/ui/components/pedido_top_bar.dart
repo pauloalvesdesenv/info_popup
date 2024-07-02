@@ -48,7 +48,7 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
           const Spacer(),
           InkWell(
               onTap: () async => context
-                  .push('/acompanhamento/pedidos/0VO0BCbtfKlAkAVzqtpZd0V8m'),
+                  .push('/acompanhamento/pedidos/${pedido.id}'),
               child: Icon(
                 Icons.local_shipping,
                 color: AppColors.white,
@@ -90,7 +90,7 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
           const W(12),
           IconButton(
               onPressed: () => context
-                  .push('/acompanhamento/pedidos/0VO0BCbtfKlAkAVzqtpZd0V8m'),
+                  .push('/acompanhamento/pedidos/${pedido.id}'),
               icon: Icon(Icons.local_shipping, color: AppColors.white)),
           IconButton(
               onPressed: () => pedidoCtrl.onArchive(context, pedido),

@@ -34,12 +34,6 @@ class _PedidoAcompanhamentoPageState extends State<PedidoAcompanhamentoPage>
   }
 
   @override
-  void dispose() {
-    pedidoCtrl.setPedido(null);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     super.build(context);
     final String promoveText =

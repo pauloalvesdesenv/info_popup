@@ -8,6 +8,7 @@ import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
+import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -117,11 +118,17 @@ class StepController {
   }
 
   void _onAddStep(PedidoModel pedido, StepModel step) {
-    pedido.histories.add(
-      PedidoHistoryModel.create(
-          data: step,
-          action: PedidoHistoryAction.update,
-          type: PedidoHistoryType.step),
+    late StepModel newStep;
+    try {
+      newStep = FirestoreClient.steps.getById(step.id);
+    } catch (e) {
+      newStep = step.copyWith();
+    }
+    pedidoCtrl.onAddHistory(
+      pedido: pedido,
+      data: newStep,
+      type: PedidoHistoryType.step,
+      action: PedidoHistoryAction.update,
     );
     pedido.addStep(step);
     FirestoreClient.pedidos.dataStream.update();
