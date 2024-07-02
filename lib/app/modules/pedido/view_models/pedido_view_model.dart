@@ -1,4 +1,3 @@
-import 'package:aco_plus/app/core/client/firestore/collections/automatizacao/automatizacao_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/checklist/models/checklist_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
@@ -50,7 +49,8 @@ class PedidoCreateModel {
   PedidoCreateModel()
       : id = HashService.get,
         isEdit = false,
-        step = FirestoreClient.steps.data.firstWhereOrNull((e) => e.id == FirestoreClient.automatizacao.data.criacaoPedido.step.id);
+        step = FirestoreClient.steps.data.firstWhereOrNull((e) =>
+            e.id == FirestoreClient.automatizacao.data.criacaoPedido.step.id);
 
   String getDetails() {
     List<String> localizador = [];
@@ -109,6 +109,7 @@ class PedidoCreateModel {
       users: pedido?.users ?? [],
       index: pedido?.index ?? 0,
       isArchived: pedido?.isArchived ?? false,
+      archives: pedido?.archives ?? [],
       histories: pedido?.histories ??
           [
             PedidoHistoryModel.create(

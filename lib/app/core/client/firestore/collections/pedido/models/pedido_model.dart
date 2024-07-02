@@ -109,7 +109,7 @@ class PedidoModel {
     required this.index,
     required this.histories,
     required this.isArchived,
-    this.archives = const [],
+    required this.archives,
   });
 
   List<PedidoProdutoStatus> get getStatusess {
@@ -259,6 +259,7 @@ class PedidoModel {
     int? index,
     List<PedidoHistoryModel>? histories,
     bool? isArchived,
+    List<ArchiveModel>? archives,
   }) {
     return PedidoModel(
       id: id ?? this.id,
@@ -279,6 +280,7 @@ class PedidoModel {
       index: index ?? this.index,
       histories: histories ?? this.histories,
       isArchived: isArchived ?? this.isArchived,
+      archives: archives ?? this.archives,
     );
   }
 
