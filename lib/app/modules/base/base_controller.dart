@@ -16,8 +16,9 @@ class BaseController {
 
   final AppStream<AppModule> moduleStream = AppStream<AppModule>();
 
-  void onInit() {
+  Future<void> onInit() async {
     moduleStream.add(AppModule.values.first);
+
     FCMProvider.putToken();
   }
 }

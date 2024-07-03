@@ -3,6 +3,7 @@ import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/enums/app_module.dart';
 import 'package:aco_plus/app/modules/base/base_controller.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:flutter/material.dart';
 
 class BasePage extends StatefulWidget {
@@ -15,7 +16,9 @@ class BasePage extends StatefulWidget {
 class _BasePageState extends State<BasePage> {
   @override
   void initState() {
-    baseCtrl.onInit();
+    baseCtrl.onInit().then((_) {
+      kanbanCtrl.onInit();
+    });
     super.initState();
   }
 

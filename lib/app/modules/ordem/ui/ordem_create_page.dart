@@ -147,7 +147,6 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                     produtosAddeds.removeWhere(
                         (e) => produtosAddeds.map((e) => e.id).contains(e.id));
                   }
-
                   return Column(
                     children: [
                       for (PedidoProdutoModel produto in produtosAddeds)

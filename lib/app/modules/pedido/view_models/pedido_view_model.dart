@@ -14,10 +14,12 @@ import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class PedidoUtils {
-  final TextController search = TextController();
+  final TextController search =
+      TextController(text: kDebugMode ? 'teste' : null);
   final TextController searchArchived = TextController();
   SortType sortType = SortType.localizator;
   SortOrder sortOrder = SortOrder.asc;
@@ -40,7 +42,6 @@ class PedidoCreateModel {
   final GlobalKey produtoKey = GlobalKey();
   List<PedidoProdutoCreateModel> produtos = [];
   DateTime? deliveryAt;
-  ExpansionTileController tileController = ExpansionTileController();
   ChecklistModel? checklist;
   StepModel? step;
 

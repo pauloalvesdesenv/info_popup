@@ -16,12 +16,15 @@ class PedidoProdutoModel {
   final double qtde;
   bool selected = true;
 
-
   PedidoModel get pedido => FirestoreClient.pedidos.getById(pedidoId);
+
+  bool get hasOrder => statusess.last.status == PedidoProdutoStatus.separado;
 
   ClienteModel get cliente => FirestoreClient.clientes.getById(clienteId);
   ObraModel get obra => cliente.obras.firstWhere((e) => e.id == obraId);
+
   PedidoProdutoStatusModel get status => statusess.last;
+
   PedidoProdutoStatusModel get statusView => statusess.last.copyWith(
       status: statusess.last.status == PedidoProdutoStatus.separado
           ? PedidoProdutoStatus.aguardandoProducao
