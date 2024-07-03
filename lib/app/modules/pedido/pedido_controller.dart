@@ -21,6 +21,7 @@ import 'package:aco_plus/app/modules/pedido/ui/pedido_status_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_step_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -147,7 +148,7 @@ class PedidoController {
   }
 
   OrdemModel? getOrdemByProduto(PedidoProdutoModel produto) {
-    return FirestoreClient.ordens.data.firstWhere(
+    return FirestoreClient.ordens.data.firstWhereOrNull(
       (e) => e.produtos.any((p) => p.id == produto.id),
     );
   }

@@ -18,6 +18,3 @@ void main() async {
   await Service.initAplicationServices();
   runApp(const App());
 }
-
-
-//uvI3LybCdJKE7ivo14JDIdHtP

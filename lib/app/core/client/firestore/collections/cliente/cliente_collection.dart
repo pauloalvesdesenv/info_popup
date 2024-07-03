@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -25,6 +26,7 @@ class ClienteCollection {
   bool _isStarted = false;
   Future<void> start({bool lock = true, GetOptions? options}) async {
     if (_isStarted && lock) return;
+    await FirestoreClient.usuarios.start();
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
     final countries =

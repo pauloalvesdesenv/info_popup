@@ -70,8 +70,7 @@ class UsuarioCollection {
             : collection)
         .snapshots()
         .listen((e) {
-      final data =
-          e.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
+      final data = e.docs.map((e) => UsuarioModel.fromMap(e.data())).toList();
       data.sort((a, b) => a.nome.compareTo(b.nome));
       dataStream.add(data);
     });
