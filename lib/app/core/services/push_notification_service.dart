@@ -44,7 +44,7 @@ Future<String?> getDeviceToken() async {
   if (kIsWeb) {
     return await _menssaging.getToken(
         vapidKey: kIsWeb
-            ? 'BOp4Fx_efcGMjerqT1aNM-VwixbtTg-3k_XkESpq3961o59HCh-743r2Iqf_bQ04uUwd39VZszhngi8GhR9CjNA'
+            ? 'BMzSKaJYdozeg3ZFbdIKl7prhb03HQEU-VR9SbAqvAJNUDzQjRM6Tm463QGv5WkKdYea9gkVZS-WhEP4_U7Z8TY'
             : null);
   } else if (Platform.isAndroid) {
     return await _menssaging.getToken();

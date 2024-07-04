@@ -90,7 +90,7 @@ class _PedidoUsersBottomState extends State<PedidoUsersBottom> {
                   Expanded(
                       child: ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    children: FirestoreClient.usuarios.data.map((user) {
+                    children: FirestoreClient.usuarios.data.toList().map((user) {
                       bool isCurrentUser = user.id == usuario.id;
                       bool isEnable = isCurrentUser ||
                           !widget.pedido.users

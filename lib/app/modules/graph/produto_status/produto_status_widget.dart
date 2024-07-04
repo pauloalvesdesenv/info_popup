@@ -72,7 +72,8 @@ class _GrapOrdemhTotalWidgetState extends State<ProdutoStatusWidget> {
             overflowMode: LegendItemOverflowMode.wrap,
             position: LegendPosition.bottom,
           ),
-          primaryXAxis: const CategoryAxis(),
+          primaryXAxis: const CategoryAxis(
+          ),
           primaryYAxis: NumericAxis(
             axisLabelFormatter: (axisLabelRenderArgs) {
               return ChartAxisLabel(

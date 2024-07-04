@@ -30,8 +30,9 @@ class ProdutoStatusController {
               pointColorMapper: (ProdutoStatusGraphModel data, _) =>
                   data.status.color,
               dataLabelSettings: const DataLabelSettings(
-                  isVisible: true,
-                  labelPosition: ChartDataLabelPosition.outside),
+                isVisible: true,
+                labelPosition: ChartDataLabelPosition.outside,
+              ),
             ))
         .toList();
   }

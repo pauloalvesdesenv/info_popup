@@ -89,8 +89,11 @@ class StepController {
 
   void onAccept(StepModel step, PedidoModel pedido, int index,
       {bool auto = false}) async {
+    print('onWillAccept');
     if (!onWillAccept(pedido, step, auto: auto)) return;
+    print('_onMovePedido');
     _onMovePedido(pedido, step, index);
+    print('_onAddStep');
     _onAddStep(pedido, step);
     utilsStream.update();
   }

@@ -26,7 +26,6 @@ class ClienteCollection {
   bool _isStarted = false;
   Future<void> start({bool lock = true, GetOptions? options}) async {
     if (_isStarted && lock) return;
-    await FirestoreClient.usuarios.start();
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
     final countries =

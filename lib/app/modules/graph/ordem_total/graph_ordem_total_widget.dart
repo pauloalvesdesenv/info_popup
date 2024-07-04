@@ -83,6 +83,7 @@ class _GrapOrdemhTotalWidgetState extends State<GraphOrdemTotalWidget> {
                 isVisible: true,
                 labelPosition: ChartDataLabelPosition.outside,
               ),
+              initialSelectedDataIndexes: const [1],
             ),
           ],
         ))

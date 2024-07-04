@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -33,16 +31,6 @@ class OrdemCollection {
         data.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
     countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     dataStream.add(countries);
-
-    //Z9mrqc1CWgdM9qxVbHCj7MFwp
-    for (final ordem in countries) {
-      for (var produto in ordem.produtos) {
-        if(produto.id == 'Z9mrqc1CWgdM9qxVbHCj7MFwp'){
-
-         log('log id produtox: ${produto.id}');
-        }
-      }
-    }
   }
 
   bool _isListen = false;

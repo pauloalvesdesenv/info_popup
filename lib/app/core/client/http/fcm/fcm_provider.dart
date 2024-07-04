@@ -8,20 +8,21 @@ import 'package:http/http.dart' as http;
 class FCMProvider {
   static Future<void> putToken() async {
     final token = await getDeviceToken();
-    if (token != null && usuario.deviceTokens.contains(token)) return;
-    usuario.deviceTokens.add(token!);
+    if (token == null || usuario.deviceTokens.contains(token)) return;
+    usuario.deviceTokens.clear();
+    usuario.deviceTokens.add(token);
     FirestoreClient.usuarios.update(usuario);
   }
 
   static Future<void> postSend(Map<String, dynamic> body) async {
     try {
-      await Dio()
-          .post('https://fcm.googleapis.com/v1/projects/pcp-m2/messages:send',
-              options: Options(headers: {
-                'Authorization': 'Bearer ${await _getAccessToken()}',
-                'Content-Type': 'application/json'
-              }),
-              data: body);
+      await Dio().post(
+          'https://fcm.googleapis.com/v1/projects/aco-plus-fa455/messages:send',
+          options: Options(headers: {
+            'Authorization': 'Bearer ${await _getAccessToken()}',
+            'Content-Type': 'application/json'
+          }),
+          data: body);
     } catch (_) {
       return;
     }

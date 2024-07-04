@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_text_button.dart';
 import 'package:aco_plus/app/core/components/archive/archive_model.dart';
@@ -211,26 +209,22 @@ class _ArchiveAddBottomState extends State<ArchiveAddBottom> {
   }
 
   Future<void> onAdd() async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+    );
+    if (result?.xFiles.isNotEmpty ?? false) {
+      final xFile = result!.xFiles.first;
+      final mime = lookupMimeType(kIsWeb ? xFile.name : xFile.path)!;
+      archive = ArchiveModel.fromFile(
+        bytes: await xFile.readAsBytes(),
+        createdAt: DateTime.now(),
+        name: xFile.name,
+        mime: mime,
+        type: mime.getArchiveTypeMimeType(),
       );
-      if (result?.xFiles.isNotEmpty ?? false) {
-        final xFile = result!.xFiles.first;
-        final mime = lookupMimeType(kIsWeb ? xFile.name : xFile.path)!;
-        archive = ArchiveModel.fromFile(
-          bytes: await xFile.readAsBytes(),
-          createdAt: DateTime.now(),
-          name: xFile.name,
-          mime: mime,
-          type: mime.getArchiveTypeMimeType(),
-        );
-        _nameEC.text = xFile.name;
-        _focusNode.requestFocus();
-        setState(() {});
-      }
-    } catch (e) {
-      log(e.toString());
+      _nameEC.text = xFile.name;
+      _focusNode.requestFocus();
+      setState(() {});
     }
   }
 

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -15,10 +17,6 @@ class PedidoCollection {
   AppStream<List<PedidoModel>> dataStream = AppStream<List<PedidoModel>>();
   List<PedidoModel> get data => dataStream.value;
 
-  AppStream<void> updateStream = AppStream<void>();
-
-  void notifyUpdate() => updateStream.update();
-
   CollectionReference<Map<String, dynamic>> get collection =>
       FirebaseFirestore.instance.collection(name);
 
@@ -35,6 +33,7 @@ class PedidoCollection {
     final data = await FirebaseFirestore.instance.collection(name).get();
     final pedidos =
         data.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
+
     dataStream.add(pedidos);
   }
 
