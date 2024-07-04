@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
@@ -23,6 +25,7 @@ class OrdemCreateModel {
   SortType sortType = SortType.alfabetic;
   SortOrder sortOrder = SortOrder.asc;
   bool isCreate = false;
+  DateTime? createdAt;
 
   late bool isEdit;
 
@@ -33,22 +36,27 @@ class OrdemCreateModel {
   OrdemCreateModel.edit(OrdemModel pedido)
       : id = pedido.id,
         isEdit = true {
+    createdAt = pedido.createdAt;
     produto = FirestoreClient.produtos.data
         .firstWhere((e) => e.id == pedido.produto.id);
+    produtos = pedido.produtos
+        .map((e) =>
+            e.copyWith(isSelected: true, isAvailable: e.isAvailableToChanges))
+        .toList();
   }
 
-  OrdemModel toOrdemModel(OrdemModel? ordem) {
+  OrdemModel toOrdemModel() {
     return OrdemModel(
-      id: id,
-      createdAt: ordem?.createdAt ?? DateTime.now(),
-      produto: produto!,
-      produtos: [
-        ...produtos.where((e) => e.selected).toList(),
-        if (ordem != null)
-          ...ordem.produtos
-              .where((e) => e.status.status.index >= 2 || e.selected)
-              .toList()
-      ],
-    );
+        id: id,
+        createdAt: createdAt ?? DateTime.now(),
+        produto: produto!,
+        produtos: produtos
+            .map((e) => e.copyWith(statusess: [
+                  ...e.statusess,
+                  if (e.isSelected && !e.isAvailable)
+                    PedidoProdutoStatusModel.create(
+                        PedidoProdutoStatus.aguardandoProducao)
+                ]))
+            .toList());
   }
 }

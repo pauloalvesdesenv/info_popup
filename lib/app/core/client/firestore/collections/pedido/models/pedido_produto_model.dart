@@ -14,7 +14,8 @@ class PedidoProdutoModel {
   final ProdutoModel produto;
   final List<PedidoProdutoStatusModel> statusess;
   final double qtde;
-  bool selected = true;
+  bool isSelected = true;
+  bool isAvailable = true;
 
   PedidoModel get pedido => FirestoreClient.pedidos.getById(pedidoId);
 
@@ -30,6 +31,8 @@ class PedidoProdutoModel {
           ? PedidoProdutoStatus.aguardandoProducao
           : statusess.last.status);
 
+          bool get isAvailableToChanges => status.status.index < 2;
+
   PedidoProdutoModel({
     required this.id,
     required this.pedidoId,
@@ -38,6 +41,8 @@ class PedidoProdutoModel {
     required this.produto,
     required this.statusess,
     required this.qtde,
+    this.isAvailable = true,
+    this.isSelected = true,
   });
 
   Map<String, dynamic> toMap() {
@@ -78,6 +83,8 @@ class PedidoProdutoModel {
     ProdutoModel? produto,
     List<PedidoProdutoStatusModel>? statusess,
     double? qtde,
+    bool? isAvailable,
+    bool? isSelected,
   }) {
     return PedidoProdutoModel(
       id: id ?? this.id,
@@ -87,6 +94,8 @@ class PedidoProdutoModel {
       produto: produto ?? this.produto,
       statusess: statusess ?? this.statusess,
       qtde: qtde ?? this.qtde,
+      isAvailable: isAvailable ?? this.isAvailable,
+      isSelected: isSelected ?? this.isSelected,
     );
   }
 }

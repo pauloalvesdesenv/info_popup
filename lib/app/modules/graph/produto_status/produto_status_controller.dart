@@ -2,9 +2,6 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:aco_plus/app/core/extensions/double_ext.dart';
-import 'package:aco_plus/app/core/utils/app_css.dart';
-import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/graph/produto_status/produto_status_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -17,27 +14,26 @@ class ProdutoStatusController {
 
   factory ProdutoStatusController() => _instance;
 
-
-  List<ColumnSeries<ProdutoStatusGraphModel, String>> getSource(){
+  List<ColumnSeries<ProdutoStatusGraphModel, String>> getSource() {
     return [
-          PedidoProdutoStatus.aguardandoProducao,
-          PedidoProdutoStatus.produzindo,
-          PedidoProdutoStatus.pronto
-        ]
-            .map((status) => ColumnSeries<ProdutoStatusGraphModel, String>(
-                  dataSource: getSourceByStatus(status),
-                  name: status.label,
-                  xValueMapper: (ProdutoStatusGraphModel data, _) =>
-                      data.produto.descricao,
-                  yValueMapper: (ProdutoStatusGraphModel data, _) => data.qtde,
-                  color: status.color,
-                  pointColorMapper: (ProdutoStatusGraphModel data, _) =>
-                      data.status.color,
-                  dataLabelSettings: const DataLabelSettings(
-                      isVisible: true,
-                      labelPosition: ChartDataLabelPosition.outside),
-                ))
-            .toList();
+      PedidoProdutoStatus.aguardandoProducao,
+      PedidoProdutoStatus.produzindo,
+      PedidoProdutoStatus.pronto
+    ]
+        .map((status) => ColumnSeries<ProdutoStatusGraphModel, String>(
+              dataSource: getSourceByStatus(status),
+              name: status.label,
+              xValueMapper: (ProdutoStatusGraphModel data, _) =>
+                  data.produto.descricao,
+              yValueMapper: (ProdutoStatusGraphModel data, _) => data.qtde,
+              color: status.color,
+              pointColorMapper: (ProdutoStatusGraphModel data, _) =>
+                  data.status.color,
+              dataLabelSettings: const DataLabelSettings(
+                  isVisible: true,
+                  labelPosition: ChartDataLabelPosition.outside),
+            ))
+        .toList();
   }
 
   List<ProdutoStatusGraphModel> getSourceByStatus(PedidoProdutoStatus status) {

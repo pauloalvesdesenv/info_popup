@@ -134,48 +134,20 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                   ],
                 ),
               ),
-              Builder(
-                builder: (context) {
-                  List<PedidoProdutoModel> produtosAddeds = [
-                    if (form.isEdit)
-                      ...ordemCtrl.getPedidosPorProdutoEdit(widget.ordem!),
-                  ];
-                  List<PedidoProdutoModel> produtosSepairs = [];
-                  if (form.produto != null) {
-                    produtosSepairs =
-                        ordemCtrl.getPedidosPorProduto(form.produto!);
-                    produtosAddeds.removeWhere(
-                        (e) => produtosAddeds.map((e) => e.id).contains(e.id));
-                  }
-                  return Column(
-                    children: [
-                      for (PedidoProdutoModel produto in produtosAddeds)
-                        _itemProduto(
-                          produto: produto,
-                          check: produto.selected,
-                          onTap: () {
-                            produto.selected = !produto.selected;
-                            ordemCtrl.formStream.update();
-                          },
-                          isEnable: produto.status.status.index <= 1,
-                        ),
-                      for (PedidoProdutoModel produto in produtosSepairs)
-                        _itemProduto(
-                            isEnable: true,
-                            produto: produto,
-                            check: form.produtos.contains(produto),
-                            onTap: () {
-                              if (form.produtos.contains(produto)) {
-                                form.produtos.remove(produto);
-                              } else {
-                                form.produtos.add(produto);
-                              }
-                              ordemCtrl.formStream.update();
-                            })
-                    ],
-                  );
-                },
-              )
+              if (form.produto != null)
+                for (PedidoProdutoModel produto
+                    in ordemCtrl.getPedidosPorProduto(form.produto!))
+                  _itemProduto(
+                      isEnable: produto.isAvailable,
+                      produto: produto,
+                      check:
+                          form.produtos.map((e) => e.id).contains(produto.id),
+                      onTap: () {
+                        form.produtos.map((e) => e.id).contains(produto.id)
+                            ? form.produtos.remove(produto)
+                            : form.produtos.add(produto);
+                        ordemCtrl.formStream.update();
+                      })
             ],
           ),
         ),

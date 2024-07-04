@@ -92,17 +92,9 @@ class OrdemController {
 
   Future<void> onConfirm(_, OrdemModel? ordem) async {
     try {
+      final ordem = form.toOrdemModel();
       onValid(ordem);
-      for (var pedidoProduto in form.produtos) {
-        pedidoProduto.statusess.clear();
-        pedidoProduto.statusess.add(PedidoProdutoStatusModel(
-            id: HashService.get,
-            status: pedidoProduto.selected
-                ? PedidoProdutoStatus.aguardandoProducao
-                : PedidoProdutoStatus.separado,
-            createdAt: DateTime.now()));
-      }
-      if (ordem != null) {
+      if (form.isEdit) {
         await onEdit(_, ordem);
       } else {
         await onCreate(_);
@@ -117,7 +109,7 @@ class OrdemController {
     form.id =
         'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${form.id}';
 
-    final ordemCriada = form.toOrdemModel(null);
+    final ordemCriada = form.toOrdemModel();
     await FirestoreClient.ordens.add(ordemCriada);
     await FirestoreClient.pedidos.fetch();
     await pedidoCtrl.onVerifyPedidoStatus();
@@ -131,19 +123,9 @@ class OrdemController {
   }
 
   Future<void> onEdit(_, OrdemModel ordem) async {
-    for (var pedidoProduto
-        in ordem.produtos.where((e) => e.status.status.index <= 1).toList()) {
-      pedidoProduto.statusess.clear();
-      pedidoProduto.statusess.add(PedidoProdutoStatusModel(
-          id: HashService.get,
-          status: pedidoProduto.selected
-              ? PedidoProdutoStatus.aguardandoProducao
-              : PedidoProdutoStatus.separado,
-          createdAt: DateTime.now()));
-    }
     await FirestoreClient.pedidos.fetch();
     ordem.produtos.removeWhere((e) => e.status.status.index == 0);
-    final result = form.toOrdemModel(ordem);
+    final result = form.toOrdemModel();
     await FirestoreClient.ordens.update(result);
     await automatizacaoCtrl.onSetStepByPedidoStatus(result.pedidos);
     Navigator.pop(_);
@@ -198,8 +180,9 @@ class OrdemController {
   }
 
   bool _checkIsEmpty(OrdemModel? ordem) {
-    final edit = form.toOrdemModel(ordem).copyWith();
-    edit.produtos.removeWhere((e) => e.status.status.index <= 1 && !e.selected);
+    final edit = form.toOrdemModel().copyWith();
+    edit.produtos
+        .removeWhere((e) => e.status.status.index <= 1 && !e.isSelected);
     return edit.produtos.isEmpty;
   }
 

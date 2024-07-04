@@ -176,34 +176,34 @@ class PedidoController {
   }
 
   Future<void> onVerifyPedidoStatus() async {
-    final ordens = FirestoreClient.ordens.data;
-    final batch = FirebaseFirestore.instance.batch();
-    for (var pedido in FirestoreClient.pedidos.data) {
-      for (var produtoPedido in pedido.produtos) {
-        bool hasInOrder = false;
-        for (var ordem in ordens) {
-          for (var produtoOrdem in ordem.produtos) {
-            if (pedido.id == produtoOrdem.pedidoId &&
-                produtoPedido.id == produtoOrdem.id) {
-              hasInOrder = true;
-              break;
-            }
-          }
-        }
-        if (!hasInOrder &&
-            produtoPedido.status.status ==
-                PedidoProdutoStatus.aguardandoProducao) {
-          produtoPedido.statusess.clear();
-          produtoPedido.statusess.add(PedidoProdutoStatusModel(
-              id: HashService.get,
-              status: PedidoProdutoStatus.separado,
-              createdAt: DateTime.now()));
-        }
-      }
-      batch.update(
-          FirestoreClient.pedidos.collection.doc(pedido.id), pedido.toMap());
-    }
-    await batch.commit();
+    // final ordens = FirestoreClient.ordens.data;
+    // final batch = FirebaseFirestore.instance.batch();
+    // for (var pedido in FirestoreClient.pedidos.data) {
+    //   for (var produtoPedido in pedido.produtos) {
+    //     bool hasInOrder = false;
+    //     for (var ordem in ordens) {
+    //       for (var produtoOrdem in ordem.produtos) {
+    //         if (pedido.id == produtoOrdem.pedidoId &&
+    //             produtoPedido.id == produtoOrdem.id) {
+    //           hasInOrder = true;
+    //           break;
+    //         }
+    //       }
+    //     }
+    //     if (!hasInOrder &&
+    //         produtoPedido.status.status ==
+    //             PedidoProdutoStatus.aguardandoProducao) {
+    //       produtoPedido.statusess.clear();
+    //       produtoPedido.statusess.add(PedidoProdutoStatusModel(
+    //           id: HashService.get,
+    //           status: PedidoProdutoStatus.separado,
+    //           createdAt: DateTime.now()));
+    //     }
+    //   }
+    //   batch.update(
+    //       FirestoreClient.pedidos.collection.doc(pedido.id), pedido.toMap());
+    // }
+    // await batch.commit();
   }
 
   void onSortPedidos(List<PedidoModel> pedidos) {

@@ -101,8 +101,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
     return Builder(builder: (context) {
       bool isDisabled = form.isEdit &&
           FirestoreClient.ordens.data
-              .expand((e) => e.produtos.map((e) => e.produto.id))
-              .any((e) => e == produto.produtoModel?.id);
+              .expand((e) => e.produtos.map((e) => e.id))
+              .any((e) => e == produto.id);
       return IgnorePointer(
         ignoring: isDisabled,
         child: Container(
@@ -231,6 +231,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
       initiallyExpanded: true,
       maintainState: true,
       controller: tileController,
+      key: const Key('pedidoDetalhes'),
       leading: const Icon(Icons.info_outline),
       title: Text('Informações do Pedido', style: AppCss.mediumBold),
       subtitle: Text(form.getDetails(), style: AppCss.minimumRegular),

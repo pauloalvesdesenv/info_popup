@@ -73,7 +73,7 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
               )),
           const W(12),
           InkWell(
-              onTapCancel: () async => pedidoCtrl.onDelete(context, pedido),
+              onTap: () async => pedidoCtrl.onDelete(context, pedido),
               child: Icon(
                 Icons.delete,
                 color: AppColors.white,
@@ -105,3 +105,6 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       );
 }
+
+
+
