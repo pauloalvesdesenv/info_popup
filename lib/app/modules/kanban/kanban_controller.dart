@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
@@ -145,9 +146,13 @@ class StepController {
   }
 
   PedidoModel _onRemovePedidoFromStep(String stepId, String pedidoId) {
+    log('message');
     final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
+    log('message $key');
     final pedido = utils.kanban[key]!.firstWhere((e) => e.id == pedidoId);
+    log('message $pedido');
     utils.kanban[key]!.remove(pedido);
+    log('message $pedido');
     return pedido;
   }
 

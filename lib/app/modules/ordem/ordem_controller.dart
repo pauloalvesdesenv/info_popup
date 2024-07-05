@@ -278,7 +278,7 @@ class OrdemController {
     ordemStream.add(result);
     await FirestoreClient.ordens.update(ordem);
     await onSetStatusPedido(produto);
-    await automatizacaoCtrl.onSetStepByPedidoStatus(ordem.pedidos);
+    await automatizacaoCtrl.onSetStepByPedidoStatus(ordem.pedidos.where((e) => e.id == produto.pedido.id).toList());
     await FirestoreClient.ordens.fetch();
     FirestoreClient.ordens.dataStream.update();
     Navigator.pop(contextGlobal);

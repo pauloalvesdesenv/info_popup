@@ -33,7 +33,7 @@ class StepModel {
   );
 
   List<StepModel> get fromSteps =>
-      fromStepsIds.map((e) => FirestoreClient.steps.getById(e)).toList();
+      fromStepsIds.map((e) => FirestoreClient.steps.getById(e).copyWith(fromStepsIds: [], toStepsIds: [])).toList();
 
   bool get isEnable => moveRoles.contains(usuario.role);
 

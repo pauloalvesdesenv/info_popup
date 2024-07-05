@@ -5,7 +5,9 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedi
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
+import 'package:collection/collection.dart';
 
 final automatizacaoCtrl = AutomatizacaoController();
 
@@ -59,6 +61,7 @@ class AutomatizacaoController {
           kanbanCtrl.mountKanban();
 
           kanbanCtrl.onAccept(step, pedido, 0, auto: true);
+
         }
       }
     } catch (e) {
