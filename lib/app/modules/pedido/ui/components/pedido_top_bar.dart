@@ -3,6 +3,7 @@ import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_create_page.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_page.dart';
@@ -46,39 +47,56 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
             style: AppCss.largeBold.setColor(Colors.white).setSize(18),
           ),
           const Spacer(),
-          InkWell(
-              onTap: () async => context
-                  .push('/acompanhamento/pedidos/${pedido.id}'),
-              child: Icon(
-                Icons.local_shipping,
-                color: AppColors.white,
-              )),
+          Tooltip(
+            message: 'Acompanhar pedido',
+            child: InkWell(
+                onTap: () async =>
+                    context.push('/acompanhamento/pedidos/${pedido.id}'),
+                child: Icon(
+                  Icons.local_shipping,
+                  color: AppColors.white,
+                )),
+          ),
           const W(12),
-          InkWell(
-              onTap: () async =>
-                  push(context, PedidoCreatePage(pedido: pedido)),
-              child: Icon(
-                Icons.archive,
-                color: AppColors.white,
-                size: 20,
-              )),
+          Tooltip(
+            message: 'Arquivar pedido',
+            child: InkWell(
+                onTap: () async => pedidoCtrl
+                        .onArchive(context, pedido, isPedido: false)
+                        .then((result) {
+                      if (result) {
+                        kanbanCtrl.setPedido(null);
+                      }
+                    }),
+                child: Icon(
+                  Icons.archive,
+                  color: AppColors.white,
+                  size: 20,
+                )),
+          ),
           const W(12),
-          InkWell(
-              onTap: () async =>
-                  push(context, PedidoCreatePage(pedido: pedido)),
-              child: Icon(
-                Icons.edit,
-                color: AppColors.white,
-                size: 20,
-              )),
+          Tooltip(
+            message: 'Editar pedido',
+            child: InkWell(
+                onTap: () async =>
+                    push(context, PedidoCreatePage(pedido: pedido)),
+                child: Icon(
+                  Icons.edit,
+                  color: AppColors.white,
+                  size: 20,
+                )),
+          ),
           const W(12),
-          InkWell(
-              onTap: () async => pedidoCtrl.onDelete(context, pedido),
-              child: Icon(
-                Icons.delete,
-                color: AppColors.white,
-                size: 20,
-              )),
+          Tooltip(
+            message: 'Excluir pedido',
+            child: InkWell(
+                onTap: () async => pedidoCtrl.onDelete(context, pedido),
+                child: Icon(
+                  Icons.delete,
+                  color: AppColors.white,
+                  size: 20,
+                )),
+          ),
         ],
       ));
 
@@ -88,10 +106,13 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: AppColors.primaryMain,
         actions: [
           const W(12),
-          IconButton(
-              onPressed: () => context
-                  .push('/acompanhamento/pedidos/${pedido.id}'),
-              icon: Icon(Icons.local_shipping, color: AppColors.white)),
+          Tooltip(
+            message: 'Acompanhar pedido',
+            child: IconButton(
+                onPressed: () =>
+                    context.push('/acompanhamento/pedidos/${pedido.id}'),
+                icon: Icon(Icons.local_shipping, color: AppColors.white)),
+          ),
           IconButton(
               onPressed: () => pedidoCtrl.onArchive(context, pedido),
               icon: Icon(Icons.archive, color: AppColors.white)),
@@ -105,6 +126,3 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       );
 }
-
-
-

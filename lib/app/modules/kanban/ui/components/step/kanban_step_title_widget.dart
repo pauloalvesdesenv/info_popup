@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
+import 'package:aco_plus/app/core/enums/sort_step_type.dart';
 import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
@@ -21,7 +22,7 @@ class KanbanStepTitleWidget extends StatelessWidget {
       minTileHeight: 30,
       tilePadding: const EdgeInsets.only(left: 8),
       childrenPadding: const EdgeInsets.symmetric(horizontal: 8),
-      trailing: PopupMenuButton(
+      trailing: PopupMenuButton<SortStepType?>(
         style: ButtonStyle(
           padding: WidgetStateProperty.all(EdgeInsets.zero),
           fixedSize: WidgetStateProperty.all(const Size(10, 10)),
@@ -29,6 +30,7 @@ class KanbanStepTitleWidget extends StatelessWidget {
         padding: EdgeInsets.zero,
         surfaceTintColor: Colors.white,
         color: Colors.white,
+        onSelected: (e) => kanbanCtrl.onOrderPedidos(e, pedidos),
         itemBuilder: (context) => [
           PopupMenuItem(
               child: Row(
@@ -43,57 +45,12 @@ class KanbanStepTitleWidget extends StatelessWidget {
               )
             ],
           )),
-          PopupMenuItem(
-            onTap: () {
-              pedidos.sort((b, a) => a.createdAt.compareTo(b.createdAt));
-              for (var i = 0; i < pedidos.length; i++) {
-                pedidos[i].index = i;
-              }
-              kanbanCtrl.utilsStream.update();
-            },
-            child: const Text('Data de criação (mais recente primeiro)'),
-          ),
-          PopupMenuItem(
-            onTap: () {
-              pedidos.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-              for (var i = 0; i < pedidos.length; i++) {
-                pedidos[i].index = i;
-              }
-              kanbanCtrl.utilsStream.update();
-            },
-            child: const Text('Data de criação (mais antigo primeiro)'),
-          ),
-          PopupMenuItem(
-            onTap: () {
-              pedidos.sort((a, b) => a.localizador.compareTo(b.localizador));
-              for (var i = 0; i < pedidos.length; i++) {
-                pedidos[i].index = i;
-              }
-              kanbanCtrl.utilsStream.update();
-            },
-            child: const Text('Nome do cartão (em ordem alfabética)'),
-          ),
-          PopupMenuItem(
-            onTap: () {
-              pedidos.sort((a, b) {
-                if (a.deliveryAt == null && b.deliveryAt == null) {
-                  return 0;
-                } else if (a.deliveryAt == null) {
-                  return 1;
-                } else if (b.deliveryAt == null) {
-                  return -1;
-                } else {
-                  return a.deliveryAt!
-                      .compareTo(b.deliveryAt!); // Comparação normal
-                }
-              });
-              for (var i = 0; i < pedidos.length; i++) {
-                pedidos[i].index = i;
-              }
-              kanbanCtrl.utilsStream.update();
-            },
-            child: const Text('Data de entrega'),
-          ),
+          ...SortStepType.values
+              .map((e) => PopupMenuItem(
+                    value: e,
+                    child: Text(e.label),
+                  ))
+              .toList(),
         ],
       ),
       title: Row(

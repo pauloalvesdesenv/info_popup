@@ -5,12 +5,12 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
+import 'package:aco_plus/app/core/enums/sort_step_type.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -160,13 +160,10 @@ class StepController {
   void _onUpdatePedidosIndex(String stepId, int index) {
     final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
     List<PedidoModel> pedidos = utils.kanban[key]!;
-    final batch = FirebaseFirestore.instance.batch();
     for (int i = 0; i < pedidos.length; i++) {
       pedidos[i].index = i;
-      batch.update(FirestoreClient.pedidos.collection.doc(pedidos[i].id),
-          {'index': pedidos[i].index});
     }
-    batch.commit();
+    FirestoreClient.pedidos.updateAll(pedidos);
   }
 
   void onListenerSrollEnd(BuildContext context, Offset mouse) {
@@ -215,5 +212,39 @@ class StepController {
     _onMovePedido(pedido, step, 0);
     _onAddStep(pedido, step);
     utilsStream.update();
+  }
+
+  void onOrderPedidos(SortStepType? value, List<PedidoModel> pedidos) {
+    if (value != null) {
+      switch (value) {
+        case SortStepType.createdAtAsc:
+          pedidos.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+          break;
+        case SortStepType.createdAtDesc:
+          pedidos.sort((b, a) => a.createdAt.compareTo(b.createdAt));
+          break;
+        case SortStepType.localizador:
+          pedidos.sort((a, b) => a.localizador.compareTo(b.localizador));
+          break;
+        case SortStepType.deliveryAt:
+          pedidos.sort((a, b) {
+            if (a.deliveryAt == null && b.deliveryAt == null) {
+              return 0;
+            } else if (a.deliveryAt == null) {
+              return 1;
+            } else if (b.deliveryAt == null) {
+              return -1;
+            } else {
+              return a.deliveryAt!.compareTo(b.deliveryAt!);
+            }
+          });
+          break;
+      }
+      for (var i = 0; i < pedidos.length; i++) {
+        pedidos[i].index = i;
+      }
+      FirestoreClient.pedidos.updateAll(pedidos);
+      utilsStream.update();
+    }
   }
 }

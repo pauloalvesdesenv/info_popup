@@ -20,7 +20,6 @@ class KanbanPage extends StatefulWidget {
 }
 
 class _KanbanPageState extends State<KanbanPage> {
-
   late StreamSubscription<List<PedidoModel>> pedidoStream;
   late StreamSubscription<List<StepModel>> stepStream;
 
@@ -31,16 +30,15 @@ class _KanbanPageState extends State<KanbanPage> {
     super.dispose();
   }
 
-
   @override
   void initState() {
     kanbanCtrl.onInit().then((_) {
-      // pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
-      //   kanbanCtrl.onMount();
-      // });
-      // stepStream= FirestoreClient.steps.dataStream.listen.listen((e) {
-      //   kanbanCtrl.onMount();
-      // });
+      pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
+        kanbanCtrl.onMount();
+      });
+      stepStream = FirestoreClient.steps.dataStream.listen.listen((e) {
+        kanbanCtrl.onMount();
+      });
     });
     super.initState();
   }

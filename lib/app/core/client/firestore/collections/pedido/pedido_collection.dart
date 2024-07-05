@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
-import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -92,18 +89,15 @@ class PedidoCollection {
     return model;
   }
 
-  Future<PedidoModel?> updateBatch(PedidoModel model) async {
-    await collection.doc(model.id).update(model.toMap());
-    return model;
-  }
-
   Future<void> delete(PedidoModel model) async {
     await collection.doc(model.id).delete();
   }
 
-  Future<void> fetchAllItens() async {
-    for (final pedido in data) {
-      await FirestoreClient.pedidos.update(pedido);
+  Future<void> updateAll(List<PedidoModel> pedidos) async {
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+    for (var pedido in pedidos) {
+      batch.update(collection.doc(pedido.id), pedido.toMap());
     }
+    await batch.commit();
   }
 }

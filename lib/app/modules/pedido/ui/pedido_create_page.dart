@@ -24,6 +24,7 @@ import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/cliente/ui/cliente_create_simplify_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
+import 'package:aco_plus/app/modules/pedido/ui/pedido_order_edit_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
@@ -103,29 +104,78 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
           FirestoreClient.ordens.data
               .expand((e) => e.produtos.map((e) => e.id))
               .any((e) => e == produto.id);
-      return IgnorePointer(
-        ignoring: isDisabled,
-        child: Container(
-          color: isDisabled ? Colors.grey[300] : Colors.transparent,
-          child: ListTile(
-            leading: Text((form.produtos.indexOf(produto) + 1).toString(),
-                style: AppCss.mediumBold),
-            minLeadingWidth: 14,
-            contentPadding: const EdgeInsets.only(left: 16),
-            title: Row(
-              children: [
-                Text(produto.produtoModel?.descricao ?? ''),
-                if (isDisabled)
-                  Text(' Produto já foi adicionado há uma ordem',
-                      style: AppCss.mediumRegular
-                          .setColor(Colors.red[500]!)
-                          .setSize(11))
-              ],
+      return ColorFiltered(
+        colorFilter: isDisabled
+            ? ColorFilter.mode(
+                Colors.grey.withOpacity(0.4), BlendMode.softLight)
+            : const ColorFilter.mode(Colors.transparent, BlendMode.color),
+        child: IgnorePointer(
+          ignoring: isDisabled,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: isDisabled ? Colors.grey[200] : Colors.transparent,
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey[300]!,
+                  width: 1,
+                ),
+              ),
             ),
-            subtitle: Text('Quantidade: ${produto.qtde.text} Kg'),
-            trailing: isDisabled
-                ? null
-                : IconButton(
+            child: Row(
+              children: [
+                const W(24),
+                Text((form.produtos.indexOf(produto) + 1).toString(),
+                    style: AppCss.mediumBold),
+                const W(18),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(produto.produtoModel?.descricao ?? '',
+                                style: AppCss.mediumBold
+                                    .copyWith(fontWeight: FontWeight.w400)),
+                          ),
+                          if (isDisabled)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                  'Produto já foi adicionado há uma ordem',
+                                  style: AppCss.mediumRegular.copyWith(
+                                      color: Colors.red[500]!,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                            )
+                        ],
+                      ),
+                      Text('Quantidade: ${produto.qtde.text} Kg')
+                    ],
+                  ),
+                ),
+                if (!isDisabled) ...[
+                  IconButton(
+                    onPressed: () async {
+                      final qtde = await showPedidoOrderEditBottom(produto);
+                      if (qtde != null) {
+                        produto.qtde.text = qtde.toString();
+                        pedidoCtrl.formStream.update();
+                      }
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStateProperty.all(Colors.transparent),
+                    ),
+                    icon: const Icon(
+                      Icons.edit,
+                      color: Colors.red,
+                    ),
+                  ),
+                  const W(8),
+                  IconButton(
                     onPressed: () {
                       showConfirmDialog('Deseja remover bitola?',
                               'A bitola será removida do pedido')
@@ -136,11 +186,69 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                         }
                       });
                     },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStateProperty.all(Colors.transparent),
+                    ),
                     icon: const Icon(
                       Icons.delete,
                       color: Colors.red,
                     ),
                   ),
+                  const W(16),
+                ],
+              ],
+            ),
+            // child: ListTile(
+            //   leading: Text((form.produtos.indexOf(produto) + 1).toString(),
+            //       style: AppCss.mediumBold),
+            //   minLeadingWidth: 14,
+            //   contentPadding: const EdgeInsets.only(left: 16),
+            //   title: Row(
+            //     children: [
+            //       Text(produto.produtoModel?.descricao ?? ''),
+            //       if (isDisabled)
+            //         Text(' Produto já foi adicionado há uma ordem',
+            //             style: AppCss.mediumRegular
+            //                 .setColor(Colors.red[500]!)
+            //                 .setSize(11))
+            //     ],
+            //   ),
+            //   subtitle: Text('Quantidade: ${produto.qtde.text} Kg'),
+            //   trailing: Row(
+            //     children: [
+            //       isDisabled
+            //           ? const SizedBox()
+            //           : IconButton(
+            //               onPressed: () {
+            //                 showPedidoOrderEditBottom(produto);
+            //               },
+            //               icon: const Icon(
+            //                 Icons.edit,
+            //                 color: Colors.red,
+            //               ),
+            //             ),
+            //       isDisabled
+            //           ? const SizedBox()
+            //           : IconButton(
+            //               onPressed: () {
+            //                 showConfirmDialog('Deseja remover bitola?',
+            //                         'A bitola será removida do pedido')
+            //                     .then((value) {
+            //                   if (value) {
+            //                     form.produtos.remove(produto);
+            //                     pedidoCtrl.formStream.update();
+            //                   }
+            //                 });
+            //               },
+            //               icon: const Icon(
+            //                 Icons.delete,
+            //                 color: Colors.red,
+            //               ),
+            //             ),
+            //     ],
+            //   ),
+            // ),
           ),
         ),
       );

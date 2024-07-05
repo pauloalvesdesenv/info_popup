@@ -256,18 +256,19 @@ class PedidoController {
     FirestoreClient.pedidos.update(pedido);
   }
 
-  Future<void> onArchive(_, PedidoModel pedido) async {
+  Future<bool> onArchive(_, PedidoModel pedido, {bool isPedido = true}) async {
     if (!await showConfirmDialog('Deseja archivar esse pedidos?',
-        'O pedido ficará disponível na lista de arquivados')) return;
+        'O pedido ficará disponível na lista de arquivados')) return false;
     showLoadingDialog();
     pedido.isArchived = !pedido.isArchived;
     await FirestoreClient.pedidos.update(pedido);
     await FirestoreClient.pedidos.fetch();
     Navigator.pop(contextGlobal);
-    Navigator.pop(_);
+    if (isPedido) Navigator.pop(_);
     NotificationService.showPositive('Pedido Arquivado!',
         'Acesse a lista de arquivados para visualizar o pedido',
         position: NotificationPosition.bottom);
+    return true;
   }
 
   Future<void> onUnArchivePedido(_, PedidoModel pedido) async {

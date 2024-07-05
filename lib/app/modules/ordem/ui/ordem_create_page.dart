@@ -144,7 +144,8 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                           form.produtos.map((e) => e.id).contains(produto.id),
                       onTap: () {
                         form.produtos.map((e) => e.id).contains(produto.id)
-                            ? form.produtos.remove(produto)
+                            ? form.produtos
+                                .removeWhere((e) => e.id == produto.id)
                             : form.produtos.add(produto);
                         ordemCtrl.formStream.update();
                       })
@@ -165,7 +166,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                   'Total: ${[
                     if (widget.ordem != null) ...widget.ordem!.produtos,
                     ...form.produtos
-                  ].map((e) => e.qtde).fold(.0, (a, b) => a + b)}Kg',
+                  ].map((e) => e.qtde).fold(.0, (a, b) => a + b).toKg()}',
                   style: AppCss.mediumBold.setSize(16),
                 ),
               ),
