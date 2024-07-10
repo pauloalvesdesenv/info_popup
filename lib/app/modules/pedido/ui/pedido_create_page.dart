@@ -199,56 +199,6 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                 ],
               ],
             ),
-            // child: ListTile(
-            //   leading: Text((form.produtos.indexOf(produto) + 1).toString(),
-            //       style: AppCss.mediumBold),
-            //   minLeadingWidth: 14,
-            //   contentPadding: const EdgeInsets.only(left: 16),
-            //   title: Row(
-            //     children: [
-            //       Text(produto.produtoModel?.descricao ?? ''),
-            //       if (isDisabled)
-            //         Text(' Produto já foi adicionado há uma ordem',
-            //             style: AppCss.mediumRegular
-            //                 .setColor(Colors.red[500]!)
-            //                 .setSize(11))
-            //     ],
-            //   ),
-            //   subtitle: Text('Quantidade: ${produto.qtde.text} Kg'),
-            //   trailing: Row(
-            //     children: [
-            //       isDisabled
-            //           ? const SizedBox()
-            //           : IconButton(
-            //               onPressed: () {
-            //                 showPedidoOrderEditBottom(produto);
-            //               },
-            //               icon: const Icon(
-            //                 Icons.edit,
-            //                 color: Colors.red,
-            //               ),
-            //             ),
-            //       isDisabled
-            //           ? const SizedBox()
-            //           : IconButton(
-            //               onPressed: () {
-            //                 showConfirmDialog('Deseja remover bitola?',
-            //                         'A bitola será removida do pedido')
-            //                     .then((value) {
-            //                   if (value) {
-            //                     form.produtos.remove(produto);
-            //                     pedidoCtrl.formStream.update();
-            //                   }
-            //                 });
-            //               },
-            //               icon: const Icon(
-            //                 Icons.delete,
-            //                 color: Colors.red,
-            //               ),
-            //             ),
-            //     ],
-            //   ),
-            // ),
           ),
         ),
       );

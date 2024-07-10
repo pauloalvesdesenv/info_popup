@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
-import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -91,5 +88,4 @@ class UsuarioCollection {
   Future<void> delete(UsuarioModel model) async {
     await collection.doc(model.id).delete();
   }
-
 }

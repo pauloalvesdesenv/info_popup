@@ -18,8 +18,8 @@ import 'package:aco_plus/app/modules/ordem/ui/ordem_create_page.dart';
 import 'package:flutter/material.dart';
 
 class OrdemPage extends StatefulWidget {
-  final OrdemModel ordem;
-  const OrdemPage(this.ordem, {super.key});
+  final String ordemId;
+  const OrdemPage(this.ordemId, {super.key});
 
   @override
   State<OrdemPage> createState() => _OrdemPageState();
@@ -28,40 +28,41 @@ class OrdemPage extends StatefulWidget {
 class _OrdemPageState extends State<OrdemPage> {
   @override
   void initState() {
-    ordemCtrl.onInitPage(widget.ordem);
+    ordemCtrl.onInitPage(widget.ordemId);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-        resizeAvoid: true,
-        appBar: AppBar(
-          actions: [
-            IconButton(
-                onPressed: () async =>
-                    push(context, OrdemCreatePage(ordem: widget.ordem)),
-                icon: Icon(Icons.edit, color: AppColors.white)),
-            IconButton(
-                onPressed: () async =>
-                    ordemCtrl.onDelete(context, widget.ordem),
-                icon: Icon(Icons.delete, color: AppColors.white))
-          ],
-          title: Text('Ordem ${widget.ordem.id}',
-              style: AppCss.largeBold.setColor(AppColors.white)),
-          backgroundColor: AppColors.primaryMain,
-        ),
-        body: StreamOut(
-            stream: ordemCtrl.ordemStream.listen,
-            builder: (_, form) => body(form)));
+    return StreamOut(
+      stream: ordemCtrl.ordemStream.listen,
+      builder: (_, ordem) => AppScaffold(
+          resizeAvoid: true,
+          appBar: AppBar(
+            actions: [
+              IconButton(
+                  onPressed: () async =>
+                      push(context, OrdemCreatePage(ordem: ordem)),
+                  icon: Icon(Icons.edit, color: AppColors.white)),
+              IconButton(
+                  onPressed: () async => ordemCtrl.onDelete(context, ordem),
+                  icon: Icon(Icons.delete, color: AppColors.white))
+            ],
+            title: Text('Ordem ${ordem.id}',
+                style: AppCss.largeBold.setColor(AppColors.white)),
+            backgroundColor: AppColors.primaryMain,
+          ),
+          body: StreamOut(
+              stream: ordemCtrl.ordemStream.listen,
+              builder: (_, form) => body(form))),
+    );
   }
 
   Widget body(OrdemModel ordem) {
     return RefreshIndicator(
       onRefresh: () async {
         await FirestoreClient.ordens.fetch();
-        ordemCtrl.ordemStream
-            .add(FirestoreClient.ordens.getById(widget.ordem.id));
+        ordemCtrl.getOrdemById(widget.ordemId);
       },
       child: ListView(
         children: [
@@ -172,7 +173,7 @@ class _OrdemPageState extends State<OrdemPage> {
                 ],
               ),
               trailing: InkWell(
-                onTap: () => ordemCtrl.onChangeProdutoStatus(produto),
+                onTap: () => ordemCtrl.showBottomChangeProdutoStatus(produto),
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 3),

@@ -67,12 +67,16 @@ class PedidoController {
 
   Future<void> onConfirm(_, PedidoModel? pedido, bool isFromOrder) async {
     try {
+      if (!await showConfirmDialog('Produto não confirmado',
+          'Você adicionou a quantidade mas não confirmou o produto. Deseja continuar?')) {
+        return;
+      }
       onValid();
       if (form.isEdit) {
         final edit = form.toPedidoModel(pedido);
         final update = await FirestoreClient.pedidos.update(edit);
         if (update != null) {
-          pedidoStream.add(update);
+        pedidoStream.add(update);
           pedidoStream.update();
         }
       } else {
@@ -170,37 +174,6 @@ class PedidoController {
     if (pedido.steps.last.step.id == step.id) return;
     kanbanCtrl.onAccept(step, pedido, 0);
     pedidoStream.update();
-  }
-
-  Future<void> onVerifyPedidoStatus() async {
-    // final ordens = FirestoreClient.ordens.data;
-    // final batch = FirebaseFirestore.instance.batch();
-    // for (var pedido in FirestoreClient.pedidos.data) {
-    //   for (var produtoPedido in pedido.produtos) {
-    //     bool hasInOrder = false;
-    //     for (var ordem in ordens) {
-    //       for (var produtoOrdem in ordem.produtos) {
-    //         if (pedido.id == produtoOrdem.pedidoId &&
-    //             produtoPedido.id == produtoOrdem.id) {
-    //           hasInOrder = true;
-    //           break;
-    //         }
-    //       }
-    //     }
-    //     if (!hasInOrder &&
-    //         produtoPedido.status.status ==
-    //             PedidoProdutoStatus.aguardandoProducao) {
-    //       produtoPedido.statusess.clear();
-    //       produtoPedido.statusess.add(PedidoProdutoStatusModel(
-    //           id: HashService.get,
-    //           status: PedidoProdutoStatus.separado,
-    //           createdAt: DateTime.now()));
-    //     }
-    //   }
-    //   batch.update(
-    //       FirestoreClient.pedidos.collection.doc(pedido.id), pedido.toMap());
-    // }
-    // await batch.commit();
   }
 
   void onSortPedidos(List<PedidoModel> pedidos) {

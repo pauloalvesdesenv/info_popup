@@ -1,6 +1,12 @@
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
+import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PedidoCollection {
@@ -99,5 +105,42 @@ class PedidoCollection {
       batch.update(collection.doc(pedido.id), pedido.toMap());
     }
     await batch.commit();
+  }
+
+  Future<void> updateProdutoStatus(
+      PedidoProdutoModel produto, PedidoProdutoStatus status) async {
+    final pedido = getById(produto.pedidoId);
+
+    pedido.produtos
+        .firstWhere((element) => element.id == produto.id)
+        .statusess
+        .add(PedidoProdutoStatusModel.create(status));
+    return await collection.doc(pedido.id).update(pedido.toMap());
+  }
+
+  Future<PedidoModel?> updatePedidoStatus(PedidoProdutoModel produto) async {
+    final pedido = getById(produto.pedidoId);
+    final status = PedidoStatusModel.create(getPedidoStatusByProduto(pedido));
+    if (status.status == pedido.status) return null;
+    pedido.statusess.add(status);
+    await collection.doc(pedido.id).update(pedido.toMap());
+    return pedido;
+  }
+
+  PedidoStatus getPedidoStatusByProduto(PedidoModel pedido) {
+    bool isAllDone = pedido.produtos
+        .every((e) => e.status.status == PedidoProdutoStatus.pronto);
+    if (isAllDone) {
+      return pedido.tipo == PedidoTipo.cd
+          ? PedidoStatus.pronto
+          : PedidoStatus.aguardandoProducaoCDA;
+    } else {
+      bool isAllAguardandoProducao = pedido.produtos.every(
+          (e) => e.status.status == PedidoProdutoStatus.aguardandoProducao);
+
+      return isAllAguardandoProducao
+          ? PedidoStatus.aguardandoProducaoCD
+          : PedidoStatus.produzindoCD;
+    }
   }
 }

@@ -301,7 +301,7 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
           const Divisor(),
           itemInfo('Cliente', pedido.cliente.nome),
           const Divisor(),
-          itemInfo('Descrição', pedido.obra.descricao),
+          itemInfo('Descrição', pedido.descricao),
           const Divisor(),
           itemInfo(
               'Data de Entrega',

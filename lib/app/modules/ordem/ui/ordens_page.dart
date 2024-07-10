@@ -147,7 +147,7 @@ class _OrdensPageState extends State<OrdensPage> {
 
   Widget _itemOrdemWidget(OrdemModel ordem) {
     return InkWell(
-      onTap: () => push(OrdemPage(ordem)),
+      onTap: () => push(OrdemPage(ordem.id)),
       child: Container(
         padding: const EdgeInsets.all(16),
         child: Row(

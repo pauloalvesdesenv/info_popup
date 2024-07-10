@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
@@ -90,11 +89,8 @@ class StepController {
 
   void onAccept(StepModel step, PedidoModel pedido, int index,
       {bool auto = false}) async {
-    print('onWillAccept');
     if (!onWillAccept(pedido, step, auto: auto)) return;
-    print('_onMovePedido');
     _onMovePedido(pedido, step, index);
-    print('_onAddStep');
     _onAddStep(pedido, step);
     utilsStream.update();
   }
@@ -122,15 +118,9 @@ class StepController {
   }
 
   void _onAddStep(PedidoModel pedido, StepModel step) {
-    late StepModel newStep;
-    try {
-      newStep = FirestoreClient.steps.getById(step.id);
-    } catch (e) {
-      newStep = step.copyWith();
-    }
     pedidoCtrl.onAddHistory(
       pedido: pedido,
-      data: newStep,
+      data: step,
       type: PedidoHistoryType.step,
       action: PedidoHistoryAction.update,
     );
@@ -146,13 +136,9 @@ class StepController {
   }
 
   PedidoModel _onRemovePedidoFromStep(String stepId, String pedidoId) {
-    log('message');
     final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
-    log('message $key');
     final pedido = utils.kanban[key]!.firstWhere((e) => e.id == pedidoId);
-    log('message $pedido');
     utils.kanban[key]!.remove(pedido);
-    log('message $pedido');
     return pedido;
   }
 

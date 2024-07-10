@@ -83,7 +83,7 @@ class RelatorioPedidoPdfPage {
           PdfDivisor.build(
             color: Colors.grey[200],
           ),
-          _itemInfo('Descrição', pedido.obra.descricao),
+          _itemInfo('Descrição', pedido.descricao),
           PdfDivisor.build(
             color: Colors.grey[200],
           ),
