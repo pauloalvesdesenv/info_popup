@@ -5,6 +5,8 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/enums/obra_status.dart';
+import 'package:collection/collection.dart';
 
 class PedidoProdutoModel {
   final String id;
@@ -22,7 +24,14 @@ class PedidoProdutoModel {
   bool get hasOrder => statusess.last.status == PedidoProdutoStatus.separado;
 
   ClienteModel get cliente => FirestoreClient.clientes.getById(clienteId);
-  ObraModel get obra => cliente.obras.firstWhere((e) => e.id == obraId);
+  ObraModel get obra =>
+      cliente.obras.firstWhereOrNull((e) => e.id == obraId) ??
+      ObraModel(
+          id: id,
+          descricao: 'Indefinida',
+          telefoneFixo: '',
+          endereco: null,
+          status: ObraStatus.emAndamento);
 
   PedidoProdutoStatusModel get status => statusess.last;
 
@@ -31,7 +40,7 @@ class PedidoProdutoModel {
           ? PedidoProdutoStatus.aguardandoProducao
           : statusess.last.status);
 
-          bool get isAvailableToChanges => status.status.index < 2;
+  bool get isAvailableToChanges => status.status.index < 2;
 
   PedidoProdutoModel({
     required this.id,
