@@ -20,7 +20,7 @@ class PedidoProdutoModel {
   bool isAvailable = true;
 
   PedidoModel get pedido => FirestoreClient.pedidos.getById(pedidoId);
-
+  bool get isAvailableToChanges => status.status.index < 2;
   bool get hasOrder => statusess.last.status == PedidoProdutoStatus.separado;
 
   ClienteModel get cliente => FirestoreClient.clientes.getById(clienteId);
@@ -39,8 +39,6 @@ class PedidoProdutoModel {
       status: statusess.last.status == PedidoProdutoStatus.separado
           ? PedidoProdutoStatus.aguardandoProducao
           : statusess.last.status);
-
-  bool get isAvailableToChanges => status.status.index < 2;
 
   PedidoProdutoModel({
     required this.id,

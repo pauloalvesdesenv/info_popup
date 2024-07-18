@@ -1,4 +1,3 @@
-
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
@@ -50,12 +49,16 @@ class OrdemCreateModel {
         createdAt: createdAt ?? DateTime.now(),
         produto: produto!,
         produtos: produtos
-            .map((e) => e.copyWith(statusess: [
+            .map(
+              (e) => e.copyWith(
+                statusess: [
                   ...e.statusess,
-                  if (e.isSelected && !e.isAvailable)
+                  if(e.statusess.last.status != PedidoProdutoStatus.aguardandoProducao) if (e.isSelected && e.isAvailableToChanges)
                     PedidoProdutoStatusModel.create(
                         PedidoProdutoStatus.aguardandoProducao)
-                ]))
+                ],
+              ),
+            )
             .toList());
   }
 }

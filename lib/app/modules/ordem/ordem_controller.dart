@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
@@ -36,6 +38,17 @@ class OrdemController {
     FirestoreClient.ordens.fetch();
   }
 
+  List<OrdemModel> getOrdensFiltered(String search, List<OrdemModel> ordens) {
+    if (search.length < 3) return ordens;
+    List<OrdemModel> filtered = [];
+    for (final ordem in ordens) {
+      if (ordem.id.toString().toCompare.contains(search.toCompare)) {
+        filtered.add(ordem);
+      }
+    }
+    return filtered;
+  }
+
   final AppStream<OrdemCreateModel> formStream = AppStream<OrdemCreateModel>();
   OrdemCreateModel get form => formStream.value;
 
@@ -44,14 +57,26 @@ class OrdemController {
         .add(ordem != null ? OrdemCreateModel.edit(ordem) : OrdemCreateModel());
   }
 
-  List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto) {
+  List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto, {OrdemModel? ordem}) {
+    List<PedidoProdutoModel> pedidos = [
+      ..._getPedidosProdutosAtual(ordem: ordem),
+      ..._getPedidosProdutosSeparados(produto),
+    ];
+    onSortPedidos(pedidos);
+    return pedidos;
+  }
+
+  List<PedidoProdutoModel> _getPedidosProdutosAtual({OrdemModel? ordem}) =>
+      ordem != null ? ordem.produtos.map((e) => e.copyWith(isSelected: true, isAvailable: e.isAvailableToChanges)).toList() : [];
+
+  List<PedidoProdutoModel> _getPedidosProdutosSeparados(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
-    for (var pedido in FirestoreClient.pedidos.data
+    for (final pedido in FirestoreClient.pedidos.data
         .where((e) =>
             form.cliente.text.isEmpty ||
             e.cliente.nome.toCompare.contains(form.cliente.text.toCompare))
         .toList()) {
-      for (var pedidoProduto in pedido.produtos
+      for (final pedidoProduto in pedido.produtos
           .where((e) =>
               e.status.status == PedidoProdutoStatus.separado &&
               e.produto.id == produto.id)
@@ -59,7 +84,6 @@ class OrdemController {
         pedidos.add(pedidoProduto);
       }
     }
-    onSortPedidos(pedidos);
     return pedidos;
   }
 
@@ -74,23 +98,10 @@ class OrdemController {
     return pedidos;
   }
 
-  List<OrdemModel> getOrdensFiltered(String search, List<OrdemModel> ordens) {
-    if (search.length < 3) return ordens;
-    List<OrdemModel> filtered = [];
-    for (final ordem in ordens) {
-      if (ordem.id.toString().toCompare.contains(search.toCompare)) {
-        filtered.add(ordem);
-      }
-    }
-    return filtered;
-  }
-
   Future<void> onConfirm(_, OrdemModel? ordem) async {
     try {
-      final ordem = form.toOrdemModel();
-      onValid(ordem);
       if (form.isEdit) {
-        await onEdit(_, ordem);
+        await onEdit(_);
       } else {
         await onCreate(_);
       }
@@ -105,28 +116,39 @@ class OrdemController {
         'OP${form.produto!.descricao.replaceAll('m', '').replaceAll('.', '')}${form.id}';
 
     final ordemCriada = form.toOrdemModel();
+    onValid(ordemCriada);
     await FirestoreClient.ordens.add(ordemCriada);
     await FirestoreClient.pedidos.fetch();
-    await automatizacaoCtrl.onSetStepByPedidoStatus(ordemCriada.pedidos.map((e) => FirestoreClient.pedidos.getById(e.id)).toList());
-
+    await automatizacaoCtrl.onSetStepByPedidoStatus(ordemCriada.pedidos
+        .map((e) => FirestoreClient.pedidos.getById(e.id))
+        .toList());
     Navigator.pop(_);
-
     NotificationService.showPositive(
         'Ordem Adicionada', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
   }
 
-  Future<void> onEdit(_, OrdemModel ordem) async {
+  Future<void> onEdit(_) async {
     await FirestoreClient.pedidos.fetch();
-    ordem.produtos.removeWhere((e) => e.status.status.index == 0);
-    final result = form.toOrdemModel();
-    await FirestoreClient.ordens.update(result);
-    await automatizacaoCtrl.onSetStepByPedidoStatus(result.pedidos);
+    final ordemEditada = form.toOrdemModel();
+    ordemEditada.produtos.removeWhere((e) => e.status.status.index == 0);
+    onValid(ordemEditada);
+    await FirestoreClient.ordens.update(ordemEditada);
+    await automatizacaoCtrl.onSetStepByPedidoStatus(ordemEditada.pedidos);
     Navigator.pop(_);
     Navigator.pop(_);
     NotificationService.showPositive(
         'Ordem Editada', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
+  }
+
+   void onValid(OrdemModel ordem) {
+    if (form.produto == null) {
+      throw Exception('Selecione o produto');
+    }
+    if (ordem.produtos.isEmpty) {
+      throw Exception('A lista de produtos não pode ser vazia');
+    }
   }
 
   Future<void> onDelete(_, OrdemModel ordem) async {
@@ -164,21 +186,7 @@ class OrdemController {
             e.status.status == PedidoProdutoStatus.separado),
       );
 
-  void onValid(OrdemModel? ordem) {
-    if (form.produto == null) {
-      throw Exception('Selecione o produto');
-    }
-    if (_checkIsEmpty(ordem)) {
-      throw Exception('A lista de produtos não pode ser vazia');
-    }
-  }
 
-  bool _checkIsEmpty(OrdemModel? ordem) {
-    final edit = form.toOrdemModel().copyWith();
-    edit.produtos
-        .removeWhere((e) => e.status.status.index <= 1 && !e.isSelected);
-    return edit.produtos.isEmpty;
-  }
 
   void onSortPedidos(List<PedidoProdutoModel> pedidos) {
     bool isAsc = form.sortOrder == SortOrder.asc;

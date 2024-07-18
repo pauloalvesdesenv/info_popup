@@ -136,7 +136,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
               ),
               if (form.produto != null)
                 for (PedidoProdutoModel produto
-                    in ordemCtrl.getPedidosPorProduto(form.produto!))
+                    in ordemCtrl.getPedidosPorProduto(form.produto!, ordem: widget.ordem))
                   _itemProduto(
                       isEnable: produto.isAvailable,
                       produto: produto,

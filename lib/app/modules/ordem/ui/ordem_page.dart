@@ -168,7 +168,7 @@ class _OrdemPageState extends State<OrdemPage> {
                   Text(
                       '${produto.pedido.localizador} - ${produto.cliente.nome}',
                       style: AppCss.minimumRegular.setSize(12)),
-                  Text(produto.obra?.descricao ?? 'Não Disponível',
+                  Text(produto.obra.descricao ?? 'Não Disponível',
                       style: AppCss.minimumRegular.setSize(12)),
                 ],
               ),
