@@ -36,14 +36,13 @@ class PedidoProdutosWidget extends StatelessWidget {
                   PedidoProdutoStatus.aguardandoProducao.index) ...[
                 Builder(builder: (context) {
                   final ordem = pedidoCtrl.getOrdemByProduto(produto);
-                  if (ordem == null) return const SizedBox();
                   return Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
                         color: Colors.grey.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(4)),
-                    child: Text(ordem.id,
+                    child: Text(ordem?.id ?? 'N/A',
                         style: AppCss.mediumRegular.copyWith(
                             fontSize: 12,
                             color: Colors.black,

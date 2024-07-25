@@ -67,16 +67,19 @@ class PedidoController {
 
   Future<void> onConfirm(_, PedidoModel? pedido, bool isFromOrder) async {
     try {
-      if (!await showConfirmDialog('Produto não confirmado',
-          'Você adicionou a quantidade mas não confirmou o produto. Deseja continuar?')) {
-        return;
-      }
       onValid();
+      if (form.produto.produtoModel != null &&
+          form.produto.qtde.text.isNotEmpty) {
+        if (!await showConfirmDialog('Produto não confirmado',
+            'Você adicionou a quantidade mas não confirmou o produto. Deseja continuar?')) {
+          return;
+        }
+      }
       if (form.isEdit) {
         final edit = form.toPedidoModel(pedido);
         final update = await FirestoreClient.pedidos.update(edit);
         if (update != null) {
-        pedidoStream.add(update);
+          pedidoStream.add(update);
           pedidoStream.update();
         }
       } else {

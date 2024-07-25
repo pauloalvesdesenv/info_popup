@@ -1,12 +1,10 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
-import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PedidoCollection {
@@ -108,13 +106,22 @@ class PedidoCollection {
   }
 
   Future<void> updateProdutoStatus(
-      PedidoProdutoModel produto, PedidoProdutoStatus status) async {
+      PedidoProdutoModel produto, PedidoProdutoStatus status,
+      {bool clear = false}) async {
     final pedido = getById(produto.pedidoId);
 
-    pedido.produtos
-        .firstWhere((element) => element.id == produto.id)
-        .statusess
-        .add(PedidoProdutoStatusModel.create(status));
+    final pedidoProduto =
+        pedido.produtos.firstWhere((element) => element.id == produto.id);
+
+    if (clear) {
+      pedidoProduto.statusess.clear();
+    }
+
+    if (pedidoProduto.statusess.isEmpty ||
+        pedidoProduto.statusess.last.status != status) {
+      pedidoProduto.statusess.add(PedidoProdutoStatusModel.create(status));
+    }
+
     return await collection.doc(pedido.id).update(pedido.toMap());
   }
 

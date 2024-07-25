@@ -347,6 +347,7 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
           itemLabel: (e) => e!.nome,
           onSelect: (e) async {
             form.cliente = e;
+            form.obra = null;
             pedidoCtrl.formStream.update();
           },
         ),
@@ -354,12 +355,12 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
         AppDropDown<ObraModel?>(
           label: 'Obra',
           item: form.obra,
-          disable: form.isEdit ? form.isEdit : form.cliente == null,
+          disable: form.cliente == null,
           itens: form.cliente?.obras
                   .where((e) => e.status == ObraStatus.emAndamento)
                   .toList() ??
               [],
-          itemLabel: (e) => e!.descricao,
+          itemLabel: (e) => e?.descricao ?? 'Selecione',
           onSelect: (e) {
             form.obra = e;
             pedidoCtrl.formStream.update();

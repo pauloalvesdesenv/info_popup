@@ -48,11 +48,18 @@ class _AppDropDown<T> extends State<AppDropDown<T>> {
 
   TextController get controller => widget.controller ?? _controller;
 
-  // @override
-  // void initState() {
-  //   controller.text = widget.itemLabel.call(widget.item) ?? '';
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    if (widget.item != null) {
+      final item = widget.itemLabel.call(widget.item);
+      if (item.isEmpty || item == 'Selecione') {
+        controller.text = '';
+      } else {
+        controller.text = item;
+      }
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

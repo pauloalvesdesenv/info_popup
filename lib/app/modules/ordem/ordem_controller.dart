@@ -57,7 +57,8 @@ class OrdemController {
         .add(ordem != null ? OrdemCreateModel.edit(ordem) : OrdemCreateModel());
   }
 
-  List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto, {OrdemModel? ordem}) {
+  List<PedidoProdutoModel> getPedidosPorProduto(ProdutoModel produto,
+      {OrdemModel? ordem}) {
     List<PedidoProdutoModel> pedidos = [
       ..._getPedidosProdutosAtual(ordem: ordem),
       ..._getPedidosProdutosSeparados(produto),
@@ -67,20 +68,30 @@ class OrdemController {
   }
 
   List<PedidoProdutoModel> _getPedidosProdutosAtual({OrdemModel? ordem}) =>
-      ordem != null ? ordem.produtos.map((e) => e.copyWith(isSelected: true, isAvailable: e.isAvailableToChanges)).toList() : [];
+      ordem != null
+          ? ordem.produtos
+              .map((e) => e.copyWith(
+                  isSelected: true, isAvailable: e.isAvailableToChanges))
+              .toList()
+          : [];
 
   List<PedidoProdutoModel> _getPedidosProdutosSeparados(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
-    for (final pedido in FirestoreClient.pedidos.data
+    List<PedidoModel> pedidosBySearch = FirestoreClient.pedidos.data
         .where((e) =>
             form.cliente.text.isEmpty ||
             e.cliente.nome.toCompare.contains(form.cliente.text.toCompare))
-        .toList()) {
-      for (final pedidoProduto in pedido.produtos
+        .toList();
+    for (final pedido in pedidosBySearch) {
+      final pedidoProdutos = pedido.produtos
           .where((e) =>
               e.status.status == PedidoProdutoStatus.separado &&
               e.produto.id == produto.id)
-          .toList()) {
+          .toList();
+      if (pedidoProdutos.isNotEmpty) {
+        log('teste');
+      }
+      for (final pedidoProduto in pedidoProdutos) {
         pedidos.add(pedidoProduto);
       }
     }
@@ -101,7 +112,7 @@ class OrdemController {
   Future<void> onConfirm(_, OrdemModel? ordem) async {
     try {
       if (form.isEdit) {
-        await onEdit(_);
+        await onEdit(_, ordem!);
       } else {
         await onCreate(_);
       }
@@ -117,6 +128,9 @@ class OrdemController {
 
     final ordemCriada = form.toOrdemModel();
     onValid(ordemCriada);
+    for (PedidoProdutoModel produto in ordemCriada.produtos) {
+      await FirestoreClient.pedidos.updateProdutoStatus(produto, produto.statusess.last.status);
+    }
     await FirestoreClient.ordens.add(ordemCriada);
     await FirestoreClient.pedidos.fetch();
     await automatizacaoCtrl.onSetStepByPedidoStatus(ordemCriada.pedidos
@@ -128,12 +142,21 @@ class OrdemController {
         position: NotificationPosition.bottom);
   }
 
-  Future<void> onEdit(_) async {
+  Future<void> onEdit(_, OrdemModel ordem) async {
     await FirestoreClient.pedidos.fetch();
     final ordemEditada = form.toOrdemModel();
+    for (PedidoProdutoModel produto in ordem.produtos) {
+      if (!ordemEditada.produtos.contains(produto)) {
+        await FirestoreClient.pedidos.updateProdutoStatus(produto, PedidoProdutoStatus.separado, clear: true);
+      }
+    }
+    for (PedidoProdutoModel produto in ordemEditada.produtos) {
+      await FirestoreClient.pedidos.updateProdutoStatus(produto, produto.statusess.last.status);
+    }
     ordemEditada.produtos.removeWhere((e) => e.status.status.index == 0);
     onValid(ordemEditada);
     await FirestoreClient.ordens.update(ordemEditada);
+    await FirestoreClient.pedidos.fetch();
     await automatizacaoCtrl.onSetStepByPedidoStatus(ordemEditada.pedidos);
     Navigator.pop(_);
     Navigator.pop(_);
@@ -142,7 +165,7 @@ class OrdemController {
         position: NotificationPosition.bottom);
   }
 
-   void onValid(OrdemModel ordem) {
+  void onValid(OrdemModel ordem) {
     if (form.produto == null) {
       throw Exception('Selecione o produto');
     }
@@ -185,8 +208,6 @@ class OrdemController {
             e.status.status == PedidoProdutoStatus.aguardandoProducao ||
             e.status.status == PedidoProdutoStatus.separado),
       );
-
-
 
   void onSortPedidos(List<PedidoProdutoModel> pedidos) {
     bool isAsc = form.sortOrder == SortOrder.asc;
