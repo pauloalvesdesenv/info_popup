@@ -42,9 +42,11 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           const W(16),
-          Text(
-            pedido.localizador,
-            style: AppCss.largeBold.setColor(Colors.white).setSize(18),
+          Expanded(
+            child: Text(
+              pedido.localizador,
+              style: AppCss.largeBold.setColor(Colors.white).setSize(18),
+            ),
           ),
           const Spacer(),
           Tooltip(
@@ -90,7 +92,13 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
           Tooltip(
             message: 'Excluir pedido',
             child: InkWell(
-                onTap: () async => pedidoCtrl.onDelete(context, pedido),
+                onTap: () async => pedidoCtrl
+                    .onDelete(context, pedido, isPedido: false)
+                    .then((e) {
+                      if(e){
+                        kanbanCtrl.setPedido(null);
+                      }
+                    }),
                 child: Icon(
                   Icons.delete,
                   color: AppColors.white,

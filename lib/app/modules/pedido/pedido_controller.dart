@@ -101,13 +101,16 @@ class PedidoController {
     }
   }
 
-  Future<void> onDelete(_, PedidoModel pedido) async {
-    if (await _isDeleteUnavailable(pedido)) return;
+  Future<bool> onDelete(_, PedidoModel pedido, {bool isPedido = true}) async {
+    if (await _isDeleteUnavailable(pedido)) return false;
     await FirestoreClient.pedidos.delete(pedido);
-    pop(_);
+    if (isPedido) {
+      pop(_);
+    }
     NotificationService.showPositive(
         'Pedido Excluida', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
+    return true;
   }
 
   Future<bool> _isDeleteUnavailable(PedidoModel pedido) async =>
