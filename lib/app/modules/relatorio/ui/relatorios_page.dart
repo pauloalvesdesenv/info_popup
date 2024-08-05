@@ -28,7 +28,8 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
             color: AppColors.white,
           ),
         ),
-        title: Text('Relatórios', style: AppCss.largeBold.setColor(AppColors.white)),
+        title: Text('Relatórios',
+            style: AppCss.largeBold.setColor(AppColors.white)),
         backgroundColor: AppColors.primaryMain,
       ),
       body: Column(
@@ -39,7 +40,8 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
             leading: const Icon(
               Icons.shopping_cart_outlined,
             ),
-            trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 16),
+            trailing:
+                Icon(Icons.chevron_right, color: Colors.grey[400], size: 16),
           ),
           const Divisor(),
           ListTile(
@@ -48,7 +50,8 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
             leading: const Icon(
               Icons.work_outline,
             ),
-            trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 16),
+            trailing:
+                Icon(Icons.chevron_right, color: Colors.grey[400], size: 16),
           ),
         ],
       ),

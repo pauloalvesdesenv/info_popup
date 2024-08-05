@@ -19,8 +19,7 @@ class PedidoStatusWidget extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Expanded(
-              child: Text('Status de Produção', style: AppCss.largeBold)),
+          Expanded(child: Text('Status de Produção', style: AppCss.largeBold)),
           InkWell(
             onTap: pedido.isChangeStatusAvailable
                 ? () => pedidoCtrl.onChangePedidoStatus(pedido)

@@ -14,8 +14,8 @@ class RelatorioOrdemPdfOrdemPage {
   RelatorioOrdemPdfOrdemPage(this.model);
 
   pw.Page build(Uint8List bytes) => pw.MultiPage(
-    pageFormat: PdfPageFormat.a4,
-    crossAxisAlignment: pw.CrossAxisAlignment.center,
+        pageFormat: PdfPageFormat.a4,
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
         build: (pw.Context context) => [
           pw.Image(pw.MemoryImage(bytes), width: 60, height: 60),
           pw.SizedBox(height: 24),
@@ -59,7 +59,8 @@ class RelatorioOrdemPdfOrdemPage {
           for (final produto in ordem.produtos)
             pw.Column(
               children: [
-                _itemInfo('${produto.pedido.localizador} - ${produto.cliente.nome} - ${produto.obra.descricao}',
+                _itemInfo(
+                    '${produto.pedido.localizador} - ${produto.cliente.nome} - ${produto.obra.descricao}',
                     '${produto.qtde} kg'),
                 PdfDivisor.build(
                   color: Colors.grey[200],

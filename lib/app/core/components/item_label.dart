@@ -28,10 +28,11 @@ class ItemLabel extends StatelessWidget {
                 )),
         Text(
           value,
-          style: AppCss.mediumRegular.setColor(color ?? AppColors.black).copyWith(
-                decoration: isDisable ? TextDecoration.lineThrough : null,
-                color: isDisable ? AppColors.black.withOpacity(0.3) : null,
-              ),
+          style:
+              AppCss.mediumRegular.setColor(color ?? AppColors.black).copyWith(
+                    decoration: isDisable ? TextDecoration.lineThrough : null,
+                    color: isDisable ? AppColors.black.withOpacity(0.3) : null,
+                  ),
         ),
       ],
     );

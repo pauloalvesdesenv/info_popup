@@ -37,13 +37,17 @@ class _EnderecoCreatePageState extends State<EnderecoCreatePage> {
                 Icons.arrow_back,
                 color: AppColors.white,
               )),
-          title: Text('${enderecoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Endereco',
+          title: Text(
+              '${enderecoCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Endereco',
               style: AppCss.largeBold.setColor(AppColors.white)),
-          actions: [IconLoadingButton(() async => await enderecoCtrl.onConfirm(context))],
+          actions: [
+            IconLoadingButton(() async => await enderecoCtrl.onConfirm(context))
+          ],
           backgroundColor: AppColors.primaryMain,
         ),
         body: StreamOut(
-            stream: enderecoCtrl.enderecoCreateStream.listen, builder: (_, form) => body(form)));
+            stream: enderecoCtrl.enderecoCreateStream.listen,
+            builder: (_, form) => body(form)));
   }
 
   Widget body(EnderecoCreateModel form) {

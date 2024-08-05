@@ -25,7 +25,6 @@ class ClientesPage extends StatefulWidget {
 }
 
 class _ClientesPageState extends State<ClientesPage> {
-
   @override
   void initState() {
     FirestoreClient.clientes.fetch();
@@ -47,12 +46,13 @@ class _ClientesPageState extends State<ClientesPage> {
         title:
             Text('Clientes', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          if(usuario.permission.cliente.contains(UserPermissionType.create)) IconButton(
-              onPressed: () => push(context, const ClienteCreatePage()),
-              icon: Icon(
-                Icons.add,
-                color: AppColors.white,
-              ))
+          if (usuario.permission.cliente.contains(UserPermissionType.create))
+            IconButton(
+                onPressed: () => push(context, const ClienteCreatePage()),
+                icon: Icon(
+                  Icons.add,
+                  color: AppColors.white,
+                ))
         ],
         backgroundColor: AppColors.primaryMain,
       ),

@@ -17,7 +17,6 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: StreamOut<AppModule>(
-        
         stream: baseCtrl.moduleStream.listen,
         builder: (_, module) => Column(
           children: [

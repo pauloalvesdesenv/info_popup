@@ -7,7 +7,8 @@ import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
-Future<PedidoProdutoStatus?> showOrdemProdutoStatusBottom(PedidoProdutoStatus status) async =>
+Future<PedidoProdutoStatus?> showOrdemProdutoStatusBottom(
+        PedidoProdutoStatus status) async =>
     showModalBottomSheet(
       backgroundColor: AppColors.white,
       context: contextGlobal,
@@ -20,7 +21,8 @@ class OrdemProdutoStatusBottom extends StatefulWidget {
   const OrdemProdutoStatusBottom(this.status, {super.key});
 
   @override
-  State<OrdemProdutoStatusBottom> createState() => _OrdemProdutoStatusBottomState();
+  State<OrdemProdutoStatusBottom> createState() =>
+      _OrdemProdutoStatusBottomState();
 }
 
 class _OrdemProdutoStatusBottomState extends State<OrdemProdutoStatusBottom> {
@@ -42,13 +44,15 @@ class _OrdemProdutoStatusBottomState extends State<OrdemProdutoStatusBottom> {
   Widget build(BuildContext context) {
     return BottomSheet(
         onClosing: () {},
-        builder: (context) => KeyboardVisibilityBuilder(builder: (context, isVisible) {
+        builder: (context) =>
+            KeyboardVisibilityBuilder(builder: (context, isVisible) {
               return Container(
                 height: 400,
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24)),
                 ),
                 child: ListView(
                   children: [
@@ -59,9 +63,12 @@ class _OrdemProdutoStatusBottomState extends State<OrdemProdutoStatusBottom> {
                         padding: const EdgeInsets.only(left: 8),
                         child: IconButton(
                           style: ButtonStyle(
-                              padding: const WidgetStatePropertyAll(EdgeInsets.all(16)),
-                              backgroundColor: WidgetStatePropertyAll(AppColors.white),
-                              foregroundColor: WidgetStatePropertyAll(AppColors.black)),
+                              padding: const WidgetStatePropertyAll(
+                                  EdgeInsets.all(16)),
+                              backgroundColor:
+                                  WidgetStatePropertyAll(AppColors.white),
+                              foregroundColor:
+                                  WidgetStatePropertyAll(AppColors.black)),
                           onPressed: () => Navigator.pop(context),
                           icon: const Icon(Icons.keyboard_backspace),
                         ),
@@ -87,9 +94,11 @@ class _OrdemProdutoStatusBottomState extends State<OrdemProdutoStatusBottom> {
                                       color: status.color.withOpacity(0.4),
                                       borderRadius: BorderRadius.circular(4)),
                                   child: RadioListTile<PedidoProdutoStatus>(
-                                    title: Text(status.label, style: AppCss.mediumRegular),
+                                    title: Text(status.label,
+                                        style: AppCss.mediumRegular),
                                     value: status,
-                                    groupValue: currentStatus == PedidoProdutoStatus.separado
+                                    groupValue: currentStatus ==
+                                            PedidoProdutoStatus.separado
                                         ? PedidoProdutoStatus.aguardandoProducao
                                         : currentStatus,
                                     onChanged: (value) {
@@ -102,7 +111,8 @@ class _OrdemProdutoStatusBottomState extends State<OrdemProdutoStatusBottom> {
                               const H(16),
                               AppTextButton(
                                   label: 'Confirmar',
-                                  onPressed: () => Navigator.pop(context, currentStatus))
+                                  onPressed: () =>
+                                      Navigator.pop(context, currentStatus))
                             ],
                           )
                         ],

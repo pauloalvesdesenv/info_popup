@@ -61,11 +61,11 @@ class _ClienteCreatePageState extends State<ClienteCreatePage> {
               style: AppCss.largeBold.setColor(AppColors.white)),
           actions: [
             if ((widget.cliente != null &&
-                  usuario.permission.cliente
-                      .contains(UserPermissionType.update)) ||
-              (widget.cliente == null &&
-                  usuario.permission.cliente
-                      .contains(UserPermissionType.create)))
+                    usuario.permission.cliente
+                        .contains(UserPermissionType.update)) ||
+                (widget.cliente == null &&
+                    usuario.permission.cliente
+                        .contains(UserPermissionType.create)))
               IconLoadingButton(() async => await clienteCtrl.onConfirm(
                   context, widget.cliente, widget.isFromOrder))
           ],

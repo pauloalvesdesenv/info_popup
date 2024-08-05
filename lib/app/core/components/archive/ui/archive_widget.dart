@@ -85,7 +85,7 @@ class ArchiveWidget extends StatelessWidget {
       case ArchiveType.pdf:
         child = ArchivePDFWidget(archive, inList: inList);
       default:
-        child =  ArchiveOtherWidget(archive);
+        child = ArchiveOtherWidget(archive);
     }
     return InkWell(
       onTap: () => DownloadFileURLService.call(archive.url!),

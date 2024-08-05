@@ -25,7 +25,8 @@ class _ClienteSelectPageState extends State<ClienteSelectPage> {
   Widget build(BuildContext context) {
     return AppScaffold(
       appBar: AppBar(
-        title: Text('Clientees', style: AppCss.largeBold.setColor(AppColors.white)),
+        title: Text('Clientees',
+            style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
           IconButton(
               onPressed: () => push(context, const ClienteCreatePage()),
@@ -41,7 +42,9 @@ class _ClienteSelectPageState extends State<ClienteSelectPage> {
         builder: (_, __) => StreamOut<ClienteUtils>(
           stream: clienteCtrl.utilsStream.listen,
           builder: (_, utils) {
-            final clientes = clienteCtrl.getClienteesFiltered(utils.search.text, __).toList();
+            final clientes = clienteCtrl
+                .getClienteesFiltered(utils.search.text, __)
+                .toList();
             return Column(
               children: [
                 Padding(
@@ -59,7 +62,8 @@ class _ClienteSelectPageState extends State<ClienteSelectPage> {
                       : ListView.separated(
                           itemCount: clientes.length,
                           separatorBuilder: (_, i) => const Divisor(),
-                          itemBuilder: (_, i) => _itemClienteWidget(clientes[i]),
+                          itemBuilder: (_, i) =>
+                              _itemClienteWidget(clientes[i]),
                         ),
                 ),
               ],

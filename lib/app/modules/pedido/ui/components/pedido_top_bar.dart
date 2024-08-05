@@ -93,9 +93,9 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
             message: 'Excluir pedido',
             child: InkWell(
                 onTap: () async => pedidoCtrl
-                    .onDelete(context, pedido, isPedido: false)
-                    .then((e) {
-                      if(e){
+                        .onDelete(context, pedido, isPedido: false)
+                        .then((e) {
+                      if (e) {
                         kanbanCtrl.setPedido(null);
                       }
                     }),

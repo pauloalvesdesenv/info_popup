@@ -50,21 +50,21 @@ class _BackupsPageState extends State<BackupsPage> {
         builder: (_, backups) {
           backups = backups.reversed.toList();
           return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text('Backups Realizados', style: AppCss.mediumBold),
-            ),
-            Expanded(
-              child: ListView.separated(
-                itemCount: backups.length,
-                separatorBuilder: (_, i) => const Divisor(),
-                itemBuilder: (_, i) => _itemWidget(backups[i]),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text('Backups Realizados', style: AppCss.mediumBold),
               ),
-            ),
-          ],
-        );
+              Expanded(
+                child: ListView.separated(
+                  itemCount: backups.length,
+                  separatorBuilder: (_, i) => const Divisor(),
+                  itemBuilder: (_, i) => _itemWidget(backups[i]),
+                ),
+              ),
+            ],
+          );
         },
       ),
     );

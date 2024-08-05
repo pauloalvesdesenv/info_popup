@@ -8,6 +8,7 @@ import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CommentWidget extends StatelessWidget {
   final CommentModel comment;
@@ -47,7 +48,7 @@ class CommentWidget extends StatelessWidget {
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(comment.delta,
+                child: SelectableText(comment.delta,
                     style: AppCss.mediumRegular.copyWith(fontSize: 16)),
               ),
               const H(8),
@@ -55,13 +56,23 @@ class CommentWidget extends StatelessWidget {
                 children: [
                   const Spacer(),
                   InkWell(
+                    onTap: () async => Clipboard.setData(
+                        ClipboardData(text: comment.delta.toString())),
+                    child: Icon(
+                      Icons.copy,
+                      color: Colors.grey[800],
+                      size: 22,
+                    ),
+                  ),
+                  const W(8),
+                  InkWell(
                     onTap: () async {
                       if (await showConfirmDialog(
                           'Deseja excluir o comentário?',
                           'Não será possível desfazer essa ação.')) {
                         onRemove.call(comment);
                         pedidoCtrl.onAddHistory(
-              pedido:  pedidoCtrl.pedido,
+                          pedido: pedidoCtrl.pedido,
                           data: comment,
                           type: PedidoHistoryType.comment,
                           action: PedidoHistoryAction.delete,
@@ -72,7 +83,7 @@ class CommentWidget extends StatelessWidget {
                       Icons.delete,
                       color: Colors.grey[800],
                     ),
-                  )
+                  ),
                 ],
               )
             ],

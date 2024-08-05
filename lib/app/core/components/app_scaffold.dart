@@ -61,7 +61,9 @@ class _AppScaffoldState extends State<AppScaffold> {
               backgroundColor: AppColors.white,
               resizeToAvoidBottomInset: widget.resizeAvoid,
               floatingActionButton: widget.fab,
-              body: widget.body),
+              body: SelectionArea(
+                child: widget.body,
+              )),
         ),
       ),
     );

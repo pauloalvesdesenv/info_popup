@@ -55,7 +55,8 @@ class _TypeSelectorWidgetState<T> extends State<TypeSelectorWidget<T>> {
                   scrollDirection: Axis.horizontal,
                   itemCount: widget.values.length,
                   separatorBuilder: (_, __) => const W(8),
-                  itemBuilder: (_, i) => _goalFilterType(widget.value, widget.values[i])),
+                  itemBuilder: (_, i) =>
+                      _goalFilterType(widget.value, widget.values[i])),
             ),
           ),
         ),
