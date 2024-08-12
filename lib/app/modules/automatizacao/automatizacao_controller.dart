@@ -42,26 +42,26 @@ class AutomatizacaoController {
               step = automatizacaoConfig.prontoArmacaoPedido.step;
             default:
           }
-          if (step != null) {
-            if (pedido.step.index >= step.index) {
-              step = null;
-            }
-          }
 
           break;
         default:
       }
 
       if (step != null) {
+        if (pedido.step.index >= step.index) {
+          step = null;
+        }
+      }
+
+      if (step != null) {
         final stepById = FirestoreClient.steps.getById(step.id);
-        pedido.steps.add(
-            PedidoStepModel.create(stepById));
+        pedido.steps.add(PedidoStepModel.create(stepById));
         pedidoCtrl.onAddHistory(
-          pedido: pedido,
-          data: stepById,
-          type: PedidoHistoryType.step,
-          action: PedidoHistoryAction.update,
-        );
+            pedido: pedido,
+            data: stepById,
+            type: PedidoHistoryType.step,
+            action: PedidoHistoryAction.update,
+            isFromAutomatizacao: true);
         await FirestoreClient.pedidos.update(pedido);
       }
     }

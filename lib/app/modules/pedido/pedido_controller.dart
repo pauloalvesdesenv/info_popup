@@ -221,9 +221,10 @@ class PedidoController {
     required dynamic data,
     required PedidoHistoryAction action,
     required PedidoHistoryType type,
+    bool isFromAutomatizacao = false,
   }) {
     pedido.histories.add(
-      PedidoHistoryModel.create(data: data, action: action, type: type),
+      PedidoHistoryModel.create(data: data, action: action, type: type, isFromAutomatizacao: isFromAutomatizacao),
     );
     FirestoreClient.pedidos.update(pedido);
   }

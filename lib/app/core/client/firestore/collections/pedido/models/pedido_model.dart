@@ -34,6 +34,7 @@ class PedidoModel {
   List<TagModel> tags;
   final List<ArchiveModel> archives;
   final List<CheckItemModel> checks;
+  final String? checklistId;
   final List<CommentModel> comments;
   final List<UsuarioModel> users;
   final List<PedidoHistoryModel> histories;
@@ -110,6 +111,7 @@ class PedidoModel {
     required this.histories,
     required this.isArchived,
     required this.archives,
+    required this.checklistId,
   });
 
   List<PedidoProdutoStatus> get getStatusess {
@@ -187,11 +189,13 @@ class PedidoModel {
       'index': index,
       'histories': histories.map((x) => x.toMap()).toList(),
       'isArchived': isArchived,
+      'checklistId': checklistId,
     };
   }
 
   factory PedidoModel.fromMap(Map<String, dynamic> map) {
     return PedidoModel(
+      checklistId: map['checklistId'],
       localizador: map['localizador'] ?? '',
       descricao: map['descricao'] ?? '',
       id: map['id'] ?? '',
@@ -240,29 +244,30 @@ class PedidoModel {
   factory PedidoModel.fromJson(String source) =>
       PedidoModel.fromMap(json.decode(source));
 
-  PedidoModel copyWith({
-    String? id,
-    String? localizador,
-    String? descricao,
-    DateTime? createdAt,
-    ClienteModel? cliente,
-    ObraModel? obra,
-    List<PedidoProdutoModel>? produtos,
-    PedidoTipo? tipo,
-    List<PedidoStatusModel>? statusess,
-    DateTime? deliveryAt,
-    List<PedidoStepModel>? steps,
-    List<TagModel>? tags,
-    List<CheckItemModel>? checks,
-    List<CommentModel>? comments,
-    List<UsuarioModel>? users,
-    int? index,
-    List<PedidoHistoryModel>? histories,
-    bool? isArchived,
-    List<ArchiveModel>? archives,
-  }) {
+  PedidoModel copyWith(
+      {String? id,
+      String? localizador,
+      String? descricao,
+      DateTime? createdAt,
+      ClienteModel? cliente,
+      ObraModel? obra,
+      List<PedidoProdutoModel>? produtos,
+      PedidoTipo? tipo,
+      List<PedidoStatusModel>? statusess,
+      DateTime? deliveryAt,
+      List<PedidoStepModel>? steps,
+      List<TagModel>? tags,
+      List<CheckItemModel>? checks,
+      List<CommentModel>? comments,
+      List<UsuarioModel>? users,
+      int? index,
+      List<PedidoHistoryModel>? histories,
+      bool? isArchived,
+      List<ArchiveModel>? archives,
+      String? checklistId}) {
     return PedidoModel(
       id: id ?? this.id,
+      checklistId: checklistId ?? this.checklistId,
       comments: comments ?? this.comments,
       checks: checks ?? this.checks,
       localizador: localizador ?? this.localizador,

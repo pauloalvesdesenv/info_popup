@@ -94,9 +94,9 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                     ),
                     const H(16),
                     AppField(
-                      label: 'Filtrar por cliente',
+                      label: 'Filtrar por localizador',
                       required: false,
-                      controller: form.cliente,
+                      controller: form.localizador,
                       onChanged: (e) {
                         ordemCtrl.formStream.update();
                       },

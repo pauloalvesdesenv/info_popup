@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_permission_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 
 class UsuarioModel {
   final String id;
@@ -13,6 +14,17 @@ class UsuarioModel {
   final UserPermissionModel permission;
   final List<StepModel> steps;
   final List<String> deviceTokens;
+
+  static UsuarioModel get system => UsuarioModel(
+        id: 'system',
+        nome: 'Sistema',
+        email: 'system@pcpm2.com',
+        senha: 'system',
+        role: UsuarioRole.administrador,
+        permission: UserPermissionModel.all(),
+        steps: FirestoreClient.steps.data.map((e) => e.copyWith()).toList(),
+        deviceTokens: [],
+      );
 
   UsuarioModel(
       {required this.id,

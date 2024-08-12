@@ -81,6 +81,21 @@ class PedidoCreateModel {
         pedido.produtos.map((e) => PedidoProdutoCreateModel.edit(e)).toList();
     deliveryAt = pedido.deliveryAt;
     step = FirestoreClient.steps.getById(pedido.steps.first.step.id);
+    if (pedido.checklistId != null) {
+      checklist = FirestoreClient.checklists.getById(pedido.checklistId!);
+      if (checklist != null) {
+        for (var item in checklist!.checklist) {
+          final checkPedido =
+              pedido.checks.firstWhereOrNull((e) => e.title == item.title);
+          if (checkPedido != null) {
+            item.isCheck = checkPedido.isCheck;
+          }
+        }
+      }
+    }
+    checklist = pedido.checklistId != null
+        ? FirestoreClient.checklists.getById(pedido.checklistId!)
+        : null;
   }
 
   PedidoModel toPedidoModel(PedidoModel? pedido) {
@@ -106,6 +121,7 @@ class PedidoCreateModel {
       steps: pedido?.steps ?? [pedidoStepModel],
       tags: pedido?.tags ?? [tipo!.tag],
       checks: checklist?.checklist.map((e) => e.copyWith()).toList() ?? [],
+      checklistId: checklist?.id,
       comments: pedido?.comments ?? [],
       users: pedido?.users ?? [],
       index: pedido?.index ?? 0,

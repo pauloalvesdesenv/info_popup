@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
@@ -77,22 +75,19 @@ class OrdemController {
 
   List<PedidoProdutoModel> _getPedidosProdutosSeparados(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
-    List<PedidoModel> pedidosBySearch = FirestoreClient.pedidos.data
-        .where((e) =>
-            form.cliente.text.isEmpty ||
-            e.cliente.nome.toCompare.contains(form.cliente.text.toCompare))
-        .toList();
-    for (final pedido in pedidosBySearch) {
+    for (final pedido in FirestoreClient.pedidos.data.toList()) {
       final pedidoProdutos = pedido.produtos
           .where((e) =>
               e.status.status == PedidoProdutoStatus.separado &&
               e.produto.id == produto.id)
           .toList();
-      if (pedidoProdutos.isNotEmpty) {
-        log('teste');
-      }
       for (final pedidoProduto in pedidoProdutos) {
-        pedidos.add(pedidoProduto);
+        final isFiltered = form.localizador.text.isEmpty ||
+            pedidoProduto.pedido.localizador.toCompare
+                .contains(form.localizador.text.toCompare);
+        if (isFiltered) {
+          pedidos.add(pedidoProduto);
+        }
       }
     }
     return pedidos;
@@ -101,8 +96,8 @@ class OrdemController {
   List<PedidoProdutoModel> getPedidosPorProdutoEdit(OrdemModel ordem) {
     final pedidos = ordem.produtos
         .where((e) =>
-            form.cliente.text.isEmpty ||
-            e.cliente.nome.toCompare.contains(form.cliente.text.toCompare))
+            form.localizador.text.isEmpty ||
+            e.cliente.nome.toCompare.contains(form.localizador.text.toCompare))
         .toList();
     onSortPedidos(pedidos);
 
@@ -129,7 +124,8 @@ class OrdemController {
     final ordemCriada = form.toOrdemModel();
     onValid(ordemCriada);
     for (PedidoProdutoModel produto in ordemCriada.produtos) {
-      await FirestoreClient.pedidos.updateProdutoStatus(produto, produto.statusess.last.status);
+      await FirestoreClient.pedidos
+          .updateProdutoStatus(produto, produto.statusess.last.status);
     }
     await FirestoreClient.ordens.add(ordemCriada);
     await FirestoreClient.pedidos.fetch();
@@ -147,11 +143,14 @@ class OrdemController {
     final ordemEditada = form.toOrdemModel();
     for (PedidoProdutoModel produto in ordem.produtos) {
       if (!ordemEditada.produtos.contains(produto)) {
-        await FirestoreClient.pedidos.updateProdutoStatus(produto, PedidoProdutoStatus.separado, clear: true);
+        await FirestoreClient.pedidos.updateProdutoStatus(
+            produto, PedidoProdutoStatus.separado,
+            clear: true);
       }
     }
     for (PedidoProdutoModel produto in ordemEditada.produtos) {
-      await FirestoreClient.pedidos.updateProdutoStatus(produto, produto.statusess.last.status);
+      await FirestoreClient.pedidos
+          .updateProdutoStatus(produto, produto.statusess.last.status);
     }
     ordemEditada.produtos.removeWhere((e) => e.status.status.index == 0);
     onValid(ordemEditada);

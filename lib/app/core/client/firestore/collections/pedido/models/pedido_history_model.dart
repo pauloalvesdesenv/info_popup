@@ -89,8 +89,6 @@ class PedidoHistoryModel {
     }
   }
 
-  
-
   String get title {
     switch (type) {
       case PedidoHistoryType.status:
@@ -137,11 +135,14 @@ class PedidoHistoryModel {
     required this.action,
   });
 
-  PedidoHistoryModel.create(
-      {required this.data, required this.type, required this.action})
-      : id = HashService.get,
+  PedidoHistoryModel.create({
+    required this.data,
+    required this.type,
+    required this.action,
+    bool isFromAutomatizacao = false,
+  })  : id = HashService.get,
         createdAt = DateTime.now(),
-        usuario = user.usuario;
+        usuario = isFromAutomatizacao ? UsuarioModel.system : user.usuario;
 
   Map<String, dynamic> toMap() {
     return {

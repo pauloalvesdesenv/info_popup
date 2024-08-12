@@ -18,7 +18,7 @@ class OrdemUtils {
 class OrdemCreateModel {
   String id;
   ProdutoModel? produto;
-  TextController cliente = TextController();
+  TextController localizador = TextController();
   List<PedidoProdutoModel> produtos = [];
   SortType sortType = SortType.alfabetic;
   SortOrder sortOrder = SortOrder.asc;
@@ -53,9 +53,11 @@ class OrdemCreateModel {
               (e) => e.copyWith(
                 statusess: [
                   ...e.statusess,
-                  if(e.statusess.last.status != PedidoProdutoStatus.aguardandoProducao) if (e.isSelected && e.isAvailableToChanges)
-                    PedidoProdutoStatusModel.create(
-                        PedidoProdutoStatus.aguardandoProducao)
+                  if (e.statusess.last.status !=
+                      PedidoProdutoStatus.aguardandoProducao)
+                    if (e.isSelected && e.isAvailableToChanges)
+                      PedidoProdutoStatusModel.create(
+                          PedidoProdutoStatus.aguardandoProducao)
                 ],
               ),
             )
