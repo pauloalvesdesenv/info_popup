@@ -1,5 +1,8 @@
 {
-    "dart.flutterSdkPath": "~/Documents/development/flutter",
+    "dart.flutterSdkPath": "~/fvm/versions/3.22.0",
+    "dart.flutterSdkPaths": [
+        "~/fvm/versions"
+    ],
     "workbench.iconTheme": "vscode-icons",
     "workbench.startupEditor": "none",
     "terminal.integrated.defaultProfile.windows": "Git Bash",

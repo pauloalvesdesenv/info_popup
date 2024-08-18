@@ -141,6 +141,7 @@ class OrdemController {
   Future<void> onEdit(_, OrdemModel ordem) async {
     await FirestoreClient.pedidos.fetch();
     final ordemEditada = form.toOrdemModel();
+    onValid(ordemEditada);
     for (PedidoProdutoModel produto in ordem.produtos) {
       if (!ordemEditada.produtos.contains(produto)) {
         await FirestoreClient.pedidos.updateProdutoStatus(
@@ -153,7 +154,6 @@ class OrdemController {
           .updateProdutoStatus(produto, produto.statusess.last.status);
     }
     ordemEditada.produtos.removeWhere((e) => e.status.status.index == 0);
-    onValid(ordemEditada);
     await FirestoreClient.ordens.update(ordemEditada);
     await FirestoreClient.pedidos.fetch();
     await automatizacaoCtrl.onSetStepByPedidoStatus(ordemEditada.pedidos);

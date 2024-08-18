@@ -57,15 +57,10 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
         backgroundColor: AppColors.primaryMain,
       ),
       body: StreamOut<List<PedidoModel>>(
-        stream: FirestoreClient.pedidos.dataStream.listen,
+        stream: FirestoreClient.pedidos.pedidosArchivedsStream.listen,
         builder: (_, pedidos) => StreamOut<PedidoUtils>(
           stream: pedidoCtrl.utilsStream.listen,
           builder: (_, utils) {
-            pedidos = pedidos.where((e) => e.isArchived).toList();
-            pedidos = pedidoCtrl
-                .getPedidosFiltered(utils.searchArchived.text, pedidos)
-                .toList();
-            pedidoCtrl.onSortPedidos(pedidos);
             return Column(
               children: [
                 if (utils.showFilterArchived)

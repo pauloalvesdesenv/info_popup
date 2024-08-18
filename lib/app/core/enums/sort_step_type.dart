@@ -2,7 +2,8 @@ enum SortStepType {
   createdAtDesc,
   createdAtAsc,
   localizador,
-  deliveryAt,
+  deliveryAtDesc,
+  deliveryAtAsc,
 }
 
 extension SortStepTypeExt on SortStepType {
@@ -14,8 +15,10 @@ extension SortStepTypeExt on SortStepType {
         return 'Data de criação (mais antigo primeiro)';
       case SortStepType.localizador:
         return 'Nome do cartão (em ordem alfabética)';
-      case SortStepType.deliveryAt:
-        return 'Data de entrega';
+      case SortStepType.deliveryAtDesc:
+        return 'Data de entrega (mais recente primeiro)';
+      case SortStepType.deliveryAtAsc:
+        return 'Data de entrega (mais antigo primeiro)';
     }
   }
 }

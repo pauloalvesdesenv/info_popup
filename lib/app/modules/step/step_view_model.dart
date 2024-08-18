@@ -21,6 +21,7 @@ class StepCreateModel {
   bool isDefault = false;
   bool isShipping = false;
   StepShippingCreateModel? shipping;
+  bool isArchivedAvailable = false;
 
   late bool isEdit;
 
@@ -41,6 +42,7 @@ class StepCreateModel {
     shipping = etapa.shipping != null
         ? StepShippingCreateModel.edit(etapa.shipping!)
         : null;
+    isArchivedAvailable = etapa.isArchivedAvailable;
   }
 
   StepModel toStepModel(StepModel? etapa) => StepModel(
@@ -54,5 +56,6 @@ class StepCreateModel {
         isDefault: isDefault,
         isShipping: isShipping,
         shipping: shipping?.toStepShippingModel(),
+        isArchivedAvailable: isArchivedAvailable,
       );
 }

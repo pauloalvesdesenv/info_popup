@@ -49,7 +49,7 @@ class _RelatoriosPedidoPageState extends State<RelatoriosPedidoPage> {
             stream: relatorioCtrl.pedidoViewModelStream.listen,
             builder: (_, model) => IconButton(
               onPressed: model.relatorio != null
-                  ? () => relatorioCtrl.onExportRelatorioPedidoPDF()
+                  ? () => relatorioCtrl.onExportRelatorioPedidoPDF(relatorioCtrl.pedidoViewModel)
                   : null,
               icon: Icon(
                 Icons.picture_as_pdf_outlined,

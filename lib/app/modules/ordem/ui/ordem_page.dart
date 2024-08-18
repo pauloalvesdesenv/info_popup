@@ -116,7 +116,7 @@ class _OrdemPageState extends State<OrdemPage> {
                             child: Text('Produzindo',
                                 style: AppCss.mediumRegular)),
                         Text(
-                          '${ordem.qtdeProduzindo().formatted}Kg (${(ordem.getPrcntgProduzindo() * 100).percent}%)',
+                          '${ordem.qtdeProduzindo().toKg()} (${(ordem.getPrcntgProduzindo() * 100).percent}%)',
                         )
                       ],
                     ),
@@ -168,7 +168,7 @@ class _OrdemPageState extends State<OrdemPage> {
                   Text(
                       '${produto.pedido.localizador} - ${produto.cliente.nome}',
                       style: AppCss.minimumRegular.setSize(12)),
-                  Text(produto.obra.descricao ?? 'Não Disponível',
+                  Text(produto.pedido.descricao,
                       style: AppCss.minimumRegular.setSize(12)),
                 ],
               ),

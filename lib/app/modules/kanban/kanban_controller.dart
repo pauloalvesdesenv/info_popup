@@ -217,7 +217,7 @@ class StepController {
         case SortStepType.localizador:
           pedidos.sort((a, b) => a.localizador.compareTo(b.localizador));
           break;
-        case SortStepType.deliveryAt:
+        case SortStepType.deliveryAtDesc:
           pedidos.sort((a, b) {
             if (a.deliveryAt == null && b.deliveryAt == null) {
               return 0;
@@ -227,6 +227,19 @@ class StepController {
               return -1;
             } else {
               return a.deliveryAt!.compareTo(b.deliveryAt!);
+            }
+          });
+          break;
+        case SortStepType.deliveryAtAsc:
+          pedidos.sort((a, b) {
+            if (a.deliveryAt == null && b.deliveryAt == null) {
+              return 0;
+            } else if (a.deliveryAt == null) {
+              return 1;
+            } else if (b.deliveryAt == null) {
+              return -1;
+            } else {
+              return b.deliveryAt!.compareTo(a.deliveryAt!);
             }
           });
           break;

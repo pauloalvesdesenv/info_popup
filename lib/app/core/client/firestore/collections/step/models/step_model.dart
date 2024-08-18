@@ -18,6 +18,7 @@ class StepModel {
   bool isDefault = false;
   bool isShipping = false;
   StepShippingModel? shipping;
+  bool isArchivedAvailable = false;
 
   static StepModel notFound = StepModel(
     createdAt: DateTime.now(),
@@ -30,10 +31,14 @@ class StepModel {
     index: 100000000,
     isShipping: false,
     shipping: null,
+    isArchivedAvailable: false,
   );
 
-  List<StepModel> get fromSteps =>
-      fromStepsIds.map((e) => FirestoreClient.steps.getById(e).copyWith(fromStepsIds: [], toStepsIds: [])).toList();
+  List<StepModel> get fromSteps => fromStepsIds
+      .map((e) => FirestoreClient.steps
+          .getById(e)
+          .copyWith(fromStepsIds: [], toStepsIds: []))
+      .toList();
 
   bool get isEnable => moveRoles.contains(usuario.role);
 
@@ -48,6 +53,7 @@ class StepModel {
     required this.isDefault,
     required this.isShipping,
     required this.shipping,
+    required this.isArchivedAvailable,
   });
 
   StepModel copyWith({
@@ -62,6 +68,7 @@ class StepModel {
     bool? isDefault,
     bool? isShipping,
     StepShippingModel? shipping,
+    bool? isArchivedAvailable
   }) {
     return StepModel(
       id: id ?? this.id,
@@ -74,6 +81,7 @@ class StepModel {
       isDefault: isDefault ?? this.isDefault,
       isShipping: isShipping ?? this.isShipping,
       shipping: shipping ?? this.shipping,
+      isArchivedAvailable: isArchivedAvailable ?? this.isArchivedAvailable,
     );
   }
 
@@ -89,6 +97,7 @@ class StepModel {
       'isDefault': isDefault,
       'isShipping': isShipping,
       'shipping': shipping?.toMap(),
+      'isArchivedAvailable': isArchivedAvailable,
     };
   }
 
@@ -116,8 +125,9 @@ class StepModel {
         isDefault: false,
         isShipping: map['isShipping'] ?? false,
         shipping: map['shipping'] != null
-          ? StepShippingModel.fromMap(map['shipping'])
-          : null,
+            ? StepShippingModel.fromMap(map['shipping'])
+            : null,
+            isArchivedAvailable: false,
       );
     }
     return StepModel(
@@ -136,6 +146,7 @@ class StepModel {
       shipping: map['shipping'] != null
           ? StepShippingModel.fromMap(map['shipping'])
           : null,
+      isArchivedAvailable: map['isArchivedAvailable'] ?? false,
     );
   }
 
@@ -146,6 +157,6 @@ class StepModel {
 
   @override
   String toString() {
-    return 'StepModel(id: $id, name: $name, color: $color, fromSteps: $fromSteps, moveRoles: $moveRoles, createdAt: $createdAt)';
+    return 'StepModel(id: $id, name: $name, color: $color, fromSteps: $fromSteps, moveRoles: $moveRoles, createdAt: $createdAt, index: $index, isDefault: $isDefault, isShipping: $isShipping, shipping: $shipping, isArchivedAvailable: $isArchivedAvailable)';
   }
 }

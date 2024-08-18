@@ -104,15 +104,6 @@ class _StepCreatePageState extends State<StepCreatePage> {
               stepCtrl.formStream.add(form);
             }),
         const H(16),
-        // AppCheckbox(
-        //   label: 'Padrão ao criar pedido',
-        //   value: form.isDefault,
-        //   onChanged: (e) {
-        //     form.isDefault = e;
-        //     stepCtrl.formStream.update();
-        //   },
-        // ),
-        // const H(16),
         AppCheckbox(
           value: form.isShipping,
           label: 'Acompanhamento do Cliente',
@@ -135,6 +126,15 @@ class _StepCreatePageState extends State<StepCreatePage> {
           ),
           const H(16),
         ],
+        const H(8),
+        AppCheckbox(
+          value: form.isArchivedAvailable,
+          label: 'Permite arquivamento de pedidos',
+          onChanged: (e) {
+            form.isArchivedAvailable = !form.isArchivedAvailable;
+            stepCtrl.formStream.update();
+          },
+        ),
         const H(24),
         if (form.isEdit)
           TextButton.icon(

@@ -30,7 +30,7 @@ class KanbanStepWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            KanbanStepTitleWidget(step, pedidos),
+            KanbanStepTitleWidget(utils, step, pedidos),
             Expanded(
               child: KanbanStepBodyWidget(utils, step, pedidos),
             )

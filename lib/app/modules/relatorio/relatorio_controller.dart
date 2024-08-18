@@ -111,7 +111,9 @@ class PedidoController {
     }
   }
 
-  Future<void> onExportRelatorioPedidoPDF() async {
+  Future<void> onExportRelatorioPedidoPDF(
+      RelatorioPedidoViewModel pedidoViewModel,
+      {String? name}) async {
     final pdf = pw.Document();
 
     final img = await rootBundle.load('assets/images/logo.png');
@@ -120,8 +122,11 @@ class PedidoController {
     pdf.addPage(
         RelatorioPedidoPdfPage(pedidoViewModel.relatorio!).build(imageBytes));
 
+    final String namePart = name?.toFileName() ??
+        '${(pedidoViewModel.cliente?.nome ?? 'todos').toLowerCase().replaceAll(' ', '_')}_status_${(pedidoViewModel.status.map((e) => e.name).join('_')).toLowerCase()}';
+
     await downloadPDF(
-        "m2_relatorio_cliente_${(pedidoViewModel.cliente?.nome ?? 'todos').toLowerCase().replaceAll(' ', '_')}_status_${(pedidoViewModel.status.map((e) => e.name).join('_')).toLowerCase()}_${DateTime.now().toFileName()}.pdf",
+        "m2_relatorio_cliente_$namePart${DateTime.now().toFileName()}.pdf",
         '/relatorio/pedido/',
         await pdf.save());
   }

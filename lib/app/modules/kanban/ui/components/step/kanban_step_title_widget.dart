@@ -4,12 +4,15 @@ import 'package:aco_plus/app/core/enums/sort_step_type.dart';
 import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
 import 'package:flutter/material.dart';
 
 class KanbanStepTitleWidget extends StatelessWidget {
+  final KanbanUtils utils;
   final StepModel step;
   final List<PedidoModel> pedidos;
   const KanbanStepTitleWidget(
+    this.utils,
     this.step,
     this.pedidos, {
     super.key,
@@ -74,6 +77,7 @@ class KanbanStepTitleWidget extends StatelessWidget {
           ),
           Text(
             pedidos
+                .where((e) => utils.isPedidoVisibleFiltered(e))
                 .map((e) => e.getQtdeTotal())
                 .fold(.0, (a, b) => a + b)
                 .toKg(),

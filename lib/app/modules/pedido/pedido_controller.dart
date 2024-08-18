@@ -18,6 +18,8 @@ import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_status_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedido_step_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
+import 'package:aco_plus/app/modules/relatorio/relatorio_controller.dart';
+import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_pedido_view_model.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -224,7 +226,11 @@ class PedidoController {
     bool isFromAutomatizacao = false,
   }) {
     pedido.histories.add(
-      PedidoHistoryModel.create(data: data, action: action, type: type, isFromAutomatizacao: isFromAutomatizacao),
+      PedidoHistoryModel.create(
+          data: data,
+          action: action,
+          type: type,
+          isFromAutomatizacao: isFromAutomatizacao),
     );
     FirestoreClient.pedidos.update(pedido);
   }
@@ -237,7 +243,7 @@ class PedidoController {
   }
 
   Future<bool> onArchive(_, PedidoModel pedido, {bool isPedido = true}) async {
-    if (!await showConfirmDialog('Deseja archivar esse pedidos?',
+    if (!await showConfirmDialog('Deseja arquivar esse pedidos?',
         'O pedido ficará disponível na lista de arquivados')) return false;
     showLoadingDialog();
     pedido.isArchived = !pedido.isArchived;
@@ -282,5 +288,32 @@ class PedidoController {
     final stepHistory = history.data as StepModel;
     final step = FirestoreClient.steps.getById(stepHistory.id);
     return step.index;
+  }
+
+  Future<void> onGeneratePDF(PedidoModel pedido) async {
+    final RelatorioPedidoViewModel relatorio = RelatorioPedidoViewModel();
+    relatorio.cliente = FirestoreClient.clientes.getById(pedido.cliente.id);
+    relatorio.produtos = pedido.produtos.map((e) => e.produto).toList();
+    relatorio.status =
+        pedido.produtos.map((e) => e.status.status).toSet().toList();
+
+    relatorio.tipo = RelatorioPedidoTipo.pedidos;
+
+    final model = RelatorioPedidoModel(
+      relatorio.cliente,
+      relatorio.status,
+      [pedido],
+      relatorio.tipo,
+      relatorio.produtos,
+    );
+
+    relatorio.relatorio = model;
+
+    relatorioCtrl.pedidoViewModelStream.add(relatorio);
+
+    // relatorioCtrl.onCreateRelatorio();
+
+    await relatorioCtrl.onExportRelatorioPedidoPDF(relatorio,
+        name: pedido.localizador);
   }
 }
