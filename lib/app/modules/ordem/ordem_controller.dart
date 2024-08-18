@@ -5,6 +5,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
@@ -272,5 +273,27 @@ class OrdemController {
         data: pedido.statusess.last,
         action: PedidoHistoryAction.update,
         type: PedidoHistoryType.status);
+  }
+
+  Future<void> onFreezed(_, OrdemModel ordem) async {
+    if (ordem.freezed.isFreezed) {
+      if (!await showConfirmDialog('Deseja descongelar a ordem?',
+          'A ordem voltará na ultima posição da esteira de produção.')) return;
+      ordem.freezed.isFreezed = false;
+      ordem.freezed.reason.controller.clear();
+    } else {
+      if (!await showConfirmDialog('Deseja congelar a ordem?',
+          'A ordem irá sair da esteira de produção.')) return;
+      ordem.freezed.isFreezed = true;
+    }
+    await FirestoreClient.ordens.update(ordem);
+    Navigator.pop(_);
+    if (ordem.freezed.isFreezed) {
+      NotificationService.showPositive('Ordem ${ordem.id} congelada!',
+          'Ordem foi removida da esteira de produção');
+    } else {
+      NotificationService.showPositive('Ordem ${ordem.id} descongelada!',
+          'Ordem foi adicionada na ultima posição esteira de produção');
+    }
   }
 }

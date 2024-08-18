@@ -1,7 +1,10 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
+import 'package:aco_plus/app/core/components/app_text_button.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/item_label.dart';
@@ -65,137 +68,249 @@ class _OrdemPageState extends State<OrdemPage> {
         ordemCtrl.getOrdemById(widget.ordemId);
       },
       child: ListView(
+        padding: EdgeInsets.zero,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: RowItensLabel([
-              ItemLabel('Produto',
-                  '${ordem.produto.nome} - ${ordem.produto.descricao}'),
-              ItemLabel('Iniciada', ordem.createdAt.text()),
-              if (ordem.endAt != null)
-                ItemLabel('Finalizada', ordem.endAt.text()),
-            ]),
+          if (ordem.freezed.isFreezed) _unfreezedWidget(ordem),
+          ColorFiltered(
+            colorFilter: ColorFilter.mode(
+                ordem.freezed.isFreezed ? AppColors.white : Colors.transparent,
+                BlendMode.saturation),
+            child: ColoredBox(
+              color: ordem.freezed.isFreezed
+                  ? Colors.grey[100]!
+                  : Colors.transparent,
+              child: Column(
+                children: [
+                  _descriptionWidget(ordem),
+                  const Divisor(),
+                  _statusWidget(ordem),
+                  for (final produto in ordem.produtos) _produtoWidget(produto),
+                  if (!ordem.freezed.isFreezed) _freezedWidget(ordem)
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Padding _descriptionWidget(OrdemModel ordem) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: RowItensLabel([
+        ItemLabel(
+            'Produto', '${ordem.produto.nome} - ${ordem.produto.descricao}'),
+        ItemLabel('Iniciada', ordem.createdAt.text()),
+        if (ordem.endAt != null) ItemLabel('Finalizada', ordem.endAt.text()),
+      ]),
+    );
+  }
+
+  Padding _statusWidget(OrdemModel ordem) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Status', style: AppCss.largeBold),
+          const H(8),
+          Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                      child: Text('Aguardando Produção',
+                          style: AppCss.mediumRegular)),
+                  Text(
+                    '${ordem.qtdeAguardando().toKg()} (${(ordem.getPrcntgAguardando() * 100).percent}%)',
+                  )
+                ],
+              ),
+              const H(8),
+              LinearProgressIndicator(
+                value: ordem.getPrcntgAguardando(),
+                backgroundColor: PedidoProdutoStatus.aguardandoProducao.color
+                    .withOpacity(0.3),
+                valueColor: AlwaysStoppedAnimation(
+                    PedidoProdutoStatus.aguardandoProducao.color),
+              ),
+            ],
           ),
-          const Divisor(),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          const H(16),
+          Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                      child: Text('Produzindo', style: AppCss.mediumRegular)),
+                  Text(
+                    '${ordem.qtdeProduzindo().toKg()} (${(ordem.getPrcntgProduzindo() * 100).percent}%)',
+                  )
+                ],
+              ),
+              const H(8),
+              LinearProgressIndicator(
+                value: ordem.getPrcntgProduzindo(),
+                backgroundColor:
+                    PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
+                valueColor: AlwaysStoppedAnimation(
+                    PedidoProdutoStatus.produzindo.color),
+              ),
+            ],
+          ),
+          const H(16),
+          Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(child: Text('Pronto', style: AppCss.mediumRegular)),
+                  Text(
+                    '${ordem.qtdePronto().toKg()} (${(ordem.getPrcntgPronto() * 100).percent}%)',
+                  )
+                ],
+              ),
+              const H(8),
+              LinearProgressIndicator(
+                value: ordem.getPrcntgPronto(),
+                backgroundColor:
+                    PedidoProdutoStatus.pronto.color.withOpacity(0.3),
+                valueColor:
+                    AlwaysStoppedAnimation(PedidoProdutoStatus.pronto.color),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  ListTile _produtoWidget(PedidoProdutoModel produto) {
+    return ListTile(
+      title: Text(
+        '${produto.qtde}Kg',
+        style: AppCss.minimumBold,
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const H(2),
+          Text('${produto.pedido.localizador} - ${produto.cliente.nome}',
+              style: AppCss.minimumRegular.setSize(12)),
+          Text(produto.pedido.descricao,
+              style: AppCss.minimumRegular.setSize(12)),
+        ],
+      ),
+      trailing: InkWell(
+        onTap: () => ordemCtrl.showBottomChangeProdutoStatus(produto),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+          decoration: BoxDecoration(
+              color: produto.statusView.status.color.withOpacity(0.4),
+              borderRadius: BorderRadius.circular(4)),
+          child: IntrinsicWidth(
+            child: Row(
               children: [
-                Text('Status', style: AppCss.largeBold),
-                const H(8),
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Text('Aguardando Produção',
-                                style: AppCss.mediumRegular)),
-                        Text(
-                          '${ordem.qtdeAguardando().toKg()} (${(ordem.getPrcntgAguardando() * 100).percent}%)',
-                        )
-                      ],
-                    ),
-                    const H(8),
-                    LinearProgressIndicator(
-                      value: ordem.getPrcntgAguardando(),
-                      backgroundColor: PedidoProdutoStatus
-                          .aguardandoProducao.color
-                          .withOpacity(0.3),
-                      valueColor: AlwaysStoppedAnimation(
-                          PedidoProdutoStatus.aguardandoProducao.color),
-                    ),
-                  ],
-                ),
-                const H(16),
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Text('Produzindo',
-                                style: AppCss.mediumRegular)),
-                        Text(
-                          '${ordem.qtdeProduzindo().toKg()} (${(ordem.getPrcntgProduzindo() * 100).percent}%)',
-                        )
-                      ],
-                    ),
-                    const H(8),
-                    LinearProgressIndicator(
-                      value: ordem.getPrcntgProduzindo(),
-                      backgroundColor:
-                          PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
-                      valueColor: AlwaysStoppedAnimation(
-                          PedidoProdutoStatus.produzindo.color),
-                    ),
-                  ],
-                ),
-                const H(16),
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Text('Pronto', style: AppCss.mediumRegular)),
-                        Text(
-                          '${ordem.qtdePronto().toKg()} (${(ordem.getPrcntgPronto() * 100).percent}%)',
-                        )
-                      ],
-                    ),
-                    const H(8),
-                    LinearProgressIndicator(
-                      value: ordem.getPrcntgPronto(),
-                      backgroundColor:
-                          PedidoProdutoStatus.pronto.color.withOpacity(0.3),
-                      valueColor: AlwaysStoppedAnimation(
-                          PedidoProdutoStatus.pronto.color),
-                    ),
-                  ],
-                ),
+                Text(produto.statusView.status.label,
+                    style: AppCss.mediumRegular.setSize(12)),
+                const W(2),
+                Icon(Icons.keyboard_arrow_down,
+                    size: 16, color: AppColors.black.withOpacity(0.6))
               ],
             ),
           ),
-          for (final produto in ordem.produtos)
-            ListTile(
-              title: Text(
-                '${produto.qtde}Kg',
-                style: AppCss.minimumBold,
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+      ),
+    );
+  }
+
+  Widget _freezedWidget(OrdemModel ordem) {
+    return Column(
+      children: [
+        const Divisor(),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  const H(2),
-                  Text(
-                      '${produto.pedido.localizador} - ${produto.cliente.nome}',
-                      style: AppCss.minimumRegular.setSize(12)),
-                  Text(produto.pedido.descricao,
-                      style: AppCss.minimumRegular.setSize(12)),
+                  const Icon(Icons.stop_circle_outlined),
+                  const W(8),
+                  Expanded(
+                      child: Text('Congelar Ordem', style: AppCss.largeBold)),
                 ],
               ),
-              trailing: InkWell(
-                onTap: () => ordemCtrl.showBottomChangeProdutoStatus(produto),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                  decoration: BoxDecoration(
-                      color: produto.statusView.status.color.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(4)),
-                  child: IntrinsicWidth(
-                    child: Row(
-                      children: [
-                        Text(produto.statusView.status.label,
-                            style: AppCss.mediumRegular.setSize(12)),
-                        const W(2),
-                        Icon(Icons.keyboard_arrow_down,
-                            size: 16, color: AppColors.black.withOpacity(0.6))
-                      ],
+              const H(8),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: AppField(
+                      label: 'Motivo do Congelamento',
+                      required: false,
+                      controller: ordem.freezed.reason,
+                      onChanged: (e) => ordemCtrl.ordemStream.update(),
                     ),
                   ),
-                ),
+                  const W(8),
+                  Expanded(
+                      child: Container(
+                          padding: const EdgeInsets.only(top: 26),
+                          child: AppTextButton(
+                              label: 'Confirmar',
+                              onPressed: () async =>
+                                  await ordemCtrl.onFreezed(context, ordem)))),
+                ],
               ),
-            ),
-        ],
-      ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _unfreezedWidget(OrdemModel ordem) {
+    return Column(
+      children: [
+        const Divisor(),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.stop_circle_outlined),
+                  const W(12),
+                  Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Ordem Congelada', style: AppCss.largeBold),
+                          Text(
+                              'Congelada ás ${ordem.freezed.updatedAt.textHour()}',
+                              style: AppCss.minimumRegular.copyWith(
+                                  color: AppColors.black.withOpacity(0.6),
+                                  fontSize: 12,
+                                  height: 1.1)),
+                        ],
+                      )),
+                  Expanded(
+                    child: AppTextButton(
+                        label: 'Descongelar Ordem',
+                        onPressed: () async =>
+                            await ordemCtrl.onFreezed(context, ordem)),
+                  ),
+                ],
+              ),
+              const H(16),
+              ItemLabel('Motivo', ordem.freezed.reason.text),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

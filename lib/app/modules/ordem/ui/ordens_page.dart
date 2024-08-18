@@ -55,6 +55,23 @@ class _OrdensPageState extends State<OrdensPage> {
         title:
             Text('Ordens', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
+          IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.domain_verification,
+                color: AppColors.white,
+              )),
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  ordemCtrl.utils.showFilter = !ordemCtrl.utils.showFilter;
+                  ordemCtrl.utilsStream.update();
+                });
+              },
+              icon: Icon(
+                Icons.sort,
+                color: AppColors.white,
+              )),
           if (usuario.permission.ordem.contains(UserPermissionType.create))
             IconButton(
                 onPressed: () => push(context, const OrdemCreatePage()),
@@ -70,8 +87,13 @@ class _OrdensPageState extends State<OrdensPage> {
         builder: (_, __) => StreamOut<OrdemUtils>(
           stream: ordemCtrl.utilsStream.listen,
           builder: (_, utils) {
-            List<OrdemModel> ordens =
-                ordemCtrl.getOrdensFiltered(utils.search.text, __).toList();
+            List<OrdemModel> ordens = ordemCtrl
+                .getOrdensFiltered(
+                    utils.search.text,
+                    __
+                        .where((e) => e.status != PedidoProdutoStatus.pronto)
+                        .toList())
+                .toList();
             ordens.sort((a, b) => b.createdAt.compareTo(a.createdAt));
             if (utils.status.isNotEmpty) {
               ordens =
@@ -86,46 +108,47 @@ class _OrdensPageState extends State<OrdensPage> {
               onRefresh: () async => FirestoreClient.ordens.fetch(),
               child: ListView(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        AppField(
-                          hint: 'Pesquisar',
-                          controller: utils.search,
-                          suffixIcon: Icons.search,
-                          onChanged: (_) => ordemCtrl.utilsStream.update(),
-                        ),
-                        const H(16),
-                        AppDropDown<ProdutoModel?>(
-                          label: 'Bitola',
-                          item: utils.produto,
-                          itens: FirestoreClient.produtos.data.toList(),
-                          itemLabel: (e) =>
-                              e != null ? e.descricao : 'Selecione um produto',
-                          onSelect: (e) {
-                            utils.produto = e;
-                            ordemCtrl.utilsStream.update();
-                          },
-                        ),
-                        const H(16),
-                        AppDropDownList<PedidoProdutoStatus>(
-                          label: 'Ordernar por',
-                          addeds: utils.status,
-                          itens: const [
-                            PedidoProdutoStatus.aguardandoProducao,
-                            PedidoProdutoStatus.produzindo,
-                            PedidoProdutoStatus.pronto
-                          ],
-                          itemLabel: (e) => e.label,
-                          itemColor: (e) => e.color,
-                          onChanged: () {
-                            ordemCtrl.utilsStream.update();
-                          },
-                        ),
-                      ],
+                  if (utils.showFilter)
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          AppField(
+                            hint: 'Pesquisar',
+                            controller: utils.search,
+                            suffixIcon: Icons.search,
+                            onChanged: (_) => ordemCtrl.utilsStream.update(),
+                          ),
+                          const H(16),
+                          AppDropDown<ProdutoModel?>(
+                            label: 'Bitola',
+                            item: utils.produto,
+                            itens: FirestoreClient.produtos.data.toList(),
+                            itemLabel: (e) => e != null
+                                ? e.descricao
+                                : 'Selecione um produto',
+                            onSelect: (e) {
+                              utils.produto = e;
+                              ordemCtrl.utilsStream.update();
+                            },
+                          ),
+                          const H(16),
+                          AppDropDownList<PedidoProdutoStatus>(
+                            label: 'Ordernar por',
+                            addeds: utils.status,
+                            itens: const [
+                              PedidoProdutoStatus.aguardandoProducao,
+                              PedidoProdutoStatus.produzindo,
+                            ],
+                            itemLabel: (e) => e.label,
+                            itemColor: (e) => e.color,
+                            onChanged: () {
+                              ordemCtrl.utilsStream.update();
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                   ordens.isEmpty
                       ? const EmptyData()
                       : ListView.separated(
@@ -148,49 +171,57 @@ class _OrdensPageState extends State<OrdensPage> {
   Widget _itemOrdemWidget(OrdemModel ordem) {
     return InkWell(
       onTap: () => push(OrdemPage(ordem.id)),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ordem.id,
-                    style: AppCss.mediumBold,
-                  ),
-                  Text(
-                    '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.fold(0.0, (previousValue, element) => previousValue + element.qtde).toKg()}',
-                    style: AppCss.minimumRegular
-                        .setSize(11)
-                        .setColor(AppColors.black),
-                  ),
-                  Text(
-                    'Criada dia ${ordem.createdAt.text()}',
-                    style: AppCss.minimumRegular
-                        .setSize(11)
-                        .setColor(AppColors.neutralMedium),
-                  ),
-                ],
+      child: ColorFiltered(
+        colorFilter: ColorFilter.mode(
+            ordem.freezed.isFreezed ? Colors.grey[500]! : Colors.transparent,
+            BlendMode.saturation),
+        child: Container(
+          color: ordem.freezed.isFreezed ? Colors.grey[200]! : Colors.white,
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(ordem.icon),
+              const W(16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      ordem.id,
+                      style: AppCss.mediumBold,
+                    ),
+                    Text(
+                      '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.fold(0.0, (previousValue, element) => previousValue + element.qtde).toKg()}',
+                      style: AppCss.minimumRegular
+                          .setSize(11)
+                          .setColor(AppColors.black),
+                    ),
+                    Text(
+                      'Criada dia ${ordem.createdAt.text()}',
+                      style: AppCss.minimumRegular
+                          .setSize(11)
+                          .setColor(AppColors.neutralMedium),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const W(8),
-            _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
-                ordem.getPrcntgAguardando()),
-            const W(16),
-            _progressChartWidget(
-                PedidoProdutoStatus.produzindo, ordem.getPrcntgProduzindo()),
-            const W(16),
-            _progressChartWidget(
-                PedidoProdutoStatus.pronto, ordem.getPrcntgPronto()),
-            const W(16),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              color: AppColors.neutralMedium,
-            ),
-          ],
+              const W(8),
+              _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
+                  ordem.getPrcntgAguardando()),
+              const W(16),
+              _progressChartWidget(
+                  PedidoProdutoStatus.produzindo, ordem.getPrcntgProduzindo()),
+              const W(16),
+              _progressChartWidget(
+                  PedidoProdutoStatus.pronto, ordem.getPrcntgPronto()),
+              const W(16),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: AppColors.neutralMedium,
+              ),
+            ],
+          ),
         ),
       ),
     );
