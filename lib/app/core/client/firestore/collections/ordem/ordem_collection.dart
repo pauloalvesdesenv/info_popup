@@ -1,6 +1,4 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
-import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -31,7 +29,6 @@ class OrdemCollection {
     final data = await FirebaseFirestore.instance.collection(name).get();
     final countries =
         data.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
-    countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     dataStream.add(countries);
   }
 
@@ -72,7 +69,7 @@ class OrdemCollection {
         .listen((e) {
       final countries =
           e.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
-      countries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
       dataStream.add(countries);
     });
   }
@@ -92,4 +89,13 @@ class OrdemCollection {
   Future<void> delete(OrdemModel model) async {
     await collection.doc(model.id).delete();
   }
+
+  Future<void> updateAll(List<OrdemModel> ordems) async {
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+    for (var ordem in ordems) {
+      batch.update(collection.doc(ordem.id), ordem.toMap());
+    }
+    await batch.commit();
+  }
+
 }

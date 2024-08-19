@@ -34,7 +34,6 @@ class OrdemController {
 
   void onInit() {
     utilsStream.add(OrdemUtils());
-    FirestoreClient.ordens.fetch();
   }
 
   List<OrdemModel> getOrdensFiltered(String search, List<OrdemModel> ordens) {
@@ -294,6 +293,14 @@ class OrdemController {
     } else {
       NotificationService.showPositive('Ordem ${ordem.id} descongelada!',
           'Ordem foi adicionada na ultima posição esteira de produção');
+    }
+  }
+
+  void reorderOrdens(List<OrdemModel> ordens, int oldIndex, int newIndex) {
+    final ordem = ordens.removeAt(oldIndex);
+    ordens.insert(newIndex, ordem);
+    for (int i = 0; i < ordens.length; i++) {
+      ordens[i].beltIndex = i;
     }
   }
 }

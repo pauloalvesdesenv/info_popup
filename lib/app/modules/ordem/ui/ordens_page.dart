@@ -8,7 +8,6 @@ import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_drop_down_list.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
-import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/empty_data.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
@@ -94,7 +93,6 @@ class _OrdensPageState extends State<OrdensPage> {
                         .where((e) => e.status != PedidoProdutoStatus.pronto)
                         .toList())
                 .toList();
-            ordens.sort((a, b) => b.createdAt.compareTo(a.createdAt));
             if (utils.status.isNotEmpty) {
               ordens =
                   ordens.where((e) => utils.status.contains(e.status)).toList();
@@ -104,6 +102,19 @@ class _OrdensPageState extends State<OrdensPage> {
                   .where((e) => e.produto.id == utils.produto!.id)
                   .toList();
             }
+
+            ordens.sort((a, b) {
+              if (a.beltIndex == null && b.beltIndex == null) {
+                return 0;
+              } else if (a.beltIndex == null) {
+                return 1;
+              } else if (b.beltIndex == null) {
+                return -1;
+              } else {
+                return a.beltIndex!.compareTo(b.beltIndex!);
+              }
+            });
+
             return RefreshIndicator(
               onRefresh: () async => FirestoreClient.ordens.fetch(),
               child: ListView(
@@ -151,12 +162,19 @@ class _OrdensPageState extends State<OrdensPage> {
                     ),
                   ordens.isEmpty
                       ? const EmptyData()
-                      : ListView.separated(
+                      : ReorderableListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           cacheExtent: 200,
                           itemCount: ordens.length,
-                          separatorBuilder: (_, i) => const Divisor(),
+                          // separatorBuilder: (_, i) => const Divisor(),
+                          onReorder: (oldIndex, newIndex) {
+                            setState(() {
+                              ordemCtrl.reorderOrdens(
+                                  ordens, oldIndex, newIndex);
+                            FirestoreClient.ordens.updateAll(ordens);
+                            });
+                          },
                           itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
                         )
                 ],
@@ -170,58 +188,87 @@ class _OrdensPageState extends State<OrdensPage> {
 
   Widget _itemOrdemWidget(OrdemModel ordem) {
     return InkWell(
+      key: ValueKey(ordem.id),
       onTap: () => push(OrdemPage(ordem.id)),
-      child: ColorFiltered(
-        colorFilter: ColorFilter.mode(
-            ordem.freezed.isFreezed ? Colors.grey[500]! : Colors.transparent,
-            BlendMode.saturation),
-        child: Container(
-          color: ordem.freezed.isFreezed ? Colors.grey[200]! : Colors.white,
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(ordem.icon),
-              const W(16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+        ),
+        child: Stack(
+          children: [
+            ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                  ordem.freezed.isFreezed
+                      ? Colors.grey[500]!
+                      : Colors.transparent,
+                  BlendMode.saturation),
+              child: Container(
+                color:
+                    ordem.freezed.isFreezed ? Colors.grey[200]! : Colors.white,
+                padding: const EdgeInsets.all(16),
+                child: Row(
                   children: [
-                    Text(
-                      ordem.id,
-                      style: AppCss.mediumBold,
+                    Icon(ordem.icon),
+                    const W(16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ordem.id,
+                            style: AppCss.mediumBold,
+                          ),
+                          Text(
+                            '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.fold(0.0, (previousValue, element) => previousValue + element.qtde).toKg()}',
+                            style: AppCss.minimumRegular
+                                .setSize(11)
+                                .setColor(AppColors.black),
+                          ),
+                          Text(
+                            'Criada ${ordem.createdAt.textHour()}',
+                            style: AppCss.minimumRegular
+                                .setSize(11)
+                                .setColor(AppColors.neutralMedium),
+                          ),
+                        ],
+                      ),
                     ),
-                    Text(
-                      '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.fold(0.0, (previousValue, element) => previousValue + element.qtde).toKg()}',
-                      style: AppCss.minimumRegular
-                          .setSize(11)
-                          .setColor(AppColors.black),
-                    ),
-                    Text(
-                      'Criada dia ${ordem.createdAt.text()}',
-                      style: AppCss.minimumRegular
-                          .setSize(11)
-                          .setColor(AppColors.neutralMedium),
+                    const W(8),
+                    _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
+                        ordem.getPrcntgAguardando()),
+                    const W(16),
+                    _progressChartWidget(PedidoProdutoStatus.produzindo,
+                        ordem.getPrcntgProduzindo()),
+                    const W(16),
+                    _progressChartWidget(
+                        PedidoProdutoStatus.pronto, ordem.getPrcntgPronto()),
+                    const W(16),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 14,
+                      color: AppColors.neutralMedium,
                     ),
                   ],
                 ),
               ),
-              const W(8),
-              _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
-                  ordem.getPrcntgAguardando()),
-              const W(16),
-              _progressChartWidget(
-                  PedidoProdutoStatus.produzindo, ordem.getPrcntgProduzindo()),
-              const W(16),
-              _progressChartWidget(
-                  PedidoProdutoStatus.pronto, ordem.getPrcntgPronto()),
-              const W(16),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 14,
-                color: AppColors.neutralMedium,
-              ),
-            ],
-          ),
+            ),
+            if (!ordem.freezed.isFreezed)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryMain.withOpacity(0.5),
+                  borderRadius:
+                      const BorderRadius.only(bottomRight: Radius.circular(8)),
+                ),
+                child: Text(
+                  ordem.beltIndex != null ? '${ordem.beltIndex! + 1}º' : '-',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[900]!,
+                      fontWeight: FontWeight.bold),
+                ),
+              )
+          ],
         ),
       ),
     );

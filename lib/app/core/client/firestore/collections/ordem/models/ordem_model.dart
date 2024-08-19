@@ -16,7 +16,7 @@ class OrdemModel {
   List<PedidoProdutoModel> produtos;
   bool selected = true;
   final OrdemFreezedModel freezed;
-  final int? beltIndex;
+  int? beltIndex;
 
   List<PedidoModel> get pedidos {
     final pedidosIds =
@@ -53,7 +53,6 @@ class OrdemModel {
 
   IconData get icon {
     if (freezed.isFreezed) return Icons.stop_circle_outlined;
-    if (beltIndex == 0) return Icons.build_outlined;
     switch (status) {
       case PedidoProdutoStatus.aguardandoProducao:
         return Icons.access_time;
