@@ -21,6 +21,7 @@ import 'package:aco_plus/app/modules/base/base_controller.dart';
 import 'package:aco_plus/app/modules/ordem/ordem_controller.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_create_page.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_page.dart';
+import 'package:aco_plus/app/modules/ordem/ui/ordens_concluidas_page.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +56,7 @@ class _OrdensPageState extends State<OrdensPage> {
             Text('Ordens', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () => push(context, const OrdensConcluidasPage()),
               icon: Icon(
                 Icons.domain_verification,
                 color: AppColors.white,
@@ -104,15 +105,16 @@ class _OrdensPageState extends State<OrdensPage> {
             }
 
             ordens.sort((a, b) {
-              if (a.beltIndex == null && b.beltIndex == null) {
-                return 0;
-              } else if (a.beltIndex == null) {
+              if (a.freezed.isFreezed && !b.freezed.isFreezed) {
                 return 1;
-              } else if (b.beltIndex == null) {
+              } else if (!a.freezed.isFreezed && b.freezed.isFreezed) {
                 return -1;
-              } else {
-                return a.beltIndex!.compareTo(b.beltIndex!);
               }
+
+              if (a.beltIndex == null || b.beltIndex == null) {
+                return 0;
+              }
+              return a.beltIndex!.compareTo(b.beltIndex!);
             });
 
             return RefreshIndicator(
@@ -167,12 +169,11 @@ class _OrdensPageState extends State<OrdensPage> {
                           physics: const NeverScrollableScrollPhysics(),
                           cacheExtent: 200,
                           itemCount: ordens.length,
-                          // separatorBuilder: (_, i) => const Divisor(),
                           onReorder: (oldIndex, newIndex) {
                             setState(() {
                               ordemCtrl.reorderOrdens(
                                   ordens, oldIndex, newIndex);
-                            FirestoreClient.ordens.updateAll(ordens);
+                              FirestoreClient.ordens.updateAll(ordens);
                             });
                           },
                           itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
@@ -196,60 +197,52 @@ class _OrdensPageState extends State<OrdensPage> {
         ),
         child: Stack(
           children: [
-            ColorFiltered(
-              colorFilter: ColorFilter.mode(
-                  ordem.freezed.isFreezed
-                      ? Colors.grey[500]!
-                      : Colors.transparent,
-                  BlendMode.saturation),
-              child: Container(
-                color:
-                    ordem.freezed.isFreezed ? Colors.grey[200]! : Colors.white,
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(ordem.icon),
-                    const W(16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            ordem.id,
-                            style: AppCss.mediumBold,
-                          ),
-                          Text(
-                            '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.fold(0.0, (previousValue, element) => previousValue + element.qtde).toKg()}',
-                            style: AppCss.minimumRegular
-                                .setSize(11)
-                                .setColor(AppColors.black),
-                          ),
-                          Text(
-                            'Criada ${ordem.createdAt.textHour()}',
-                            style: AppCss.minimumRegular
-                                .setSize(11)
-                                .setColor(AppColors.neutralMedium),
-                          ),
-                        ],
-                      ),
+            Container(
+              color: ordem.freezed.isFreezed ? Colors.grey[200]! : Colors.white,
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Icon(ordem.icon),
+                  const W(16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ordem.id,
+                          style: AppCss.mediumBold,
+                        ),
+                        Text(
+                          '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.fold(0.0, (previousValue, element) => previousValue + element.qtde).toKg()}',
+                          style: AppCss.minimumRegular
+                              .setSize(11)
+                              .setColor(AppColors.black),
+                        ),
+                        Text(
+                          'Criada ${ordem.createdAt.textHour()}',
+                          style: AppCss.minimumRegular
+                              .setSize(11)
+                              .setColor(AppColors.neutralMedium),
+                        ),
+                      ],
                     ),
-                    const W(8),
-                    _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
-                        ordem.getPrcntgAguardando()),
-                    const W(16),
-                    _progressChartWidget(PedidoProdutoStatus.produzindo,
-                        ordem.getPrcntgProduzindo()),
-                    const W(16),
-                    _progressChartWidget(
-                        PedidoProdutoStatus.pronto, ordem.getPrcntgPronto()),
-                    const W(16),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 14,
-                      color: AppColors.neutralMedium,
-                    ),
-                  ],
-                ),
+                  ),
+                  const W(8),
+                  _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
+                      ordem.getPrcntgAguardando(), ordem.freezed.isFreezed),
+                  const W(16),
+                  _progressChartWidget(PedidoProdutoStatus.produzindo,
+                      ordem.getPrcntgProduzindo(), ordem.freezed.isFreezed),
+                  const W(16),
+                  _progressChartWidget(PedidoProdutoStatus.pronto,
+                      ordem.getPrcntgPronto(), ordem.freezed.isFreezed),
+                  const W(32),
+                  // Icon(
+                  //   Icons.arrow_forward_ios,
+                  //   size: 14,
+                  //   color: AppColors.neutralMedium,
+                  // ),
+                ],
               ),
             ),
             if (!ordem.freezed.isFreezed)
@@ -274,15 +267,18 @@ class _OrdensPageState extends State<OrdensPage> {
     );
   }
 
-  Widget _progressChartWidget(PedidoProdutoStatus status, double porcentagem) {
+  Widget _progressChartWidget(
+      PedidoProdutoStatus status, double porcentagem, bool isFreezed) {
     return Stack(
       alignment: Alignment.center,
       children: [
         CircularProgressIndicator(
           value: porcentagem,
-          backgroundColor: status.color.withOpacity(0.2),
+          backgroundColor:
+              (isFreezed ? Colors.grey[600]! : status.color).withOpacity(0.2),
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation(status.color),
+          valueColor: AlwaysStoppedAnimation(
+              isFreezed ? Colors.grey[600]! : status.color),
         ),
         Text(
           '${(porcentagem * 100).percent}%',

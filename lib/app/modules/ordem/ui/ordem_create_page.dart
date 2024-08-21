@@ -94,6 +94,15 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                     ),
                     const H(16),
                     AppField(
+                      onTap: () {
+                        setState(() {
+                          form.localizador.controller.selection =
+                          TextSelection(
+                              baseOffset: 0,
+                              extentOffset: form
+                                  .localizador.controller.value.text.length);
+                        });
+                      },
                       label: 'Filtrar por localizador',
                       required: false,
                       controller: form.localizador,

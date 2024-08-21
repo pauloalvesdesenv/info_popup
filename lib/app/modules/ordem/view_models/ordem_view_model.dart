@@ -5,9 +5,18 @@ import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_m
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 class OrdemUtils {
+  bool showFilter = false;
+  final TextController search = TextController();
+  List<PedidoProdutoStatus> status = [
+    PedidoProdutoStatus.aguardandoProducao,
+    PedidoProdutoStatus.produzindo
+  ];
+  ProdutoModel? produto;
+}
+
+class OrdemConcluidasUtils {
   bool showFilter = false;
   final TextController search = TextController();
   List<PedidoProdutoStatus> status = [
@@ -88,9 +97,6 @@ class OrdemFreezedCreateModel {
 
   OrdemFreezedModel toOrdemFreeze() {
     return OrdemFreezedModel(
-      isFreezed: isFreezed,
-      reason: reason,
-      updatedAt: updatedAt
-    );
+        isFreezed: isFreezed, reason: reason, updatedAt: updatedAt);
   }
 }

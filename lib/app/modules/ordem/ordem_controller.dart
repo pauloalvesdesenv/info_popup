@@ -32,6 +32,10 @@ class OrdemController {
       AppStream<OrdemUtils>.seed(OrdemUtils());
   OrdemUtils get utils => utilsStream.value;
 
+  final AppStream<OrdemConcluidasUtils> utilsConcluidasStream =
+      AppStream<OrdemConcluidasUtils>.seed(OrdemConcluidasUtils());
+  OrdemConcluidasUtils get utilsConcluidas => utilsConcluidasStream.value;
+
   void onInit() {
     utilsStream.add(OrdemUtils());
   }
@@ -213,13 +217,13 @@ class OrdemController {
     switch (form.sortType) {
       case SortType.localizator:
         pedidos.sort((a, b) => isAsc
-            ? a.cliente.nome.compareTo(b.cliente.nome)
-            : b.cliente.nome.compareTo(a.cliente.nome));
+            ? a.pedido.localizador.compareTo(b.pedido.localizador)
+            : b.pedido.localizador.compareTo(a.pedido.localizador));
         break;
       case SortType.alfabetic:
         pedidos.sort((a, b) => isAsc
-            ? a.cliente.nome.compareTo(b.cliente.nome)
-            : b.cliente.nome.compareTo(a.cliente.nome));
+            ? a.pedido.localizador.compareTo(b.pedido.localizador)
+            : b.pedido.localizador.compareTo(a.pedido.localizador));
         break;
       case SortType.createdAt:
         pedidos.sort((a, b) => isAsc
