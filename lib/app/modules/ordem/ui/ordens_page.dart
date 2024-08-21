@@ -127,7 +127,7 @@ class _OrdensPageState extends State<OrdensPage> {
                       child: Column(
                         children: [
                           AppField(
-                            hint: 'Pesquisar',
+                            label: 'Pesquisar',
                             controller: utils.search,
                             suffixIcon: Icons.search,
                             onChanged: (_) => ordemCtrl.utilsStream.update(),
@@ -237,11 +237,6 @@ class _OrdensPageState extends State<OrdensPage> {
                   _progressChartWidget(PedidoProdutoStatus.pronto,
                       ordem.getPrcntgPronto(), ordem.freezed.isFreezed),
                   const W(32),
-                  // Icon(
-                  //   Icons.arrow_forward_ios,
-                  //   size: 14,
-                  //   color: AppColors.neutralMedium,
-                  // ),
                 ],
               ),
             ),

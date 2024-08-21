@@ -1,7 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
@@ -16,10 +15,8 @@ import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/ordem/ordem_controller.dart';
-import 'package:aco_plus/app/modules/ordem/ui/ordem_create_page.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_page.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
-import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 
 class OrdensConcluidasPage extends StatefulWidget {
@@ -46,7 +43,8 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
           IconButton(
               onPressed: () {
                 setState(() {
-                  ordemCtrl.utilsConcluidas.showFilter = !ordemCtrl.utilsConcluidas.showFilter;
+                  ordemCtrl.utilsConcluidas.showFilter =
+                      !ordemCtrl.utilsConcluidas.showFilter;
                   ordemCtrl.utilsConcluidasStream.update();
                 });
               },
@@ -66,7 +64,7 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
                 .getOrdensFiltered(
                     utilsConcluidas.search.text,
                     __
-                        .where((e) => e.status == PedidoProdutoStatus.pronto && e.produtos.isNotEmpty)
+                        .where((e) => e.status == PedidoProdutoStatus.pronto)
                         .toList())
                 .toList();
             if (utilsConcluidas.produto != null) {
@@ -85,10 +83,11 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
                       child: Column(
                         children: [
                           AppField(
-                            hint: 'Pesquisar',
+                            label: 'Pesquisar',
                             controller: utilsConcluidas.search,
                             suffixIcon: Icons.search,
-                            onChanged: (_) => ordemCtrl.utilsConcluidasStream.update(),
+                            onChanged: (_) =>
+                                ordemCtrl.utilsConcluidasStream.update(),
                           ),
                           const H(16),
                           AppDropDown<ProdutoModel?>(

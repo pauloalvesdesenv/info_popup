@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
@@ -17,6 +18,9 @@ class OrdemModel {
   bool selected = true;
   final OrdemFreezedModel freezed;
   int? beltIndex;
+
+  bool get isFreezed =>
+      status != PedidoProdutoStatus.pronto && freezed.isFreezed;
 
   List<PedidoModel> get pedidos {
     final pedidosIds =
