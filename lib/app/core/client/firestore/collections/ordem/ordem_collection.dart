@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -12,6 +16,12 @@ class OrdemCollection {
 
   AppStream<List<OrdemModel>> dataStream = AppStream<List<OrdemModel>>();
   List<OrdemModel> get data => dataStream.value;
+  List<OrdemModel> get ordensNaoCongeladas =>
+      dataStream.value.where((e) => !e.freezed.isFreezed).toList();
+
+  AppStream<List<OrdemModel>> dataConcluidasStream =
+      AppStream<List<OrdemModel>>();
+  List<OrdemModel> get dataConcluidas => dataConcluidasStream.value;
 
   CollectionReference<Map<String, dynamic>> get collection =>
       FirebaseFirestore.instance.collection(name);
@@ -27,9 +37,29 @@ class OrdemCollection {
     if (_isStarted && lock) return;
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
-    final countries =
-        data.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
-    dataStream.add(countries);
+    final ordens = data.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
+
+    final ordensConcluidas =
+        ordens.where((e) => e.status == PedidoProdutoStatus.pronto).toList();
+    dataConcluidasStream.add(ordensConcluidas);
+
+    final ordensNaoConcluidas =
+        ordens.where((e) => e.status != PedidoProdutoStatus.pronto).toList();
+
+    ordensNaoConcluidas.sort((a, b) {
+      if (a.freezed.isFreezed && !b.freezed.isFreezed) {
+        return 1;
+      } else if (!a.freezed.isFreezed && b.freezed.isFreezed) {
+        return -1;
+      }
+
+      if (a.beltIndex == null || b.beltIndex == null) {
+        return 0;
+      }
+      return a.beltIndex!.compareTo(b.beltIndex!);
+    });
+
+    dataStream.add(ordensNaoConcluidas);
   }
 
   bool _isListen = false;
@@ -67,14 +97,35 @@ class OrdemCollection {
             : collection)
         .snapshots()
         .listen((e) {
-      final countries =
-          e.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
+      final ordens = e.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
 
-      dataStream.add(countries);
+      final ordensConcluidas =
+          ordens.where((e) => e.status == PedidoProdutoStatus.pronto).toList();
+      dataConcluidasStream.add(ordensConcluidas);
+
+      final ordensNaoConcluidas =
+          ordens.where((e) => e.status != PedidoProdutoStatus.pronto).toList();
+      ordensNaoConcluidas.sort((a, b) {
+        if (a.freezed.isFreezed && !b.freezed.isFreezed) {
+          return 1;
+        } else if (!a.freezed.isFreezed && b.freezed.isFreezed) {
+          return -1;
+        }
+
+        if (a.beltIndex == null || b.beltIndex == null) {
+          return 0;
+        }
+        return a.beltIndex!.compareTo(b.beltIndex!);
+      });
+
+      dataStream.add(ordensNaoConcluidas);
     });
   }
 
-  OrdemModel getById(String id) => data.singleWhere((e) => e.id == id);
+  OrdemModel getById(String id) {
+    final list = [...FirestoreClient.ordens.dataStream.value, ...FirestoreClient.ordens.dataConcluidasStream.value];
+    return list.firstWhere((e) => e.id == id);
+  }
 
   Future<OrdemModel?> add(OrdemModel model) async {
     await collection.doc(model.id).set(model.toMap());
@@ -97,5 +148,4 @@ class OrdemCollection {
     }
     await batch.commit();
   }
-
 }

@@ -38,6 +38,7 @@ class OrdemController {
 
   void onInit() {
     utilsStream.add(OrdemUtils());
+    onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
   }
 
   List<OrdemModel> getOrdensFiltered(String search, List<OrdemModel> ordens) {
@@ -196,6 +197,8 @@ class OrdemController {
     await automatizacaoCtrl.onSetStepByPedidoStatus(ordem.pedidos);
     pop(_);
 
+    onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
+
     NotificationService.showPositive(
         'Ordem Excluida', 'Operação realizada com sucesso',
         position: NotificationPosition.bottom);
@@ -258,6 +261,7 @@ class OrdemController {
     final status = await showOrdemProdutoStatusBottom(produtoStatus);
     if (status == null || produtoStatus == status) return;
     await onChangeProdutoStatus(produto, status);
+      onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
   }
 
   Future<void> onChangeProdutoStatus(
@@ -290,6 +294,7 @@ class OrdemController {
       ordem.freezed.isFreezed = true;
     }
     await FirestoreClient.ordens.update(ordem);
+    onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
     Navigator.pop(_);
     if (ordem.freezed.isFreezed) {
       NotificationService.showPositive('Ordem ${ordem.id} congelada!',
@@ -300,11 +305,11 @@ class OrdemController {
     }
   }
 
-  void reorderOrdens(List<OrdemModel> ordens, int oldIndex, int newIndex) {
-    final ordem = ordens.removeAt(oldIndex);
-    ordens.insert(newIndex, ordem);
-    for (int i = 0; i < ordens.length; i++) {
-      ordens[i].beltIndex = i;
+  void onReorder(List<OrdemModel> ordensNaoConcluidas) {
+    for (var i = 0; i < ordensNaoConcluidas.length; i++) {
+      ordensNaoConcluidas[i].beltIndex = i;
+      FirestoreClient.ordens.dataStream.update();
+      FirestoreClient.ordens.update(ordensNaoConcluidas[i]);
     }
   }
 }

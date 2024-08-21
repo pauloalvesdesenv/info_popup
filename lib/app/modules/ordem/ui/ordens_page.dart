@@ -55,30 +55,39 @@ class _OrdensPageState extends State<OrdensPage> {
         title:
             Text('Ordens', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          IconButton(
-              onPressed: () => push(context, const OrdensConcluidasPage()),
-              icon: Icon(
-                Icons.domain_verification,
-                color: AppColors.white,
-              )),
-          IconButton(
-              onPressed: () {
-                setState(() {
-                  ordemCtrl.utils.showFilter = !ordemCtrl.utils.showFilter;
-                  ordemCtrl.utilsStream.update();
-                });
-              },
-              icon: Icon(
-                Icons.sort,
-                color: AppColors.white,
-              )),
-          if (usuario.permission.ordem.contains(UserPermissionType.create))
-            IconButton(
-                onPressed: () => push(context, const OrdemCreatePage()),
+          Tooltip(
+            message: 'Ordens concluídas',
+            child: IconButton(
+                onPressed: () => push(context, const OrdensConcluidasPage()),
                 icon: Icon(
-                  Icons.add,
+                  Icons.domain_verification,
                   color: AppColors.white,
-                ))
+                )),
+          ),
+          Tooltip(
+            message: 'Filtro',
+            child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    ordemCtrl.utils.showFilter = !ordemCtrl.utils.showFilter;
+                    ordemCtrl.utilsStream.update();
+                  });
+                },
+                icon: Icon(
+                  Icons.sort,
+                  color: AppColors.white,
+                )),
+          ),
+          if (usuario.permission.ordem.contains(UserPermissionType.create))
+            Tooltip(
+              message: 'Nova ordem',
+              child: IconButton(
+                  onPressed: () => push(context, const OrdemCreatePage()),
+                  icon: Icon(
+                    Icons.add,
+                    color: AppColors.white,
+                  )),
+            )
         ],
         backgroundColor: AppColors.primaryMain,
       ),
@@ -87,13 +96,8 @@ class _OrdensPageState extends State<OrdensPage> {
         builder: (_, __) => StreamOut<OrdemUtils>(
           stream: ordemCtrl.utilsStream.listen,
           builder: (_, utils) {
-            List<OrdemModel> ordens = ordemCtrl
-                .getOrdensFiltered(
-                    utils.search.text,
-                    __
-                        .where((e) => e.status != PedidoProdutoStatus.pronto)
-                        .toList())
-                .toList();
+            List<OrdemModel> ordens =
+                ordemCtrl.getOrdensFiltered(utils.search.text, __).toList();
             if (utils.status.isNotEmpty) {
               ordens =
                   ordens.where((e) => utils.status.contains(e.status)).toList();
@@ -103,19 +107,6 @@ class _OrdensPageState extends State<OrdensPage> {
                   .where((e) => e.produto.id == utils.produto!.id)
                   .toList();
             }
-
-            ordens.sort((a, b) {
-              if (a.freezed.isFreezed && !b.freezed.isFreezed) {
-                return 1;
-              } else if (!a.freezed.isFreezed && b.freezed.isFreezed) {
-                return -1;
-              }
-
-              if (a.beltIndex == null || b.beltIndex == null) {
-                return 0;
-              }
-              return a.beltIndex!.compareTo(b.beltIndex!);
-            });
 
             return RefreshIndicator(
               onRefresh: () async => FirestoreClient.ordens.fetch(),
@@ -162,22 +153,45 @@ class _OrdensPageState extends State<OrdensPage> {
                         ],
                       ),
                     ),
-                  ordens.isEmpty
-                      ? const EmptyData()
-                      : ReorderableListView.builder(
+                  if (ordens.isEmpty) const EmptyData(),
+                  if (ordens.isNotEmpty)
+                    Builder(
+                      builder: (_) {
+                        final ordensNaoConcluidas =
+                            ordens.where((e) => !e.freezed.isFreezed).toList();
+                        return ReorderableListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           cacheExtent: 200,
-                          itemCount: ordens.length,
+                          itemCount: ordensNaoConcluidas.length,
                           onReorder: (oldIndex, newIndex) {
-                            setState(() {
-                              ordemCtrl.reorderOrdens(
-                                  ordens, oldIndex, newIndex);
-                              FirestoreClient.ordens.updateAll(ordens);
-                            });
+                            if (newIndex > oldIndex) newIndex = newIndex - 1;
+                            final step = ordensNaoConcluidas.removeAt(oldIndex);
+                            ordensNaoConcluidas.insert(newIndex, step);
+                            ordemCtrl.onReorder(ordensNaoConcluidas);
                           },
-                          itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
-                        )
+                          itemBuilder: (_, i) =>
+                              _itemOrdemWidget(ordensNaoConcluidas[i]),
+                        );
+                      },
+                    ),
+                  if (ordens.isNotEmpty)
+                    Builder(
+                      builder: (_) {
+                        final ordensCongeladas =
+                            ordens.where((e) => e.freezed.isFreezed).toList();
+                        ordensCongeladas.sort((a, b) =>
+                            b.freezed.updatedAt.compareTo(a.freezed.updatedAt));
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          cacheExtent: 200,
+                          itemCount: ordensCongeladas.length,
+                          itemBuilder: (_, i) =>
+                              _itemOrdemWidget(ordensCongeladas[i]),
+                        );
+                      },
+                    )
                 ],
               ),
             );

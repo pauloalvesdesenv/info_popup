@@ -40,32 +40,32 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
         title: Text('Ordens Concluídas',
             style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          IconButton(
-              onPressed: () {
-                setState(() {
-                  ordemCtrl.utilsConcluidas.showFilter =
-                      !ordemCtrl.utilsConcluidas.showFilter;
-                  ordemCtrl.utilsConcluidasStream.update();
-                });
-              },
-              icon: Icon(
-                Icons.sort,
-                color: AppColors.white,
-              )),
+          Tooltip(
+            message: 'Filtro',
+            child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    ordemCtrl.utilsConcluidas.showFilter =
+                        !ordemCtrl.utilsConcluidas.showFilter;
+                    ordemCtrl.utilsConcluidasStream.update();
+                  });
+                },
+                icon: Icon(
+                  Icons.sort,
+                  color: AppColors.white,
+                )),
+          ),
         ],
         backgroundColor: AppColors.primaryMain,
       ),
       body: StreamOut<List<OrdemModel>>(
-        stream: FirestoreClient.ordens.dataStream.listen,
+        stream: FirestoreClient.ordens.dataConcluidasStream.listen,
         builder: (_, __) => StreamOut<OrdemConcluidasUtils>(
           stream: ordemCtrl.utilsConcluidasStream.listen,
           builder: (_, utilsConcluidas) {
             List<OrdemModel> ordens = ordemCtrl
-                .getOrdensFiltered(
-                    utilsConcluidas.search.text,
-                    __
-                        .where((e) => e.status == PedidoProdutoStatus.pronto)
-                        .toList())
+                .getOrdensFiltered(utilsConcluidas.search.text,
+                    __.where((e) => e.produtos.isNotEmpty).toList())
                 .toList();
             if (utilsConcluidas.produto != null) {
               ordens = ordens

@@ -60,6 +60,13 @@ class PedidoTopBar extends StatelessWidget implements PreferredSizeWidget {
                 )),
           ),
           const W(12),
+          Tooltip(
+            message: 'Gerar Relatório do Pedido',
+            child: IconButton(
+                onPressed: () => pedidoCtrl.onGeneratePDF(pedido),
+                icon: Icon(Icons.picture_as_pdf, color: AppColors.white)),
+          ),
+          const W(12),
           if (pedido.step.isArchivedAvailable) ...[
             Tooltip(
               message: 'Arquivar pedido',

@@ -33,19 +33,21 @@ class OrdemCreateModel {
   List<PedidoProdutoModel> produtos = [];
   SortType sortType = SortType.alfabetic;
   SortOrder sortOrder = SortOrder.asc;
-  bool isCreate = false;
+  bool isCreate = true;
   DateTime? createdAt;
   OrdemFreezedCreateModel freezed = OrdemFreezedCreateModel();
+  int? beltIndex;
 
   late bool isEdit;
 
   OrdemCreateModel()
       : id = (FirestoreClient.ordens.data.length + 1).toString(),
-        isEdit = false;
+        isEdit = false, isCreate = true;
 
   OrdemCreateModel.edit(OrdemModel pedido)
       : id = pedido.id,
         isEdit = true {
+          isCreate = false;
     createdAt = pedido.createdAt;
     produto = FirestoreClient.produtos.data
         .firstWhere((e) => e.id == pedido.produto.id);
@@ -54,6 +56,7 @@ class OrdemCreateModel {
             e.copyWith(isSelected: true, isAvailable: e.isAvailableToChanges))
         .toList();
     freezed = OrdemFreezedCreateModel.edit(pedido.freezed);
+    beltIndex = pedido.beltIndex;
   }
 
   OrdemModel toOrdemModel() {
@@ -75,7 +78,10 @@ class OrdemCreateModel {
             ),
           )
           .toList(),
-      freezed: freezed.toOrdemFreeze(),
+      freezed: isCreate ? OrdemFreezedModel.static() : freezed.toOrdemFreeze(),
+      beltIndex: isCreate
+          ? FirestoreClient.ordens.ordensNaoCongeladas.length
+          : beltIndex,
     );
   }
 }

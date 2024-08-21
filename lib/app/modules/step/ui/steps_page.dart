@@ -173,11 +173,6 @@ class _StepsPageState extends State<StepsPage> {
                   ),
                 ),
                 const W(8),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 14,
-                  color: AppColors.neutralMedium,
-                ),
                 const W(25)
               ],
             ),
