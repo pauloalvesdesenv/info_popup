@@ -12,7 +12,7 @@ import 'package:aco_plus/app/modules/kanban/ui/components/kanban/shimmer/kanban_
 import 'package:aco_plus/app/modules/pedido/ui/pedido_create_page.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:popover/popover.dart';
+import 'package:info_popup/info_popup.dart';
 
 class KanbanTopBarWidget extends StatelessWidget
     implements PreferredSizeWidget {
@@ -21,6 +21,25 @@ class KanbanTopBarWidget extends StatelessWidget
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
+  @override
+  Widget build(BuildContext context) {
+    return const _KanbanTopbarConcreteWidget();
+  }
+}
+
+class _KanbanTopbarConcreteWidget extends StatefulWidget {
+  const _KanbanTopbarConcreteWidget({
+    super.key,
+  });
+
+  @override
+  State<_KanbanTopbarConcreteWidget> createState() =>
+      _KanbanTopbarConcreteWidgetState();
+}
+
+class _KanbanTopbarConcreteWidgetState
+    extends State<_KanbanTopbarConcreteWidget> {
+  late InfoPopupController controller;
   @override
   Widget build(BuildContext context) {
     return StreamOut<KanbanUtils>(
@@ -37,20 +56,23 @@ class KanbanTopBarWidget extends StatelessWidget
         title:
             Text('Kanban', style: AppCss.largeBold.setColor(AppColors.white)),
         actions: [
-          InkWell(
-            onTap: () => showPopover(
-              context: context,
-              backgroundColor: Colors.white,
-              height: 300,
-              width: 400,
-              direction: PopoverDirection.top,
-              bodyBuilder: (context) => KanbanFilterWidget(utils),
-            ),
-            child: IgnorePointer(
-              ignoring: true,
-              child: Stack(
-                children: [
-                  IconButton(
+          InfoPopupWidget(
+            onControllerCreated: (_) {
+              controller = _;
+              utils.controller = _;
+              kanbanCtrl.utilsStream.update();
+            },
+            onAreaPressed: (e) {},
+            enableHighlight: false,
+            customContent: () => KanbanFilterWidget(utils),
+            contentOffset: const Offset(-10, 0),
+            infoPopupDismissed: () {},
+            arrowTheme: InfoPopupArrowTheme(color: AppColors.white),
+            child: Stack(
+              children: [
+                IgnorePointer(
+                  ignoring: true,
+                  child: IconButton(
                       onPressed: () {},
                       icon: Icon(
                         Icons.filter_list,
@@ -62,31 +84,59 @@ class KanbanTopBarWidget extends StatelessWidget
                                   WidgetStateProperty.all(Colors.redAccent),
                             )
                           : null),
-                  if (utils.hasFilter())
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
+                ),
+                if (utils.hasFilter())
+                  Positioned(
+                    left: 0,
+                    bottom: 0,
+                    child: Container(
+                      margin: const EdgeInsets.all(2),
+                      width: 16,
+                      height: 16,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          utils.getFilterSteps().toString(),
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: AppColors.primaryMain,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (utils.hasFilter())
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: InkWell(
+                      onTap: () {
+                        utils.search.text = '';
+                        utils.cliente = null;
+                        controller.dismissInfoPopup();
+                        kanbanCtrl.utilsStream.update();
+                      },
                       child: Container(
                         margin: const EdgeInsets.all(2),
-                        width: 20,
-                        height: 20,
+                        width: 16,
+                        height: 16,
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
                         ),
                         child: Center(
-                          child: Text(
-                            utils.getFilterSteps().toString(),
-                            style: TextStyle(
-                                fontSize: 11,
-                                color: AppColors.primaryMain,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                            child: Icon(
+                          Icons.close,
+                          size: 12,
+                          color: AppColors.primaryMain,
+                        )),
                       ),
-                    )
-                ],
-              ),
+                    ),
+                  )
+              ],
             ),
           ),
           IconButton(

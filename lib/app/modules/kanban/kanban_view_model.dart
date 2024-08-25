@@ -6,6 +6,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:info_popup/info_popup.dart';
 
 enum KanbanViewMode {
   calendar,
@@ -23,6 +24,7 @@ class KanbanUtils {
   ClienteModel? cliente;
   TextController clienteEC = TextController();
   Timer? timer;
+  late InfoPopupController controller;
 
   void cancelTimer() {
     if (timer?.isActive ?? false) {

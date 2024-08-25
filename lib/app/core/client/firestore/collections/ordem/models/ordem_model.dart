@@ -94,6 +94,9 @@ class OrdemModel {
   }
 
   PedidoProdutoStatus get status {
+    if(pedidos.isEmpty){
+      return PedidoProdutoStatus.aguardandoProducao;
+    }
     if (qtdePronto() == quantideTotal()) {
       return PedidoProdutoStatus.pronto;
     } else if (qtdeProduzindo() > 0) {

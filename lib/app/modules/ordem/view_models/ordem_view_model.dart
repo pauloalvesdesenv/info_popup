@@ -41,7 +41,7 @@ class OrdemCreateModel {
   late bool isEdit;
 
   OrdemCreateModel()
-      : id = (FirestoreClient.ordens.data.length + 1).toString(),
+      : id = ([...FirestoreClient.ordens.dataStream.value, ...FirestoreClient.ordens.dataConcluidasStream.value].length + 1).toString(),
         isEdit = false, isCreate = true;
 
   OrdemCreateModel.edit(OrdemModel pedido)

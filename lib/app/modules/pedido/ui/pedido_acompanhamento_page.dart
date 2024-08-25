@@ -48,7 +48,7 @@ class _PedidoAcompanhamentoPageState extends State<PedidoAcompanhamentoPage>
           actions: [
             IconButton(
                 onPressed: () async =>
-                    Clipboard.setData(ClipboardData(text: promoveText)),
+                    Clipboard.setData(ClipboardData(text: 'https://aco-plus-fa455.web.app/acompanhamento/pedidos/${pedido.id}')),
                 icon: Icon(Icons.copy, color: AppColors.white)),
             const W(12),
             IconButton(

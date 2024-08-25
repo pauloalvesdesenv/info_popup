@@ -128,6 +128,10 @@ class OrdemController {
 
     final ordemCriada = form.toOrdemModel();
     onValid(ordemCriada);
+    if (!await showConfirmDialog(
+        'Você está criando uma ordem vazia.', 'Deseja Continuar?')) {
+      return;
+    }
     for (PedidoProdutoModel produto in ordemCriada.produtos) {
       await FirestoreClient.pedidos
           .updateProdutoStatus(produto, produto.statusess.last.status);
@@ -147,6 +151,10 @@ class OrdemController {
     await FirestoreClient.pedidos.fetch();
     final ordemEditada = form.toOrdemModel();
     onValid(ordemEditada);
+    if (!await showConfirmDialog(
+        'A ordem vazia.', 'Deseja Continuar?')) {
+      return;
+    }
     for (PedidoProdutoModel produto in ordem.produtos) {
       if (!ordemEditada.produtos.contains(produto)) {
         await FirestoreClient.pedidos.updateProdutoStatus(
@@ -172,9 +180,6 @@ class OrdemController {
   void onValid(OrdemModel ordem) {
     if (form.produto == null) {
       throw Exception('Selecione o produto');
-    }
-    if (ordem.produtos.isEmpty) {
-      throw Exception('A lista de produtos não pode ser vazia');
     }
   }
 
@@ -261,7 +266,7 @@ class OrdemController {
     final status = await showOrdemProdutoStatusBottom(produtoStatus);
     if (status == null || produtoStatus == status) return;
     await onChangeProdutoStatus(produto, status);
-      onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
+    onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
   }
 
   Future<void> onChangeProdutoStatus(

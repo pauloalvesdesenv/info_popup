@@ -25,6 +25,7 @@ import 'package:aco_plus/app/modules/ordem/ui/ordens_concluidas_page.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class OrdensPage extends StatefulWidget {
   const OrdensPage({super.key});
@@ -242,14 +243,31 @@ class _OrdensPageState extends State<OrdensPage> {
                     ),
                   ),
                   const W(8),
-                  _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
-                      ordem.getPrcntgAguardando(), ordem.freezed.isFreezed),
-                  const W(16),
-                  _progressChartWidget(PedidoProdutoStatus.produzindo,
-                      ordem.getPrcntgProduzindo(), ordem.freezed.isFreezed),
-                  const W(16),
-                  _progressChartWidget(PedidoProdutoStatus.pronto,
-                      ordem.getPrcntgPronto(), ordem.freezed.isFreezed),
+                  if (ordem.produtos.isNotEmpty)
+                    Row(
+                      children: [
+                        _progressChartWidget(
+                            PedidoProdutoStatus.aguardandoProducao,
+                            ordem.getPrcntgAguardando(),
+                            ordem.freezed.isFreezed),
+                        const W(16),
+                        _progressChartWidget(
+                            PedidoProdutoStatus.produzindo,
+                            ordem.getPrcntgProduzindo(),
+                            ordem.freezed.isFreezed),
+                        const W(16),
+                        _progressChartWidget(PedidoProdutoStatus.pronto,
+                            ordem.getPrcntgPronto(), ordem.freezed.isFreezed),
+                      ],
+                    ),
+                  if (ordem.produtos.isEmpty)
+                    const Row(
+                      children: [
+                        Text('Ordem Vazia'),
+                        W(8),
+                        Icon(Symbols.brightness_empty),
+                      ],
+                    ),
                   const W(32),
                 ],
               ),

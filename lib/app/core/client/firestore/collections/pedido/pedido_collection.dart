@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
@@ -18,7 +20,8 @@ class PedidoCollection {
   AppStream<List<PedidoModel>> dataStream = AppStream<List<PedidoModel>>();
   List<PedidoModel> get data => dataStream.value;
 
-  AppStream<List<PedidoModel>> pedidosArchivedsStream = AppStream<List<PedidoModel>>();
+  AppStream<List<PedidoModel>> pedidosArchivedsStream =
+      AppStream<List<PedidoModel>>();
   List<PedidoModel> get pedidosArchiveds => dataStream.value;
 
   CollectionReference<Map<String, dynamic>> get collection =>
@@ -40,6 +43,7 @@ class PedidoCollection {
 
     dataStream.add(pedidos.where((e) => !e.isArchived).toList());
     pedidosArchivedsStream.add(pedidos.where((e) => e.isArchived).toList());
+
   }
 
   bool _isListen = false;

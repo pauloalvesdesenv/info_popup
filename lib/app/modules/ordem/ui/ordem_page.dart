@@ -19,6 +19,7 @@ import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/ordem/ordem_controller.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_create_page.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class OrdemPage extends StatefulWidget {
   final String ordemId;
@@ -70,26 +71,20 @@ class _OrdemPageState extends State<OrdemPage> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          if (ordem.freezed.isFreezed) _unfreezedWidget(ordem),
-          ColorFiltered(
-            colorFilter: ColorFilter.mode(
-                ordem.freezed.isFreezed ? AppColors.white : Colors.transparent,
-                BlendMode.saturation),
-            child: ColoredBox(
-              color: ordem.freezed.isFreezed
-                  ? Colors.grey[100]!
-                  : Colors.transparent,
-              child: Column(
-                children: [
-                  _descriptionWidget(ordem),
-                  const Divisor(),
-                  _statusWidget(ordem),
-                  for (final produto in ordem.produtos) _produtoWidget(produto),
-                  if (!ordem.freezed.isFreezed &&
-                      ordem.status != PedidoProdutoStatus.pronto)
-                    _freezedWidget(ordem)
-                ],
-              ),
+          if (ordem.freezed.isFreezed) unfreezedWidget(ordem),
+          Container(
+            color:
+                ordem.freezed.isFreezed ? Colors.grey.withOpacity(0.1) : null,
+            child: Column(
+              children: [
+                _descriptionWidget(ordem),
+                const Divisor(),
+                _statusWidget(ordem),
+                for (final produto in ordem.produtos) _produtoWidget(produto),
+                if (!ordem.freezed.isFreezed &&
+                    ordem.status != PedidoProdutoStatus.pronto)
+                  _freezedWidget(ordem)
+              ],
             ),
           )
         ],
@@ -117,71 +112,83 @@ class _OrdemPageState extends State<OrdemPage> {
         children: [
           Text('Status', style: AppCss.largeBold),
           const H(8),
-          Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                      child: Text('Aguardando Produção',
-                          style: AppCss.mediumRegular)),
-                  Text(
-                    '${ordem.qtdeAguardando().toKg()} (${(ordem.getPrcntgAguardando() * 100).percent}%)',
-                  )
-                ],
-              ),
-              const H(8),
-              LinearProgressIndicator(
-                value: ordem.getPrcntgAguardando(),
-                backgroundColor: PedidoProdutoStatus.aguardandoProducao.color
-                    .withOpacity(0.3),
-                valueColor: AlwaysStoppedAnimation(
-                    PedidoProdutoStatus.aguardandoProducao.color),
-              ),
-            ],
-          ),
-          const H(16),
-          Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                      child: Text('Produzindo', style: AppCss.mediumRegular)),
-                  Text(
-                    '${ordem.qtdeProduzindo().toKg()} (${(ordem.getPrcntgProduzindo() * 100).percent}%)',
-                  )
-                ],
-              ),
-              const H(8),
-              LinearProgressIndicator(
-                value: ordem.getPrcntgProduzindo(),
-                backgroundColor:
-                    PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
-                valueColor: AlwaysStoppedAnimation(
-                    PedidoProdutoStatus.produzindo.color),
-              ),
-            ],
-          ),
-          const H(16),
-          Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(child: Text('Pronto', style: AppCss.mediumRegular)),
-                  Text(
-                    '${ordem.qtdePronto().toKg()} (${(ordem.getPrcntgPronto() * 100).percent}%)',
-                  )
-                ],
-              ),
-              const H(8),
-              LinearProgressIndicator(
-                value: ordem.getPrcntgPronto(),
-                backgroundColor:
-                    PedidoProdutoStatus.pronto.color.withOpacity(0.3),
-                valueColor:
-                    AlwaysStoppedAnimation(PedidoProdutoStatus.pronto.color),
-              ),
-            ],
-          ),
+          if (ordem.pedidos.isEmpty)
+            Row(
+              children: [
+                const Icon(Symbols.brightness_empty),
+                const W(8),
+                Text('Ordem vazia, não contem pedidos.',
+                    style: AppCss.mediumRegular.setColor(Colors.grey[700]!)),
+              ],
+            ),
+          if (ordem.pedidos.isNotEmpty) ...[
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                        child: Text('Aguardando Produção',
+                            style: AppCss.mediumRegular)),
+                    Text(
+                      '${ordem.qtdeAguardando().toKg()} (${(ordem.getPrcntgAguardando() * 100).percent}%)',
+                    )
+                  ],
+                ),
+                const H(8),
+                LinearProgressIndicator(
+                  value: ordem.getPrcntgAguardando(),
+                  backgroundColor: PedidoProdutoStatus.aguardandoProducao.color
+                      .withOpacity(0.3),
+                  valueColor: AlwaysStoppedAnimation(
+                      PedidoProdutoStatus.aguardandoProducao.color),
+                ),
+              ],
+            ),
+            const H(16),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                        child: Text('Produzindo', style: AppCss.mediumRegular)),
+                    Text(
+                      '${ordem.qtdeProduzindo().toKg()} (${(ordem.getPrcntgProduzindo() * 100).percent}%)',
+                    )
+                  ],
+                ),
+                const H(8),
+                LinearProgressIndicator(
+                  value: ordem.getPrcntgProduzindo(),
+                  backgroundColor:
+                      PedidoProdutoStatus.produzindo.color.withOpacity(0.3),
+                  valueColor: AlwaysStoppedAnimation(
+                      PedidoProdutoStatus.produzindo.color),
+                ),
+              ],
+            ),
+            const H(16),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                        child: Text('Pronto', style: AppCss.mediumRegular)),
+                    Text(
+                      '${ordem.qtdePronto().toKg()} (${(ordem.getPrcntgPronto() * 100).percent}%)',
+                    )
+                  ],
+                ),
+                const H(8),
+                LinearProgressIndicator(
+                  value: ordem.getPrcntgPronto(),
+                  backgroundColor:
+                      PedidoProdutoStatus.pronto.color.withOpacity(0.3),
+                  valueColor:
+                      AlwaysStoppedAnimation(PedidoProdutoStatus.pronto.color),
+                ),
+              ],
+            ),
+          ]
         ],
       ),
     );
@@ -272,7 +279,7 @@ class _OrdemPageState extends State<OrdemPage> {
     );
   }
 
-  Widget _unfreezedWidget(OrdemModel ordem) {
+  Widget unfreezedWidget(OrdemModel ordem) {
     return Column(
       children: [
         const Divisor(),
