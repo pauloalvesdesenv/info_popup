@@ -83,15 +83,7 @@ class _PedidoPageState extends State<PedidoPage>
   Widget _kanbanReasonWidget(PedidoModel pedido) {
     return Material(
       surfaceTintColor: Colors.transparent,
-      child: KeyboardListener(
-        focusNode: _focusNode,
-        onKeyEvent: (e) {
-          if (e is KeyDownEvent && e.logicalKey == LogicalKeyboardKey.exit) {
-            kanbanCtrl.setPedido(null);
-          }
-        },
-        child: body(pedido),
-      ),
+      child: body(pedido),
     );
   }
 
@@ -135,13 +127,13 @@ class _PedidoPageState extends State<PedidoPage>
               ],
             ],
           ),
+        if (pedido.instrucoesEntrega.isNotEmpty) ...[
+          PedidoEntregaWidget(pedido),
+          const Divisor(),
+        ],
         if (pedido.instrucoesEntrega.isNotEmpty ||
             pedido.instrucoesFinanceiras.isNotEmpty) ...[
           PedidoFinancWidget(pedido),
-          const Divisor(),
-        ],
-        if (pedido.instrucoesEntrega.isNotEmpty) ...[
-          PedidoEntregaWidget(pedido),
           const Divisor(),
         ],
         PedidoAnexosWidget(pedido),

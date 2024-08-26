@@ -108,7 +108,7 @@ class PedidoHistoryModel {
       case PedidoHistoryType.archive:
         return 'Arquivo ${action.verb1}';
       case PedidoHistoryType.create:
-        return 'Criado ${action.verb1}';
+        return 'Pedido Criado';
     }
   }
 
@@ -132,7 +132,7 @@ class PedidoHistoryModel {
       case PedidoHistoryType.archive:
         return '${usuario.nome} ${action.verb1} o pedido';
       case PedidoHistoryType.create:
-        return '${usuario.nome} ás ${createdAt.textHour()}';
+        return '${usuario.nome} ${createdAt.textHour()}';
     }
   }
 

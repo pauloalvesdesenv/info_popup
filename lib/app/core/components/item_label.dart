@@ -39,7 +39,7 @@ class ItemLabel extends StatelessWidget {
                     color: isDisable ? AppColors.black.withOpacity(0.3) : null,
                   )),
         if (isEditable)
-          InkWell(
+          GestureDetector(
             onTap: () => onEdit?.call(),
             child: Row(
               children: [

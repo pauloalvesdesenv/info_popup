@@ -186,14 +186,12 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
   }
 
   Container _bottom(OrdemCreateModel form) {
-    List<PedidoProdutoModel> produtos = form.produto != null ?
-                        ordemCtrl.getPedidosPorProduto(form.produto!,
-                            ordem: widget.ordem) : <PedidoProdutoModel>[];
-                    produtos = produtos
-                        .where((produto) => form.produtos
-                            .map((e) => e.id)
-                            .contains(produto.id))
-                        .toList();
+    List<PedidoProdutoModel> produtos = form.produto != null
+        ? ordemCtrl.getPedidosPorProduto(form.produto!, ordem: widget.ordem)
+        : <PedidoProdutoModel>[];
+    produtos = produtos
+        .where((produto) => form.produtos.map((e) => e.id).contains(produto.id))
+        .toList();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -211,8 +209,9 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Total: ${produtos.map((e) => e.qtde).fold(.0, (a, b) => a + b).toKg()}',
-                    style: AppCss.mediumBold.setSize(16),
+                    'PESO TOTAL SELECIONADO PARA ESTA ORDEM: ${produtos.map((e) => e.qtde).fold(.0, (a, b) => a + b).toKg()}'
+                        .toUpperCase(),
+                    style: AppCss.mediumBold.setSize(20),
                   ),
                   if (produtos.isNotEmpty)
                     Text(

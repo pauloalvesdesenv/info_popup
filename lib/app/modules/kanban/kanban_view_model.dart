@@ -49,7 +49,7 @@ class KanbanUtils {
   bool isPedidoVisibleFiltered(PedidoModel pedido) {
     if (!hasFilter()) return true;
     if (search.text.isNotEmpty) {
-      if (pedido.localizador.toCompare.contains(search.text.toCompare)) {
+      if (pedido.filtro.toCompare.contains(search.text.toCompare)) {
         return true;
       }
     }
