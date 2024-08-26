@@ -41,6 +41,10 @@ class PedidoModel {
   int index;
   final Key key = UniqueKey();
   bool isArchived = false;
+  final String planilhamento;
+  final String pedidoFinanceiro;
+  final String instrucoesEntrega;
+  final String instrucoesFinanceiras;
 
   StepModel get step => steps.last.step;
   PedidoStatus get status => statusess.last.status;
@@ -112,6 +116,10 @@ class PedidoModel {
     required this.isArchived,
     required this.archives,
     required this.checklistId,
+    required this.planilhamento,
+    required this.pedidoFinanceiro,
+    required this.instrucoesEntrega,
+    required this.instrucoesFinanceiras,
   });
 
   List<PedidoProdutoStatus> get getStatusess {
@@ -190,6 +198,10 @@ class PedidoModel {
       'histories': histories.map((x) => x.toMap()).toList(),
       'isArchived': isArchived,
       'checklistId': checklistId,
+      'planilhamento': planilhamento,
+      'pedidoFinanceiro': pedidoFinanceiro,
+      'instrucoesEntrega': instrucoesEntrega,
+      'instrucoesFinanceiras': instrucoesFinanceiras,
     };
   }
 
@@ -236,6 +248,10 @@ class PedidoModel {
               map['histories']?.map((x) => PedidoHistoryModel.fromMap(x)))
           : [],
       isArchived: map['isArchived'] ?? false,
+      planilhamento: map['planilhamento'] ?? '',
+      pedidoFinanceiro: map['pedidoFinanceiro'] ?? '',
+      instrucoesEntrega: map['instrucoesEntrega'] ?? '',
+      instrucoesFinanceiras: map['instrucoesFinanceiras'] ?? '',
     );
   }
 
@@ -244,27 +260,32 @@ class PedidoModel {
   factory PedidoModel.fromJson(String source) =>
       PedidoModel.fromMap(json.decode(source));
 
-  PedidoModel copyWith(
-      {String? id,
-      String? localizador,
-      String? descricao,
-      DateTime? createdAt,
-      ClienteModel? cliente,
-      ObraModel? obra,
-      List<PedidoProdutoModel>? produtos,
-      PedidoTipo? tipo,
-      List<PedidoStatusModel>? statusess,
-      DateTime? deliveryAt,
-      List<PedidoStepModel>? steps,
-      List<TagModel>? tags,
-      List<CheckItemModel>? checks,
-      List<CommentModel>? comments,
-      List<UsuarioModel>? users,
-      int? index,
-      List<PedidoHistoryModel>? histories,
-      bool? isArchived,
-      List<ArchiveModel>? archives,
-      String? checklistId}) {
+  PedidoModel copyWith({
+    String? id,
+    String? localizador,
+    String? descricao,
+    DateTime? createdAt,
+    ClienteModel? cliente,
+    ObraModel? obra,
+    List<PedidoProdutoModel>? produtos,
+    PedidoTipo? tipo,
+    List<PedidoStatusModel>? statusess,
+    DateTime? deliveryAt,
+    List<PedidoStepModel>? steps,
+    List<TagModel>? tags,
+    List<CheckItemModel>? checks,
+    List<CommentModel>? comments,
+    List<UsuarioModel>? users,
+    int? index,
+    List<PedidoHistoryModel>? histories,
+    bool? isArchived,
+    List<ArchiveModel>? archives,
+    String? checklistId,
+    String? planilhamento,
+    String? pedidoFinanceiro,
+    String? instrucoesEntrega,
+    String? instrucoesFinanceiras,
+  }) {
     return PedidoModel(
       id: id ?? this.id,
       checklistId: checklistId ?? this.checklistId,
@@ -286,6 +307,11 @@ class PedidoModel {
       histories: histories ?? this.histories,
       isArchived: isArchived ?? this.isArchived,
       archives: archives ?? this.archives,
+      planilhamento: planilhamento ?? this.planilhamento,
+      pedidoFinanceiro: pedidoFinanceiro ?? this.pedidoFinanceiro,
+      instrucoesEntrega: instrucoesEntrega ?? this.instrucoesEntrega,
+      instrucoesFinanceiras:
+          instrucoesFinanceiras ?? this.instrucoesFinanceiras,
     );
   }
 

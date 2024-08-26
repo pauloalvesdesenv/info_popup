@@ -6,6 +6,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/dialogs/confirm_dialog.dart';
+import 'package:aco_plus/app/core/dialogs/loading_dialog.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
@@ -14,6 +15,7 @@ import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/automatizacao/automatizacao_controller.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_produto_status_bottom.dart';
+import 'package:aco_plus/app/modules/ordem/ui/ordem_produtos_status_bottom.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:flutter/material.dart';
@@ -128,9 +130,11 @@ class OrdemController {
 
     final ordemCriada = form.toOrdemModel();
     onValid(ordemCriada);
-    if (!await showConfirmDialog(
-        'Você está criando uma ordem vazia.', 'Deseja Continuar?')) {
-      return;
+    if (ordemCriada.produtos.isEmpty) {
+      if (!await showConfirmDialog(
+          'Você está criando uma ordem vazia.', 'Deseja Continuar?')) {
+        return;
+      }
     }
     for (PedidoProdutoModel produto in ordemCriada.produtos) {
       await FirestoreClient.pedidos
@@ -151,8 +155,7 @@ class OrdemController {
     await FirestoreClient.pedidos.fetch();
     final ordemEditada = form.toOrdemModel();
     onValid(ordemEditada);
-    if (!await showConfirmDialog(
-        'A ordem vazia.', 'Deseja Continuar?')) {
+    if (!await showConfirmDialog('A ordem vazia.', 'Deseja Continuar?')) {
       return;
     }
     for (PedidoProdutoModel produto in ordem.produtos) {
@@ -259,6 +262,22 @@ class OrdemController {
 
   void setOrdem(OrdemModel ordem) {
     ordemStream.add(ordem);
+  }
+
+  void showBottomChangeProdutosStatus(List<PedidoProdutoModel> produtos) async {
+    final status = await showOrdemProdutosStatusBottom();
+    if (status == null) return;
+    if (!await showConfirmDialog('Mover alterar status de todos os produtos?',
+        'Todos os produtos serão alterados para ${status.label}.\nEsta ação pode demorar um pouco.')) {
+      return;
+    }
+    showLoadingDialog();
+    for (final produto
+        in produtos.where((e) => e.status.status != status).toList()) {
+      await onChangeProdutoStatus(produto, status);
+    }
+    Navigator.pop(contextGlobal);
+    onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
   }
 
   void showBottomChangeProdutoStatus(PedidoProdutoModel produto) async {

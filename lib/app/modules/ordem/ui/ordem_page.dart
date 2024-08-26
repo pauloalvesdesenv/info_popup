@@ -110,7 +110,34 @@ class _OrdemPageState extends State<OrdemPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Status', style: AppCss.largeBold),
+          Row(
+            children: [
+              Expanded(child: Text('Status', style: AppCss.largeBold)),
+              if (ordem.produtos.isNotEmpty)
+                InkWell(
+                  onTap: () =>
+                      ordemCtrl.showBottomChangeProdutosStatus(ordem.produtos),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(4)),
+                    child: IntrinsicWidth(
+                      child: Row(
+                        children: [
+                          Text('Mover todos para',
+                              style: AppCss.mediumRegular.setSize(12)),
+                          const W(2),
+                          Icon(Icons.keyboard_arrow_down,
+                              size: 16, color: AppColors.black.withOpacity(0.6))
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+            ],
+          ),
           const H(8),
           if (ordem.pedidos.isEmpty)
             Row(

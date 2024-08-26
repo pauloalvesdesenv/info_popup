@@ -136,6 +136,10 @@ class PedidoCreateModel {
                 type: PedidoHistoryType.step,
                 action: PedidoHistoryAction.create)
           ],
+      instrucoesEntrega: '',
+      instrucoesFinanceiras: '',
+      pedidoFinanceiro: '',
+      planilhamento: '',
     );
   }
 }
