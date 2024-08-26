@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -40,7 +42,6 @@ class PedidoPage extends StatefulWidget {
 
 class _PedidoPageState extends State<PedidoPage>
     with AutomaticKeepAliveClientMixin {
-
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -86,7 +87,7 @@ class _PedidoPageState extends State<PedidoPage>
         focusNode: _focusNode,
         onKeyEvent: (e) {
           if (e is KeyDownEvent && e.logicalKey == LogicalKeyboardKey.exit) {
-                kanbanCtrl.setPedido(null);
+            kanbanCtrl.setPedido(null);
           }
         },
         child: body(pedido),
