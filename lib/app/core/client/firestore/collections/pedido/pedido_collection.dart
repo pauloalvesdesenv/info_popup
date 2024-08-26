@@ -109,7 +109,8 @@ class PedidoCollection {
   Future<void> updateAll(List<PedidoModel> pedidos) async {
     WriteBatch batch = FirebaseFirestore.instance.batch();
     for (var pedido in pedidos) {
-      batch.update(collection.doc(pedido.id), pedido.toMap());
+      var map = pedido.toMap();
+      batch.update(collection.doc(pedido.id), map);
     }
     await batch.commit();
   }

@@ -1,4 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_create_by_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
@@ -20,6 +21,7 @@ import 'package:aco_plus/app/modules/pedido/ui/pedido_step_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
 import 'package:aco_plus/app/modules/relatorio/relatorio_controller.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_pedido_view_model.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -60,7 +62,7 @@ class PedidoController {
     if (search.length < 3) return pedidos;
     List<PedidoModel> filtered = [];
     for (final pedido in pedidos) {
-      if (pedido.localizador.toString().toCompare.contains(search.toCompare)) {
+      if (pedido.filtro.toCompare.contains(search.toCompare)) {
         filtered.add(pedido);
       }
     }
@@ -85,8 +87,10 @@ class PedidoController {
           pedidoStream.update();
         }
       } else {
-        await FirestoreClient.pedidos.add(form.toPedidoModel(pedido));
+        PedidoModel pedidoModel = form.toPedidoModel(pedido);
+        await FirestoreClient.pedidos.add(pedidoModel);
         await FirestoreClient.pedidos.fetch();
+        
       }
       if (isFromOrder) {
         Navigator.pop(_, form.isEdit ? pedido : null);
@@ -194,8 +198,8 @@ class PedidoController {
         break;
       case SortType.alfabetic:
         pedidos.sort((a, b) => isAsc
-            ? a.cliente.nome.compareTo(b.cliente.nome)
-            : b.cliente.nome.compareTo(a.cliente.nome));
+            ? a.localizador.compareTo(b.localizador)
+            : b.localizador.compareTo(a.localizador));
         break;
       case SortType.deliveryAt:
         pedidos.sort((a, b) => isAsc

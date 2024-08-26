@@ -19,6 +19,7 @@ class StepModel {
   bool isShipping = false;
   StepShippingModel? shipping;
   bool isArchivedAvailable = false;
+  bool isPermiteProducao = false;
 
   static StepModel notFound = StepModel(
     createdAt: DateTime.now(),
@@ -32,6 +33,7 @@ class StepModel {
     isShipping: false,
     shipping: null,
     isArchivedAvailable: false,
+    isPermiteProducao: false
   );
 
   List<StepModel> get fromSteps => fromStepsIds
@@ -54,6 +56,7 @@ class StepModel {
     required this.isShipping,
     required this.shipping,
     required this.isArchivedAvailable,
+    required this.isPermiteProducao,
   });
 
   StepModel copyWith({
@@ -68,7 +71,8 @@ class StepModel {
     bool? isDefault,
     bool? isShipping,
     StepShippingModel? shipping,
-    bool? isArchivedAvailable
+    bool? isArchivedAvailable,
+    bool? isPermiteProducao
   }) {
     return StepModel(
       id: id ?? this.id,
@@ -82,6 +86,7 @@ class StepModel {
       isShipping: isShipping ?? this.isShipping,
       shipping: shipping ?? this.shipping,
       isArchivedAvailable: isArchivedAvailable ?? this.isArchivedAvailable,
+      isPermiteProducao: isPermiteProducao ?? this.isPermiteProducao,
     );
   }
 
@@ -98,6 +103,7 @@ class StepModel {
       'isShipping': isShipping,
       'shipping': shipping?.toMap(),
       'isArchivedAvailable': isArchivedAvailable,
+      'isPermiteProducao': isPermiteProducao,
     };
   }
 
@@ -128,6 +134,7 @@ class StepModel {
             ? StepShippingModel.fromMap(map['shipping'])
             : null,
             isArchivedAvailable: false,
+            isPermiteProducao: false,
       );
     }
     return StepModel(
@@ -147,6 +154,7 @@ class StepModel {
           ? StepShippingModel.fromMap(map['shipping'])
           : null,
       isArchivedAvailable: map['isArchivedAvailable'] ?? false,
+      isPermiteProducao: map['isPermiteProducao'] ?? false,
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/checklist/models/
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_create_by_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
@@ -13,6 +14,7 @@ import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_produto_view_model.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -42,6 +44,10 @@ class PedidoCreateModel {
   DateTime? deliveryAt;
   ChecklistModel? checklist;
   StepModel? step;
+  final TextController instrucoesEntrega = TextController();
+  final TextController instrucoesFinanceiras = TextController();
+  final TextController pedidoFinanceiro = TextController();
+  final TextController planilhamento = TextController();
 
   late bool isEdit;
 
@@ -94,6 +100,10 @@ class PedidoCreateModel {
     checklist = pedido.checklistId != null
         ? FirestoreClient.checklists.getById(pedido.checklistId!)
         : null;
+    instrucoesEntrega.text = pedido.instrucoesEntrega;
+    instrucoesFinanceiras.text = pedido.instrucoesFinanceiras;
+    pedidoFinanceiro.text = pedido.pedidoFinanceiro;
+    planilhamento.text = pedido.planilhamento;
   }
 
   PedidoModel toPedidoModel(PedidoModel? pedido) {
@@ -127,19 +137,20 @@ class PedidoCreateModel {
       archives: pedido?.archives ?? [],
       histories: pedido?.histories ??
           [
-            PedidoHistoryModel.create(
-                data: pedidoStatusModel,
-                type: PedidoHistoryType.status,
-                action: PedidoHistoryAction.create),
-            PedidoHistoryModel.create(
-                data: pedidoStepModel,
-                type: PedidoHistoryType.step,
-                action: PedidoHistoryAction.create)
+            PedidoHistoryModel(
+                action: PedidoHistoryAction.create,
+                createdAt: DateTime.now(),
+                id: HashService.get,
+                type: PedidoHistoryType.create,
+                usuario: usuarioCtrl.usuario!,
+                data: PedidoCreateByModel(
+                    name: usuarioCtrl.usuario?.nome ?? 'Nome Indisponível',
+                    date: DateTime.now()))
           ],
-      instrucoesEntrega: '',
-      instrucoesFinanceiras: '',
-      pedidoFinanceiro: '',
-      planilhamento: '',
+      instrucoesEntrega: instrucoesEntrega.text,
+      instrucoesFinanceiras: instrucoesFinanceiras.text,
+      pedidoFinanceiro: pedidoFinanceiro.text,
+      planilhamento: planilhamento.text,
     );
   }
 }

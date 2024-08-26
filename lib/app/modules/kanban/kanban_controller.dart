@@ -146,6 +146,7 @@ class StepController {
       {required PedidoModel pedido}) {
     final key = utils.kanban.keys.firstWhere((e) => e.id == stepId);
     utils.kanban[key]!.insert(index, pedido);
+    pedido.addStep(key);
   }
 
   void _onUpdatePedidosIndex(String stepId, int index) {

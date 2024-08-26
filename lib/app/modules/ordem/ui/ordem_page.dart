@@ -224,17 +224,22 @@ class _OrdemPageState extends State<OrdemPage> {
   ListTile _produtoWidget(PedidoProdutoModel produto) {
     return ListTile(
       title: Text(
-        '${produto.qtde}Kg',
+        produto.pedido.localizador,
         style: AppCss.minimumBold,
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const H(2),
-          Text('${produto.pedido.localizador} - ${produto.cliente.nome}',
+          Text(produto.qtde.toKg(), style: AppCss.minimumRegular.setSize(12)),
+          Text('${produto.cliente.nome} - ${produto.obra.descricao}',
               style: AppCss.minimumRegular.setSize(12)),
-          Text(produto.pedido.descricao,
-              style: AppCss.minimumRegular.setSize(12)),
+          if (produto.pedido.deliveryAt != null)
+            Text(
+              'Previsão de Entrega: ${produto.pedido.deliveryAt.text()}',
+              style: AppCss.minimumRegular
+                  .copyWith(fontSize: 12)
+                  .setColor(AppColors.neutralDark),
+            ),
         ],
       ),
       trailing: InkWell(

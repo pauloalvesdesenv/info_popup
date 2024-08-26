@@ -19,6 +19,7 @@ import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/ordem/ordem_controller.dart';
+import 'package:aco_plus/app/modules/ordem/ui/ordem_create_pedidos_selecionados_bottom.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
@@ -96,8 +97,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                     AppField(
                       onTap: () {
                         setState(() {
-                          form.localizador.controller.selection =
-                          TextSelection(
+                          form.localizador.controller.selection = TextSelection(
                               baseOffset: 0,
                               extentOffset: form
                                   .localizador.controller.value.text.length);
@@ -144,54 +144,98 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                 ),
               ),
               if (form.produto != null)
-                for (PedidoProdutoModel produto in ordemCtrl
-                    .getPedidosPorProduto(form.produto!, ordem: widget.ordem))
-                  _itemProduto(
-                      isEnable: produto.isAvailable,
-                      produto: produto,
-                      check:
-                          form.produtos.map((e) => e.id).contains(produto.id),
-                      onTap: () {
-                        form.produtos.map((e) => e.id).contains(produto.id)
-                            ? form.produtos
-                                .removeWhere((e) => e.id == produto.id)
-                            : form.produtos.add(produto);
-                        ordemCtrl.formStream.update();
-                      })
+                Builder(
+                  builder: (_) {
+                    List<PedidoProdutoModel> produtos =
+                        ordemCtrl.getPedidosPorProduto(form.produto!,
+                            ordem: widget.ordem);
+                    produtos = produtos
+                        .where((produto) => !form.produtos
+                            .map((e) => e.id)
+                            .contains(produto.id))
+                        .toList();
+
+                    return Column(
+                      children: [
+                        for (PedidoProdutoModel produto in produtos)
+                          _itemProduto(
+                              isEnable: produto.isAvailable,
+                              produto: produto,
+                              check: form.produtos
+                                  .map((e) => e.id)
+                                  .contains(produto.id),
+                              onTap: () {
+                                form.produtos
+                                        .map((e) => e.id)
+                                        .contains(produto.id)
+                                    ? form.produtos
+                                        .removeWhere((e) => e.id == produto.id)
+                                    : form.produtos.add(produto);
+                                ordemCtrl.formStream.update();
+                              })
+                      ],
+                    );
+                  },
+                )
             ],
           ),
         ),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-              color: AppColors.white,
-              border: Border(
-                  top: BorderSide(
-                      color: AppColors.black.withOpacity(0.04), width: 1))),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Total: ${[
-                    if (widget.ordem != null) ...widget.ordem!.produtos,
-                    ...form.produtos
-                  ].map((e) => e.qtde).fold(.0, (a, b) => a + b).toKg()}',
-                  style: AppCss.mediumBold.setSize(16),
-                ),
-              ),
-              IconButton(
-                  onPressed: () {
-                    form.produtos.clear();
-                    ordemCtrl.formStream.update();
-                  },
-                  icon: Icon(
-                    Icons.delete_outline,
-                    color: AppColors.white,
-                  ))
-            ],
-          ),
-        )
+        _bottom(form)
       ],
+    );
+  }
+
+  Container _bottom(OrdemCreateModel form) {
+    List<PedidoProdutoModel> produtos = form.produto != null ?
+                        ordemCtrl.getPedidosPorProduto(form.produto!,
+                            ordem: widget.ordem) : <PedidoProdutoModel>[];
+                    produtos = produtos
+                        .where((produto) => form.produtos
+                            .map((e) => e.id)
+                            .contains(produto.id))
+                        .toList();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+          color: AppColors.white,
+          border: Border(
+              top: BorderSide(
+                  color: AppColors.black.withOpacity(0.04), width: 1))),
+      child: Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: () =>
+                  showOrderCreatePedidosSelecionadosBottom(widget.ordem),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Total: ${produtos.map((e) => e.qtde).fold(.0, (a, b) => a + b).toKg()}',
+                    style: AppCss.mediumBold.setSize(16),
+                  ),
+                  if (produtos.isNotEmpty)
+                    Text(
+                      'Pedidos selecionados: ${produtos.length}',
+                      style: AppCss.minimumRegular
+                          .setSize(14)
+                          .copyWith(decoration: TextDecoration.underline),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          IconButton(
+              onPressed: () {
+                form.produtos.clear();
+                ordemCtrl.formStream.update();
+              },
+              icon: Icon(
+                Icons.delete_outline,
+                color: AppColors.white,
+              ))
+        ],
+      ),
     );
   }
 

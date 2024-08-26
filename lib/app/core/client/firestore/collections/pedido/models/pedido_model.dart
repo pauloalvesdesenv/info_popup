@@ -24,7 +24,7 @@ class PedidoModel {
   final String localizador;
   final String descricao;
   final DateTime createdAt;
-  final DateTime? deliveryAt;
+   DateTime? deliveryAt;
   final ClienteModel cliente;
   final ObraModel obra;
   final List<PedidoProdutoModel> produtos;
@@ -45,6 +45,8 @@ class PedidoModel {
   final String pedidoFinanceiro;
   final String instrucoesEntrega;
   final String instrucoesFinanceiras;
+
+  String get filtro => localizador + pedidoFinanceiro;
 
   StepModel get step => steps.last.step;
   PedidoStatus get status => statusess.last.status;

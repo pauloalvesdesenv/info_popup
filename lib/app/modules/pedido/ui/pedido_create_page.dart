@@ -226,7 +226,8 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
                       .toList(),
                   itemLabel: (e) => e?.descricao ?? 'Selecione',
                   onSelect: (e) {
-                    tileController.collapse();
+                    //TODO
+                    // tileController.collapse();
                     form.produto.produtoModel = e;
                     form.produto.qtde.focus.requestFocus();
                     pedidoCtrl.formStream.update();
@@ -314,6 +315,12 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
           },
         ),
         const H(16),
+        AppField(
+          label: 'Planilhamento',
+          controller: form.planilhamento,
+          onChanged: (_) => pedidoCtrl.formStream.update(),
+        ),
+        const H(16),
         AppDropDown<PedidoTipo?>(
           label: 'Tipo',
           item: form.tipo,
@@ -399,17 +406,26 @@ class _PedidoCreatePageState extends State<PedidoCreatePage> {
           item: form.deliveryAt,
           onChanged: (_) {
             form.deliveryAt = _;
-            if (form.deliveryAt != null) {
-              tileController.collapse();
-              Future.delayed(const Duration(milliseconds: 300))
-                  .then((value) => form.produto.produtoEC.focus.requestFocus());
-            }
-            if (form.deliveryAt != null) {
-              Future.delayed(const Duration(milliseconds: 300))
-                  .then((value) => form.produto.produtoEC.focus.requestFocus());
-            }
             pedidoCtrl.formStream.update();
           },
+        ),
+        const H(16),
+        AppField(
+          label: 'Pedido Financeiro',
+          controller: form.pedidoFinanceiro,
+          onChanged: (_) => pedidoCtrl.formStream.update(),
+        ),
+        const H(16),
+        AppField(
+          label: 'Instruções Financeiras',
+          controller: form.instrucoesFinanceiras,
+          onChanged: (_) => pedidoCtrl.formStream.update(),
+        ),
+        const H(16),
+        AppField(
+          label: 'Instruções de Entrega',
+          controller: form.instrucoesEntrega,
+          onChanged: (_) => pedidoCtrl.formStream.update(),
         ),
       ],
     );

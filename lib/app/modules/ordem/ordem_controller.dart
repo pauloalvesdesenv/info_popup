@@ -82,7 +82,7 @@ class OrdemController {
 
   List<PedidoProdutoModel> _getPedidosProdutosSeparados(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
-    for (final pedido in FirestoreClient.pedidos.data.toList()) {
+    for (final pedido in FirestoreClient.pedidos.data.where((e) => FirestoreClient.steps.getById(e.step.id).isPermiteProducao).toList()) {
       final pedidoProdutos = pedido.produtos
           .where((e) =>
               e.status.status == PedidoProdutoStatus.separado &&

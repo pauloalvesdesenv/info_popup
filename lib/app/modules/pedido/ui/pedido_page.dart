@@ -4,6 +4,7 @@ import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_anexos_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_armacao_widget.dart';
@@ -11,6 +12,8 @@ import 'package:aco_plus/app/modules/pedido/ui/components/pedido_checks_widget.d
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_comentarios_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_corte_dobra_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_desc_widget.dart';
+import 'package:aco_plus/app/modules/pedido/ui/components/pedido_entrega_widget.dart';
+import 'package:aco_plus/app/modules/pedido/ui/components/pedido_financ_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_produtos_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_status_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_steps_widget.dart';
@@ -19,6 +22,7 @@ import 'package:aco_plus/app/modules/pedido/ui/components/pedido_timeline_widget
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_top_bar.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_users_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 enum PedidoInitReason { page, kanban }
 
@@ -36,6 +40,9 @@ class PedidoPage extends StatefulWidget {
 
 class _PedidoPageState extends State<PedidoPage>
     with AutomaticKeepAliveClientMixin {
+
+  final FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     pedidoCtrl.onInitPage(widget.pedido);
@@ -75,7 +82,15 @@ class _PedidoPageState extends State<PedidoPage>
   Widget _kanbanReasonWidget(PedidoModel pedido) {
     return Material(
       surfaceTintColor: Colors.transparent,
-      child: body(pedido),
+      child: KeyboardListener(
+        focusNode: _focusNode,
+        onKeyEvent: (e) {
+          if (e is KeyDownEvent && e.logicalKey == LogicalKeyboardKey.exit) {
+                kanbanCtrl.setPedido(null);
+          }
+        },
+        child: body(pedido),
+      ),
     );
   }
 
@@ -119,6 +134,15 @@ class _PedidoPageState extends State<PedidoPage>
               ],
             ],
           ),
+        if (pedido.instrucoesEntrega.isNotEmpty ||
+            pedido.instrucoesFinanceiras.isNotEmpty) ...[
+          PedidoFinancWidget(pedido),
+          const Divisor(),
+        ],
+        if (pedido.instrucoesEntrega.isNotEmpty) ...[
+          PedidoEntregaWidget(pedido),
+          const Divisor(),
+        ],
         PedidoAnexosWidget(pedido),
         const Divisor(),
         PedidoChecksWidget(pedido),

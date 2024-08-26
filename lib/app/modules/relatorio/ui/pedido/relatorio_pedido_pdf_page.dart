@@ -31,6 +31,8 @@ class RelatorioPedidoPdfPage {
           if ([RelatorioPedidoTipo.totais, RelatorioPedidoTipo.totaisPedidos]
               .contains(model.tipo)) ...[
             pw.SizedBox(height: 24),
+            _itemTotalGeral(model),
+            pw.SizedBox(height: 24),
             _itemTotalStatus(model),
             pw.SizedBox(height: 24),
             _itemTotalBitolasStatus(model),
@@ -188,6 +190,33 @@ class RelatorioPedidoPdfPage {
     );
   }
 
+  pw.Widget _itemTotalGeral(RelatorioPedidoModel relatorio) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(16),
+      decoration: pw.BoxDecoration(
+        color: PdfColor.fromInt(Colors.white.value),
+        border: pw.Border.all(
+            color: PdfColor.fromInt(Colors.grey[700]!.value), width: 1),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Builder(builder: (context) {
+            final qtde = relatorioCtrl.getPedidosTotal();
+            return qtde <= 0
+                ? pw.SizedBox()
+                : pw.Column(
+                    children: [
+                      _itemHeaderInfo('Total Geral', qtde.toKg()),
+                      PdfDivisor.build(),
+                    ],
+                  );
+          }),
+        ],
+      ),
+    );
+  }
+
   pw.Widget _itemTotalStatus(RelatorioPedidoModel relatorio) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(16),
@@ -340,6 +369,38 @@ class RelatorioPedidoPdfPage {
                         font: pw.Font.times(),
                         fontSize: 12,
                         fontWeight: pw.FontWeight.normal,
+                        color: PdfColor.fromInt(Colors.grey[800]!.value)),
+                    textAlign: pw.TextAlign.end,
+                  ))
+            ],
+          ),
+        ));
+  }
+
+  pw.Widget _itemHeaderInfo(String label, String value, {PdfColor? color}) {
+    return pw.Container(
+        color: color,
+        child: pw.Padding(
+          padding: const pw.EdgeInsets.symmetric(vertical: 8),
+          child: pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Expanded(
+                child: pw.Text(label,
+                    style: pw.TextStyle(
+                        fontSize: 14,
+                        font: pw.Font.times(),
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromInt(AppColors.black.value))),
+              ),
+              pw.Expanded(
+                  flex: 2,
+                  child: pw.Text(
+                    value,
+                    style: pw.TextStyle(
+                        font: pw.Font.times(),
+                        fontSize: 12,
+                        fontWeight: pw.FontWeight.bold,
                         color: PdfColor.fromInt(Colors.grey[800]!.value)),
                     textAlign: pw.TextAlign.end,
                   ))

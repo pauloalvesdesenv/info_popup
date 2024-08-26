@@ -2,16 +2,18 @@ import 'dart:convert';
 
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_archive_action_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_create_by_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/models/usuario_model.dart';
 import 'package:aco_plus/app/core/components/checklist/check_item_model.dart';
 import 'package:aco_plus/app/core/components/comment/comment_model.dart';
+import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:aco_plus/app/modules/usuario/usuario_controller.dart' as user;
 import 'package:flutter/material.dart';
 
-enum PedidoHistoryType { status, step, comment, check, archive }
+enum PedidoHistoryType { status, step, comment, check, archive, create }
 
 enum PedidoHistoryAction { create, update, delete }
 
@@ -28,6 +30,8 @@ extension PedidoHistoryTypeExtension on PedidoHistoryType {
         return 'Checklist';
       case PedidoHistoryType.archive:
         return 'Arquivo';
+      case PedidoHistoryType.create:
+        return 'Criado';
     }
   }
 }
@@ -86,6 +90,8 @@ class PedidoHistoryModel {
         }
       case PedidoHistoryType.archive:
         return Icons.archive;
+      case PedidoHistoryType.create:
+        return Icons.star;
     }
   }
 
@@ -101,6 +107,8 @@ class PedidoHistoryModel {
         return 'Checklist ${action.verb1}';
       case PedidoHistoryType.archive:
         return 'Arquivo ${action.verb1}';
+      case PedidoHistoryType.create:
+        return 'Criado ${action.verb1}';
     }
   }
 
@@ -123,6 +131,8 @@ class PedidoHistoryModel {
         }
       case PedidoHistoryType.archive:
         return '${usuario.nome} ${action.verb1} o pedido';
+      case PedidoHistoryType.create:
+        return '${usuario.nome} ás ${createdAt.textHour()}';
     }
   }
 
@@ -184,6 +194,8 @@ class PedidoHistoryModel {
         return CheckItemModel.fromMap(data);
       case PedidoHistoryType.archive:
         return PedidoArchiveActionModel.fromMap(data);
+      case PedidoHistoryType.create:
+        return PedidoCreateByModel.fromMap(data);
     }
   }
 }

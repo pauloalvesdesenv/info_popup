@@ -135,6 +135,15 @@ class _StepCreatePageState extends State<StepCreatePage> {
             stepCtrl.formStream.update();
           },
         ),
+        const H(8),
+        AppCheckbox(
+          value: form.isPermiteProducao,
+          label: 'Permite Entrada em Produção',
+          onChanged: (e) {
+            form.isPermiteProducao = !form.isPermiteProducao;
+            stepCtrl.formStream.update();
+          },
+        ),
         const H(24),
         if (form.isEdit)
           TextButton.icon(
