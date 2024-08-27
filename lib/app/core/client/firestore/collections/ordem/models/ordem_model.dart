@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
@@ -17,6 +18,8 @@ class OrdemModel {
   bool selected = true;
   final OrdemFreezedModel freezed;
   int? beltIndex;
+
+  String get localizator => id.contains('_') ? id.split('_').last : id;
 
   List<PedidoModel> get pedidos {
     final pedidosIds =
@@ -94,7 +97,7 @@ class OrdemModel {
   }
 
   PedidoProdutoStatus get status {
-    if(pedidos.isEmpty){
+    if (pedidos.isEmpty) {
       return PedidoProdutoStatus.aguardandoProducao;
     }
     if (qtdePronto() == quantideTotal()) {
@@ -117,7 +120,7 @@ class OrdemModel {
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    var map = {
       'id': id,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'endAt': endAt?.millisecondsSinceEpoch,
@@ -128,16 +131,15 @@ class OrdemModel {
       'freezed': freezed.toMap(),
       'beltIndex': beltIndex,
     };
+    if ((map['idPedidosProdutos'] as List<Map<String, dynamic>>).isEmpty) {
+      log('Por algum motivo a ordem está vazia, se você NÃO estiver criando uma ordem vazia, por favor notifique o momento que este erro ocorreu.');
+      // showInfoDialog(
+      //     'Por algum motivo a ordem está vazia, se você NÃO estiver criando uma ordem vazia, por favor notifique o momento que este erro ocorreu.');
+    }
+    return map;
   }
 
   factory OrdemModel.fromMap(Map<String, dynamic> map) {
-    List<PedidoProdutoModel> list = [];
-    try {
-      list = List<PedidoProdutoModel>.from(
-        map['idPedidosProdutos']?.map((x) => FirestoreClient.pedidos
-            .getProdutoByPedidoId(x['pedidoId'], x['produtoId'])),
-      );
-    } catch (_) {}
     return OrdemModel(
       id: map['id'] ?? '',
       produto: ProdutoModel.fromMap(map['produto']),
@@ -145,7 +147,10 @@ class OrdemModel {
       endAt: map['endAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['endAt'])
           : null,
-      produtos: list,
+      produtos: List<PedidoProdutoModel>.from(
+        map['idPedidosProdutos']?.map((x) => FirestoreClient.pedidos
+            .getProdutoByPedidoId(x['pedidoId'], x['produtoId'])),
+      ),
       freezed: map['freezed'] != null
           ? OrdemFreezedModel.fromMap(map['freezed'])
           : OrdemFreezedModel.static().copyWith(),

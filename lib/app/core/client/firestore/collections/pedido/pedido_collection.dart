@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
@@ -43,7 +41,6 @@ class PedidoCollection {
 
     dataStream.add(pedidos.where((e) => !e.isArchived).toList());
     pedidosArchivedsStream.add(pedidos.where((e) => e.isArchived).toList());
-
   }
 
   bool _isListen = false;
@@ -89,8 +86,19 @@ class PedidoCollection {
 
   PedidoModel getById(String id) => data.singleWhere((e) => e.id == id);
 
-  PedidoProdutoModel getProdutoByPedidoId(String pedidoId, String produtoId) =>
-      getById(pedidoId).produtos.firstWhere((e) => e.id == produtoId);
+  PedidoProdutoModel getProdutoByPedidoId(String pedidoId, String produtoId) {
+    late PedidoModel pedido;
+    try {
+      pedido = getById(pedidoId);
+    } catch (e) {
+      pedido = PedidoModel.empty();
+    }
+    try {
+      return pedido.produtos.firstWhere((e) => e.id == produtoId);
+    } catch (e) {
+      return PedidoProdutoModel.empty(pedido);
+    }
+  }
 
   Future<PedidoModel?> add(PedidoModel model) async {
     await collection.doc(model.id).set(model.toMap());

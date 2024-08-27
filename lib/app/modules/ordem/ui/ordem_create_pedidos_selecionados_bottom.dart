@@ -53,6 +53,28 @@ class _OrderCreatePedidosSelecionadosBottomState
           child: Expanded(
             child: ListView(
               children: [
+                Row(
+                  children: [
+                    const Spacer(),
+                    InkWell(
+                      onTap: () {
+                        for (var produto in produtos) {
+                          form.produtos.map((e) => e.id).contains(produto.id)
+                              ? form.produtos
+                                  .removeWhere((e) => e.id == produto.id)
+                              : form.produtos.add(produto);
+                          ordemCtrl.formStream.update();
+                        }
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        'Remover todos',
+                        style: TextStyle(decoration: TextDecoration.underline),
+                      ),
+                    ),
+                  ],
+                ),
+                const H(16),
                 for (PedidoProdutoModel produto in produtos)
                   _itemProduto(
                       isEnable: produto.isAvailable,
@@ -65,6 +87,7 @@ class _OrderCreatePedidosSelecionadosBottomState
                                 .removeWhere((e) => e.id == produto.id)
                             : form.produtos.add(produto);
                         ordemCtrl.formStream.update();
+                        if(form.produtos.isEmpty) Navigator.pop(context);
                       }),
               ],
             ),

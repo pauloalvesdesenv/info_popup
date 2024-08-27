@@ -5,6 +5,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_m
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/enums/sort_type.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 
 class OrdemUtils {
   bool showFilter = false;
@@ -41,22 +42,26 @@ class OrdemCreateModel {
   late bool isEdit;
 
   OrdemCreateModel()
-      : id = ([...FirestoreClient.ordens.dataStream.value, ...FirestoreClient.ordens.dataConcluidasStream.value].length + 1).toString(),
-        isEdit = false, isCreate = true;
+      : id = '${[
+              ...FirestoreClient.ordens.dataStream.value,
+              ...FirestoreClient.ordens.dataConcluidasStream.value
+            ].length + 1}_${HashService.get}',
+        isEdit = false,
+        isCreate = true;
 
-  OrdemCreateModel.edit(OrdemModel pedido)
-      : id = pedido.id,
+  OrdemCreateModel.edit(OrdemModel ordem)
+      : id = ordem.id,
         isEdit = true {
-          isCreate = false;
-    createdAt = pedido.createdAt;
+    isCreate = false;
+    createdAt = ordem.createdAt;
     produto = FirestoreClient.produtos.data
-        .firstWhere((e) => e.id == pedido.produto.id);
-    produtos = pedido.produtos
+        .firstWhere((e) => e.id == ordem.produto.id);
+    produtos = ordem.produtos
         .map((e) =>
             e.copyWith(isSelected: true, isAvailable: e.isAvailableToChanges))
         .toList();
-    freezed = OrdemFreezedCreateModel.edit(pedido.freezed);
-    beltIndex = pedido.beltIndex;
+    freezed = OrdemFreezedCreateModel.edit(ordem.freezed);
+    beltIndex = ordem.beltIndex;
   }
 
   OrdemModel toOrdemModel() {

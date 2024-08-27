@@ -18,13 +18,14 @@ import 'package:aco_plus/app/core/components/checklist/check_item_model.dart';
 import 'package:aco_plus/app/core/components/comment/comment_model.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:googleapis/cloudsearch/v1.dart';
 
 class PedidoModel {
   final String id;
   final String localizador;
   final String descricao;
   final DateTime createdAt;
-   DateTime? deliveryAt;
+  DateTime? deliveryAt;
   final ClienteModel cliente;
   final ObraModel obra;
   final List<PedidoProdutoModel> produtos;
@@ -45,6 +46,33 @@ class PedidoModel {
   final String pedidoFinanceiro;
   final String instrucoesEntrega;
   final String instrucoesFinanceiras;
+
+  factory PedidoModel.empty() => PedidoModel(
+        id: HashService.get,
+        localizador: 'NOTFOUND${HashService.get}',
+        descricao: '',
+        createdAt: DateTime.now(),
+        deliveryAt: null,
+        cliente: ClienteModel.empty(),
+        obra: ObraModel.empty(),
+        produtos: [],
+        tipo: PedidoTipo.cda,
+        statusess: [],
+        steps: [],
+        tags: [],
+        checks: [],
+        comments: [],
+        users: [],
+        index: 10000000,
+        histories: [],
+        isArchived: false,
+        archives: [],
+        checklistId: '',
+        planilhamento: '',
+        pedidoFinanceiro: '',
+        instrucoesEntrega: '',
+        instrucoesFinanceiras: '',
+      );
 
   String get filtro => localizador + pedidoFinanceiro;
 

@@ -9,12 +9,14 @@ class AppBottom<T> extends StatelessWidget {
   final Widget child;
   final int height;
   final void Function()? onDone;
+  final Widget? titleLeading;
 
   const AppBottom(
       {required this.title,
       required this.child,
       this.height = 400,
       this.onDone,
+      this.titleLeading,
       super.key});
 
   @override
@@ -67,9 +69,15 @@ class AppBottom<T> extends StatelessWidget {
                     const H(8),
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(
-                        title,
-                        style: AppCss.largeBold,
+                      child: Row(
+                        children: [
+                          Text(
+                            title,
+                            style: AppCss.largeBold,
+                          ),
+                          const Spacer(),
+                          if (titleLeading != null) titleLeading!,
+                        ],
                       ),
                     ),
                     const H(16),

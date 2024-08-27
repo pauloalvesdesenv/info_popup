@@ -6,6 +6,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/enums/obra_status.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:collection/collection.dart';
 
 class PedidoProdutoModel {
@@ -19,6 +20,15 @@ class PedidoProdutoModel {
   bool isSelected = true;
   bool isAvailable = true;
 
+  factory PedidoProdutoModel.empty(PedidoModel pedido) => PedidoProdutoModel(
+        id: HashService.get,
+        pedidoId: pedido.id,
+        clienteId: pedido.cliente.id,
+        obraId: pedido.obra.id,
+        produto: ProdutoModel.empty(),
+        statusess: [],
+        qtde: 0,
+      );
   PedidoModel get pedido => FirestoreClient.pedidos.getById(pedidoId);
   bool get isAvailableToChanges => status.status.index < 2;
   bool get hasOrder => statusess.last.status == PedidoProdutoStatus.separado;

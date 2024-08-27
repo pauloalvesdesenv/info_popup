@@ -11,6 +11,14 @@ class HashService {
       return hash;
     }
   }
+  static String get getShort {
+    final hash = _getRandomString(5);
+    if (createds.contains(hash)) {
+      return HashService.get;
+    } else {
+      return hash;
+    }
+  }
 
   static const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
   static final Random _rnd = Random();

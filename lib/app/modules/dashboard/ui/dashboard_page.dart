@@ -401,7 +401,7 @@ class DashboardPageState extends State<DashboardPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            ordem.id,
+                            ordem.localizator,
                             style: AppCss.mediumBold,
                           ),
                           Text(

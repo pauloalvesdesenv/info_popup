@@ -224,7 +224,7 @@ class _OrdensPageState extends State<OrdensPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          ordem.id,
+                          ordem.localizator,
                           style: AppCss.mediumBold,
                         ),
                         Text(

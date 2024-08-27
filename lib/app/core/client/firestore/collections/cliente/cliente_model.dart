@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:aco_plus/app/core/enums/obra_status.dart';
 import 'package:aco_plus/app/core/models/endereco_model.dart';
+import 'package:aco_plus/app/core/services/hash_service.dart';
 
 class ClienteModel {
   final String id;
@@ -18,6 +19,15 @@ class ClienteModel {
     required this.endereco,
     required this.obras,
   });
+
+  factory ClienteModel.empty() => ClienteModel(
+        id: HashService.get,
+        nome: 'name',
+        telefone: 'fone',
+        cpf: 'cpf',
+        endereco: EnderecoModel.empty(),
+        obras: [],
+      );
 
   Map<String, dynamic> toMap() {
     return {
@@ -37,13 +47,15 @@ class ClienteModel {
       telefone: map['telefone'] ?? '',
       cpf: map['cpf'] ?? '',
       endereco: EnderecoModel.fromMap(map['endereco']),
-      obras: List<ObraModel>.from(map['obras']?.map((x) => ObraModel.fromMap(x))),
+      obras:
+          List<ObraModel>.from(map['obras']?.map((x) => ObraModel.fromMap(x))),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory ClienteModel.fromJson(String source) => ClienteModel.fromMap(json.decode(source));
+  factory ClienteModel.fromJson(String source) =>
+      ClienteModel.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -57,6 +69,15 @@ class ObraModel {
   final String telefoneFixo;
   final EnderecoModel? endereco;
   final ObraStatus status;
+
+  factory ObraModel.empty() => ObraModel(
+        id: HashService.get,
+        descricao: 'name',
+        telefoneFixo: 'fone',
+        endereco: null,
+        status: ObraStatus.emAndamento,
+      );
+
   ObraModel({
     required this.id,
     required this.descricao,
@@ -80,14 +101,17 @@ class ObraModel {
       id: map['id'] ?? '',
       descricao: map['descricao'] ?? '',
       telefoneFixo: map['telefoneFixo'] ?? '',
-      endereco: map['endereco'] != null ? EnderecoModel.fromMap(map['endereco']) : null,
+      endereco: map['endereco'] != null
+          ? EnderecoModel.fromMap(map['endereco'])
+          : null,
       status: ObraStatus.values[map['status']],
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory ObraModel.fromJson(String source) => ObraModel.fromMap(json.decode(source));
+  factory ObraModel.fromJson(String source) =>
+      ObraModel.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -96,7 +120,11 @@ class ObraModel {
 }
 
 ObraModel obraDeleteObj = ObraModel(
-    id: 'delete', descricao: '', endereco: null, status: ObraStatus.emAndamento, telefoneFixo: '');
+    id: 'delete',
+    descricao: '',
+    endereco: null,
+    status: ObraStatus.emAndamento,
+    telefoneFixo: '');
 
 class ClienteAdd extends ClienteModel {
   ClienteAdd()

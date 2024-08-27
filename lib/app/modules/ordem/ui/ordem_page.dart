@@ -52,7 +52,7 @@ class _OrdemPageState extends State<OrdemPage> {
                   onPressed: () async => ordemCtrl.onDelete(context, ordem),
                   icon: Icon(Icons.delete, color: AppColors.white))
             ],
-            title: Text('Ordem ${ordem.id}',
+            title: Text('Ordem ${ordem.localizator}',
                 style: AppCss.largeBold.setColor(AppColors.white)),
             backgroundColor: AppColors.primaryMain,
           ),

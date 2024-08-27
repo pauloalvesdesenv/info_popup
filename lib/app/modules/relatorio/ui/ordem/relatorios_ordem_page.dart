@@ -242,7 +242,7 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: Text(ordem.id, style: AppCss.mediumBold)),
+              Expanded(child: Text(ordem.localizator, style: AppCss.mediumBold)),
               Text(
                   DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm")
                       .format(ordem.createdAt),

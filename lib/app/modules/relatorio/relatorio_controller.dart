@@ -316,7 +316,7 @@ class PedidoController {
             .build(imageBytes)));
 
     final name = isOrdemType
-        ? "m2_relatorio_ordem_${ordemViewModel.relatorio!.ordem.id.toLowerCase()}${DateTime.now().toFileName()}.pdf"
+        ? "m2_relatorio_ordem_${ordemViewModel.relatorio!.ordem.localizator.toLowerCase()}${DateTime.now().toFileName()}.pdf"
         : "m2_relatorio_bitola_status_${ordemViewModel.status.map((e) => e.label).join('_').toLowerCase()}${DateTime.now().toFileName()}.pdf";
 
     await downloadPDF(name, '/relatorio/ordem/', await pdf.save());

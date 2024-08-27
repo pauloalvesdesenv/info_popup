@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
@@ -47,7 +49,7 @@ class OrdemController {
     if (search.length < 3) return ordens;
     List<OrdemModel> filtered = [];
     for (final ordem in ordens) {
-      if (ordem.id.toString().toCompare.contains(search.toCompare)) {
+      if (ordem.localizator.toString().toCompare.contains(search.toCompare)) {
         filtered.add(ordem);
       }
     }
@@ -82,7 +84,10 @@ class OrdemController {
 
   List<PedidoProdutoModel> _getPedidosProdutosSeparados(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
-    for (final pedido in FirestoreClient.pedidos.data.where((e) => FirestoreClient.steps.getById(e.step.id).isPermiteProducao).toList()) {
+    for (final pedido in FirestoreClient.pedidos.data
+        .where(
+            (e) => FirestoreClient.steps.getById(e.step.id).isPermiteProducao)
+        .toList()) {
       final pedidoProdutos = pedido.produtos
           .where((e) =>
               e.status.status == PedidoProdutoStatus.separado &&
@@ -155,8 +160,10 @@ class OrdemController {
     await FirestoreClient.pedidos.fetch();
     final ordemEditada = form.toOrdemModel();
     onValid(ordemEditada);
-    if (!await showConfirmDialog('A ordem vazia.', 'Deseja Continuar?')) {
-      return;
+    if (ordemEditada.produtos.isEmpty) {
+      if (!await showConfirmDialog('A ordem vazia.', 'Deseja Continuar?')) {
+        return;
+      }
     }
     for (PedidoProdutoModel produto in ordem.produtos) {
       if (!ordemEditada.produtos.contains(produto)) {
@@ -321,10 +328,10 @@ class OrdemController {
     onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
     Navigator.pop(_);
     if (ordem.freezed.isFreezed) {
-      NotificationService.showPositive('Ordem ${ordem.id} congelada!',
+      NotificationService.showPositive('Ordem ${ordem.localizator} congelada!',
           'Ordem foi removida da esteira de produção');
     } else {
-      NotificationService.showPositive('Ordem ${ordem.id} descongelada!',
+      NotificationService.showPositive('Ordem ${ordem.localizator} descongelada!',
           'Ordem foi adicionada na ultima posição esteira de produção');
     }
   }
@@ -332,6 +339,7 @@ class OrdemController {
   void onReorder(List<OrdemModel> ordensNaoConcluidas) {
     for (var i = 0; i < ordensNaoConcluidas.length; i++) {
       ordensNaoConcluidas[i].beltIndex = i;
+      log('inreorder');
       FirestoreClient.ordens.dataStream.update();
       FirestoreClient.ordens.update(ordensNaoConcluidas[i]);
     }

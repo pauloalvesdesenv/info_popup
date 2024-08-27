@@ -45,7 +45,7 @@ class RelatorioOrdemPdfStatusPage {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Expanded(
-                  child: pw.Text(ordem.id,
+                  child: pw.Text(ordem.localizator,
                       style: pw.TextStyle(
                           fontSize: 14,
                           fontWeight: pw.FontWeight.bold,
