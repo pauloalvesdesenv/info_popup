@@ -41,6 +41,12 @@ class PedidoProdutoStatusModel {
   PedidoProdutoStatus status;
   final DateTime createdAt;
 
+  factory PedidoProdutoStatusModel.empty() => PedidoProdutoStatusModel(
+    createdAt: DateTime.now(),
+    id: HashService.get,
+    status: PedidoProdutoStatus.pronto
+  );
+
   PedidoProdutoStatus getStatusMinified() {
     if (status == PedidoProdutoStatus.separado) {
       return PedidoProdutoStatus.aguardandoProducao;

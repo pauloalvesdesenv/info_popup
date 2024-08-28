@@ -6,6 +6,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/ped
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_status_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 
 class PedidoCollection {
   static final PedidoCollection _instance = PedidoCollection._();
@@ -84,21 +85,12 @@ class PedidoCollection {
     });
   }
 
-  PedidoModel getById(String id) => data.singleWhere((e) => e.id == id);
+  PedidoModel getById(String id) =>
+      data.firstWhereOrNull((e) => e.id == id) ?? PedidoModel.empty();
 
-  PedidoProdutoModel getProdutoByPedidoId(String pedidoId, String produtoId) {
-    late PedidoModel pedido;
-    try {
-      pedido = getById(pedidoId);
-    } catch (e) {
-      pedido = PedidoModel.empty();
-    }
-    try {
-      return pedido.produtos.firstWhere((e) => e.id == produtoId);
-    } catch (e) {
-      return PedidoProdutoModel.empty(pedido);
-    }
-  }
+  PedidoProdutoModel getProdutoByPedidoId(String pedidoId, String produtoId) =>
+      getById(pedidoId).produtos.firstWhereOrNull((e) => e.id == produtoId) ??
+      PedidoProdutoModel.empty(getById(pedidoId));
 
   Future<PedidoModel?> add(PedidoModel model) async {
     await collection.doc(model.id).set(model.toMap());

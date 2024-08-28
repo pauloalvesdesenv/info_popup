@@ -19,7 +19,7 @@ class OrdemModel {
   final OrdemFreezedModel freezed;
   int? beltIndex;
 
-  String get localizator => id.contains('_') ? id.split('_').last : id;
+  String get localizator => id.contains('_') ? id.split('_').first : id;
 
   List<PedidoModel> get pedidos {
     final pedidosIds =
@@ -27,31 +27,47 @@ class OrdemModel {
     return pedidosIds.map((e) => FirestoreClient.pedidos.getById(e)).toList();
   }
 
-  double get qtdeTotal => produtos.fold(
-      0, (previousValue, element) => previousValue + element.qtde);
+  double get qtdeTotal => produtos.isEmpty
+      ? 0
+      : produtos.fold(
+          0, (previousValue, element) => previousValue + element.qtde);
 
   double quantideTotal() {
-    return produtos.fold(
-        0, (previousValue, element) => previousValue + element.qtde);
+    return produtos.isEmpty
+        ? 0
+        : produtos.fold(
+            0, (previousValue, element) => previousValue + element.qtde);
   }
 
   double qtdeAguardando() {
-    return produtos
+    var where = produtos
         .where((e) =>
             e.statusView.status == PedidoProdutoStatus.aguardandoProducao)
-        .fold(0, (previousValue, element) => previousValue + element.qtde);
+        .toList();
+    return where.isEmpty
+        ? 0
+        : where.fold(
+            0, (previousValue, element) => previousValue + element.qtde);
   }
 
   double qtdeProduzindo() {
-    return produtos
+    var where = produtos
         .where((e) => e.statusess.last.status == PedidoProdutoStatus.produzindo)
-        .fold(0, (previousValue, element) => previousValue + element.qtde);
+        .toList();
+    return where.isEmpty
+        ? 0
+        : where.fold(
+            0, (previousValue, element) => previousValue + element.qtde);
   }
 
   double qtdePronto() {
-    return produtos
+    var where = produtos
         .where((e) => e.statusess.last.status == PedidoProdutoStatus.pronto)
-        .fold(0, (previousValue, element) => previousValue + element.qtde);
+        .toList();
+    return where.isEmpty
+        ? 0
+        : where.fold(
+            0, (previousValue, element) => previousValue + element.qtde);
   }
 
   IconData get icon {
@@ -131,11 +147,6 @@ class OrdemModel {
       'freezed': freezed.toMap(),
       'beltIndex': beltIndex,
     };
-    if ((map['idPedidosProdutos'] as List<Map<String, dynamic>>).isEmpty) {
-      log('Por algum motivo a ordem está vazia, se você NÃO estiver criando uma ordem vazia, por favor notifique o momento que este erro ocorreu.');
-      // showInfoDialog(
-      //     'Por algum motivo a ordem está vazia, se você NÃO estiver criando uma ordem vazia, por favor notifique o momento que este erro ocorreu.');
-    }
     return map;
   }
 

@@ -26,7 +26,7 @@ class PedidoProdutoModel {
         clienteId: pedido.cliente.id,
         obraId: pedido.obra.id,
         produto: ProdutoModel.empty(),
-        statusess: [],
+        statusess: [PedidoProdutoStatusModel.empty()],
         qtde: 0,
       );
   PedidoModel get pedido => FirestoreClient.pedidos.getById(pedidoId);
@@ -43,12 +43,12 @@ class PedidoProdutoModel {
           endereco: null,
           status: ObraStatus.emAndamento);
 
-  PedidoProdutoStatusModel get status => statusess.last;
+  PedidoProdutoStatusModel get status => statusess.isNotEmpty ? statusess.last : PedidoProdutoStatusModel.create(PedidoProdutoStatus.pronto);
 
-  PedidoProdutoStatusModel get statusView => statusess.last.copyWith(
-      status: statusess.last.status == PedidoProdutoStatus.separado
+  PedidoProdutoStatusModel get statusView => status.copyWith(
+      status: status.status == PedidoProdutoStatus.separado
           ? PedidoProdutoStatus.aguardandoProducao
-          : statusess.last.status);
+          : status.status);
 
   PedidoProdutoModel({
     required this.id,

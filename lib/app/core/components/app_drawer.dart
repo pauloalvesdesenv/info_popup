@@ -1,5 +1,6 @@
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/usuario_role.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/version/version_collection.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
 import 'package:aco_plus/app/core/enums/app_module.dart';
@@ -130,7 +131,14 @@ class AppDrawer extends StatelessWidget {
                 'Sair',
                 style: TextStyle(color: AppColors.error),
               ),
-            )
+            ),
+            Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 16, bottom: 8),
+              child: Text(
+                  'v${VersionCollection.version.toString().split('').join('.')}',
+                  style: TextStyle(color: Colors.grey[600])),
+            ),
           ],
         ),
       ),
