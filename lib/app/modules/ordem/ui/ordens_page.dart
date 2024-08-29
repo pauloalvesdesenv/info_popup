@@ -93,7 +93,7 @@ class _OrdensPageState extends State<OrdensPage> {
         backgroundColor: AppColors.primaryMain,
       ),
       body: StreamOut<List<OrdemModel>>(
-        stream: FirestoreClient.ordens.dataStream.listen,
+        stream: FirestoreClient.ordens.dataNaoConcluidasStream.listen,
         builder: (_, __) => StreamOut<OrdemUtils>(
           stream: ordemCtrl.utilsStream.listen,
           builder: (_, utils) {

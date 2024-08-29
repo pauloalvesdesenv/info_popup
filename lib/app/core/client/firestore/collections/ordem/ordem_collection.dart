@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
@@ -15,6 +14,10 @@ class OrdemCollection {
 
   AppStream<List<OrdemModel>> dataStream = AppStream<List<OrdemModel>>();
   List<OrdemModel> get data => dataStream.value;
+
+  AppStream<List<OrdemModel>> dataNaoConcluidasStream =
+      AppStream<List<OrdemModel>>();
+  List<OrdemModel> get dataNaoConcluidas => dataStream.value;
   List<OrdemModel> get ordensNaoCongeladas =>
       dataStream.value.where((e) => !e.freezed.isFreezed).toList();
 
@@ -58,7 +61,9 @@ class OrdemCollection {
       return a.beltIndex!.compareTo(b.beltIndex!);
     });
 
-    dataStream.add(ordensNaoConcluidas);
+    dataNaoConcluidasStream.add(ordensNaoConcluidas);
+
+    dataStream.add([...ordensConcluidas, ...ordensNaoConcluidas]);
   }
 
   bool _isListen = false;
@@ -121,10 +126,7 @@ class OrdemCollection {
     });
   }
 
-  OrdemModel getById(String id) {
-    final list = [...FirestoreClient.ordens.dataStream.value, ...FirestoreClient.ordens.dataConcluidasStream.value];
-    return list.firstWhere((e) => e.id == id);
-  }
+  OrdemModel getById(String id) => data.firstWhere((e) => e.id == id);
 
   Future<OrdemModel?> add(OrdemModel model) async {
     await collection.doc(model.id).set(model.toMap());

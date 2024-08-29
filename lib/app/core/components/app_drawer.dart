@@ -55,7 +55,10 @@ class AppDrawer extends StatelessWidget {
                                   fontSize: 10),
                             ),
                             Text(
-                              '1.0.0',
+                              VersionCollection.version
+                                  .toString()
+                                  .split('')
+                                  .join('.'),
                               style: TextStyle(
                                   color: Colors.white.withOpacity(0.8)),
                             ),
@@ -131,13 +134,6 @@ class AppDrawer extends StatelessWidget {
                 'Sair',
                 style: TextStyle(color: AppColors.error),
               ),
-            ),
-            Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 16, bottom: 8),
-              child: Text(
-                  'v${VersionCollection.version.toString().split('').join('.')}',
-                  style: TextStyle(color: Colors.grey[600])),
             ),
           ],
         ),
