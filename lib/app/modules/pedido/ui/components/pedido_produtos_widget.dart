@@ -42,7 +42,7 @@ class PedidoProdutosWidget extends StatelessWidget {
                     decoration: BoxDecoration(
                         color: Colors.grey.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(4)),
-                    child: Text(ordem?.id ?? 'N/A',
+                    child: Text(ordem?.localizator ?? 'N/A',
                         style: AppCss.mediumRegular.copyWith(
                             fontSize: 12,
                             color: Colors.black,

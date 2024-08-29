@@ -122,7 +122,9 @@ class OrdemCollection {
         return a.beltIndex!.compareTo(b.beltIndex!);
       });
 
-      dataStream.add(ordensNaoConcluidas);
+    dataNaoConcluidasStream.add(ordensNaoConcluidas);
+
+    dataStream.add([...ordensConcluidas, ...ordensNaoConcluidas]);
     });
   }
 

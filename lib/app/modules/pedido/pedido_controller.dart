@@ -90,7 +90,7 @@ class PedidoController {
         PedidoModel pedidoModel = form.toPedidoModel(pedido);
         await FirestoreClient.pedidos.add(pedidoModel);
         await FirestoreClient.pedidos.fetch();
-        
+
       }
       if (isFromOrder) {
         Navigator.pop(_, form.isEdit ? pedido : null);
