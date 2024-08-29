@@ -131,6 +131,7 @@ class _PedidoPageState extends State<PedidoPage>
           PedidoEntregaWidget(pedido),
           const Divisor(),
         ],
+        
         if (pedido.instrucoesEntrega.isNotEmpty ||
             pedido.instrucoesFinanceiras.isNotEmpty) ...[
           PedidoFinancWidget(pedido),

@@ -17,7 +17,7 @@ class OrdemCollection {
 
   AppStream<List<OrdemModel>> dataNaoConcluidasStream =
       AppStream<List<OrdemModel>>();
-  List<OrdemModel> get dataNaoConcluidas => dataStream.value;
+  List<OrdemModel> get dataNaoConcluidas => dataNaoConcluidasStream.value;
   List<OrdemModel> get ordensNaoCongeladas =>
       dataStream.value.where((e) => !e.freezed.isFreezed).toList();
 
