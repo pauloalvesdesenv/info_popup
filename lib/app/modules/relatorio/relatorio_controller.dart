@@ -10,8 +10,6 @@ import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:aco_plus/app/core/services/notification_service.dart';
 import 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_mobile.dart';
-import 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_web.dart'
-    if (dart.library.io) 'package:aco_plus/app/core/services/pdf_download_service/pdf_download_service_mobile.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_ordem_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/ordem/relatorio_ordem_pdf_status_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/pedido/relatorio_pedido_pdf_page.dart';
@@ -318,6 +316,21 @@ class PedidoController {
     final name = isOrdemType
         ? "m2_relatorio_ordem_${ordemViewModel.relatorio!.ordem.localizator.toLowerCase()}${DateTime.now().toFileName()}.pdf"
         : "m2_relatorio_bitola_status_${ordemViewModel.status.map((e) => e.label).join('_').toLowerCase()}${DateTime.now().toFileName()}.pdf";
+
+    await downloadPDF(name, '/relatorio/ordem/', await pdf.save());
+  }
+
+  Future<void> onExportRelatorioOrdemUniquePDF(
+      RelatorioOrdemModel relatorio) async {
+    final pdf = pw.Document();
+
+    final img = await rootBundle.load('assets/images/logo.png');
+    final imageBytes = img.buffer.asUint8List();
+
+    pdf.addPage(RelatorioOrdemPdfOrdemPage(relatorio).build(imageBytes));
+
+    final name =
+        "m2_relatorio_ordem_${ordemViewModel.relatorio!.ordem.localizator.toLowerCase()}_${DateTime.now().toFileName()}.pdf";
 
     await downloadPDF(name, '/relatorio/ordem/', await pdf.save());
   }

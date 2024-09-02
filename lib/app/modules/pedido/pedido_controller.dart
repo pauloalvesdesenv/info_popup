@@ -77,7 +77,7 @@ class PedidoController {
       String search, List<PedidoModel> pedidos) {
     pedidos = utilsArquiveds.steps.isEmpty
         ? pedidos
-        : pedidos.where((e) => e.step.id == utils.steps.last.id).toList();
+        : pedidos.where((e) =>  utilsArquiveds.steps.map((e) => e.id).contains(e.step.id)).toList();
     if (search.length < 3) return pedidos;
     List<PedidoModel> filtered = [];
     for (final pedido in pedidos) {

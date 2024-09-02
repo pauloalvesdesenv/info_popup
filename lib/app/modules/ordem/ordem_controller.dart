@@ -20,6 +20,8 @@ import 'package:aco_plus/app/modules/ordem/ui/ordem_produto_status_bottom.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_produtos_status_bottom.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
+import 'package:aco_plus/app/modules/relatorio/relatorio_controller.dart';
+import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_ordem_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -331,7 +333,8 @@ class OrdemController {
       NotificationService.showPositive('Ordem ${ordem.localizator} congelada!',
           'Ordem foi removida da esteira de produção');
     } else {
-      NotificationService.showPositive('Ordem ${ordem.localizator} descongelada!',
+      NotificationService.showPositive(
+          'Ordem ${ordem.localizator} descongelada!',
           'Ordem foi adicionada na ultima posição esteira de produção');
     }
   }
@@ -343,5 +346,16 @@ class OrdemController {
       FirestoreClient.ordens.dataStream.update();
       FirestoreClient.ordens.update(ordensNaoConcluidas[i]);
     }
+  }
+
+  Future<void> onGeneratePDF(OrdemModel ordem) async {
+    final RelatorioOrdemViewModel relatorio = RelatorioOrdemViewModel();
+    relatorio.ordem = ordem;
+    relatorio.type = RelatorioOrdemType.ORDEM;
+    relatorio.relatorio = RelatorioOrdemModel.ordem(ordem);
+
+    relatorioCtrl.ordemViewModelStream.add(relatorio);
+
+    await relatorioCtrl.onExportRelatorioOrdemUniquePDF(RelatorioOrdemModel.ordem(ordem));
   }
 }

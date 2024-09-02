@@ -45,12 +45,15 @@ class _OrdemPageState extends State<OrdemPage> {
           appBar: AppBar(
             actions: [
               IconButton(
+                  onPressed: () async => ordemCtrl.onGeneratePDF(ordem),
+                  icon: Icon(Icons.picture_as_pdf, color: AppColors.white)),
+              IconButton(
                   onPressed: () async =>
                       push(context, OrdemCreatePage(ordem: ordem)),
                   icon: Icon(Icons.edit, color: AppColors.white)),
               IconButton(
                   onPressed: () async => ordemCtrl.onDelete(context, ordem),
-                  icon: Icon(Icons.delete, color: AppColors.white))
+                  icon: Icon(Icons.delete, color: AppColors.white)),
             ],
             title: Text('Ordem ${ordem.localizator}',
                 style: AppCss.largeBold.setColor(AppColors.white)),

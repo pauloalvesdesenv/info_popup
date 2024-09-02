@@ -44,8 +44,8 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
           IconButton(
               onPressed: () {
                 setState(() {
-                  pedidoCtrl.utils.showFilter =
-                      !pedidoCtrl.utils.showFilter;
+                  pedidoCtrl.utilsArquiveds.showFilter =
+                      !pedidoCtrl.utilsArquiveds.showFilter;
                   pedidoCtrl.utilsArquivedsStream.update();
                 });
               },
@@ -79,7 +79,8 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
                           hint: 'Pesquisar',
                           controller: utils.search,
                           suffixIcon: Icons.search,
-                          onChanged: (_) => pedidoCtrl.utilsArquivedsStream.update(),
+                          onChanged: (_) =>
+                              pedidoCtrl.utilsArquivedsStream.update(),
                         ),
                         const H(16),
                         AppDropDownList<StepModel>(
