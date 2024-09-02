@@ -11,7 +11,7 @@ class ProdutoModel {
 
   String get descricaoReplaced => descricao.replaceAll('mm', '').replaceAll('.0', '');
 
-  double get number => double.parse(descricao.substring(0, descricao.length - 2));
+  double get number => double.tryParse(descricao.substring(0, descricao.length - 2)) ?? 0.0;
 
   ProdutoModel({
     required this.id,

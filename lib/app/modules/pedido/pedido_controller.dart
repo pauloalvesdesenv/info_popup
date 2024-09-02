@@ -40,6 +40,10 @@ class PedidoController {
       AppStream<PedidoUtils>.seed(PedidoUtils());
   PedidoUtils get utils => utilsStream.value;
 
+  final AppStream<PedidoArquivedUtils> utilsArquivedsStream =
+      AppStream<PedidoArquivedUtils>.seed(PedidoArquivedUtils());
+  PedidoArquivedUtils get utilsArquiveds => utilsArquivedsStream.value;
+
   void onInit() {
     utilsStream.add(PedidoUtils());
     FirestoreClient.pedidos.fetch();
@@ -57,6 +61,21 @@ class PedidoController {
   List<PedidoModel> getPedidosFiltered(
       String search, List<PedidoModel> pedidos) {
     pedidos = utils.steps.isEmpty
+        ? pedidos
+        : pedidos.where((e) => e.step.id == utils.steps.last.id).toList();
+    if (search.length < 3) return pedidos;
+    List<PedidoModel> filtered = [];
+    for (final pedido in pedidos) {
+      if (pedido.filtro.toCompare.contains(search.toCompare)) {
+        filtered.add(pedido);
+      }
+    }
+    return filtered;
+  }
+
+  List<PedidoModel> getPedidosArchivedsFiltered(
+      String search, List<PedidoModel> pedidos) {
+    pedidos = utilsArquiveds.steps.isEmpty
         ? pedidos
         : pedidos.where((e) => e.step.id == utils.steps.last.id).toList();
     if (search.length < 3) return pedidos;

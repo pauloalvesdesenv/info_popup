@@ -44,9 +44,9 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
           IconButton(
               onPressed: () {
                 setState(() {
-                  pedidoCtrl.utils.showFilterArchived =
-                      !pedidoCtrl.utils.showFilterArchived;
-                  pedidoCtrl.utilsStream.update();
+                  pedidoCtrl.utils.showFilter =
+                      !pedidoCtrl.utils.showFilter;
+                  pedidoCtrl.utilsArquivedsStream.update();
                 });
               },
               icon: Icon(
@@ -58,12 +58,19 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
       ),
       body: StreamOut<List<PedidoModel>>(
         stream: FirestoreClient.pedidos.pedidosArchivedsStream.listen,
-        builder: (_, pedidos) => StreamOut<PedidoUtils>(
-          stream: pedidoCtrl.utilsStream.listen,
+        builder: (_, pedidos) => StreamOut<PedidoArquivedUtils>(
+          stream: pedidoCtrl.utilsArquivedsStream.listen,
           builder: (_, utils) {
+            pedidos = pedidoCtrl
+                .getPedidosArchivedsFiltered(
+                    utils.search.text,
+                    FirestoreClient.pedidos.data
+                        .map((e) => e.copyWith())
+                        .toList())
+                .toList();
             return Column(
               children: [
-                if (utils.showFilterArchived)
+                if (utils.showFilter)
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -72,7 +79,7 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
                           hint: 'Pesquisar',
                           controller: utils.search,
                           suffixIcon: Icons.search,
-                          onChanged: (_) => pedidoCtrl.utilsStream.update(),
+                          onChanged: (_) => pedidoCtrl.utilsArquivedsStream.update(),
                         ),
                         const H(16),
                         AppDropDownList<StepModel>(
@@ -82,7 +89,7 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
                           addeds: utils.steps,
                           itemLabel: (e) => e.name,
                           onChanged: () {
-                            pedidoCtrl.utilsStream.update();
+                            pedidoCtrl.utilsArquivedsStream.update();
                           },
                         ),
                         const H(16),
@@ -102,7 +109,7 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
                                 itemLabel: (e) => e.name,
                                 onSelect: (e) {
                                   utils.sortType = e ?? SortType.localizator;
-                                  pedidoCtrl.utilsStream.update();
+                                  pedidoCtrl.utilsArquivedsStream.update();
                                 },
                               ),
                             ),
@@ -116,7 +123,7 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
                                 itemLabel: (e) => e.name,
                                 onSelect: (e) {
                                   utils.sortOrder = e ?? SortOrder.asc;
-                                  pedidoCtrl.utilsStream.update();
+                                  pedidoCtrl.utilsArquivedsStream.update();
                                 },
                               ),
                             ),

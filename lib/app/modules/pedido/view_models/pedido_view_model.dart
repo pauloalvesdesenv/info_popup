@@ -20,12 +20,18 @@ import 'package:flutter/material.dart';
 
 class PedidoUtils {
   final TextController search = TextController();
-  final TextController searchArchived = TextController();
   SortType sortType = SortType.localizator;
   SortOrder sortOrder = SortOrder.asc;
   List<StepModel> steps = [];
   bool showFilter = false;
-  bool showFilterArchived = false;
+}
+
+class PedidoArquivedUtils {
+  final TextController search = TextController();
+  SortType sortType = SortType.localizator;
+  SortOrder sortOrder = SortOrder.asc;
+  List<StepModel> steps = [];
+  bool showFilter = false;
 }
 
 class PedidoCreateModel {
