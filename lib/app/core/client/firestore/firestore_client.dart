@@ -1,6 +1,7 @@
 import 'package:aco_plus/app/core/client/firestore/collections/automatizacao/automatizacao_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/checklist/checklist_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_collection.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/fabricante/fabricante_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/ordem_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/pedido_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_collection.dart';
@@ -16,6 +17,7 @@ class FirestoreClient {
   static StepCollection steps = StepCollection();
   static TagCollection tags = TagCollection();
   static ChecklistCollection checklists = ChecklistCollection();
+  static FabricanteCollection fabricantes = FabricanteCollection();
   static ProdutoCollection produtos = ProdutoCollection();
   static PedidoCollection pedidos = PedidoCollection();
   static OrdemCollection ordens = OrdemCollection();
@@ -25,6 +27,7 @@ class FirestoreClient {
     await version.start();
     await usuarios.start();
     await steps.start();
+    await fabricantes.start();
     await produtos.start();
     await tags.start();
     await checklists.start();
@@ -36,6 +39,7 @@ class FirestoreClient {
     await version.listen();
     await usuarios.listen();
     await steps.listen();
+    await fabricantes.listen();
     await produtos.listen();
     await tags.listen();
     await checklists.listen();

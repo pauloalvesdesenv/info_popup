@@ -63,7 +63,7 @@ class _KanbanTopbarConcreteWidgetState
               kanbanCtrl.utilsStream.update();
             },
             onAreaPressed: (e) {},
-            enableHighlight: false,
+            dismissTriggerBehavior: PopupDismissTriggerBehavior.manuel,
             customContent: () => KanbanFilterWidget(utils),
             contentOffset: const Offset(-10, 0),
             infoPopupDismissed: () {},

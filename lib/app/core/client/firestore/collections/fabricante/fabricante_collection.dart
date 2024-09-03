@@ -1,19 +1,19 @@
-import 'package:aco_plus/app/core/client/firestore/collections/version/models/version_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/fabricante/fabricante_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
-import 'package:aco_plus/app/modules/version/ui/version_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 
-class VersionCollection {
-  static int version = 415;
-  static final VersionCollection _instance = VersionCollection._();
+class FabricanteCollection {
+  static final FabricanteCollection _instance = FabricanteCollection._();
 
-  VersionCollection._();
+  FabricanteCollection._();
 
-  factory VersionCollection() => _instance;
-  String name = 'version';
+  factory FabricanteCollection() => _instance;
+  String name = 'fabricantes';
 
-  AppStream<VersionModel> dataStream = AppStream<VersionModel>();
-  VersionModel get data => dataStream.value;
+  AppStream<List<FabricanteModel>> dataStream =
+      AppStream<List<FabricanteModel>>();
+  List<FabricanteModel> get data => dataStream.value;
 
   CollectionReference<Map<String, dynamic>> get collection =>
       FirebaseFirestore.instance.collection(name);
@@ -29,8 +29,10 @@ class VersionCollection {
     if (_isStarted && lock) return;
     _isStarted = true;
     final data = await FirebaseFirestore.instance.collection(name).get();
-    final version = VersionModel.fromMap(data.docs.first.data());
-    dataStream.add(version);
+    final countries =
+        data.docs.map((e) => FabricanteModel.fromMap(e.data())).toList();
+    countries.sort((a, b) => a.nome.compareTo(b.nome));
+    dataStream.add(countries);
   }
 
   bool _isListen = false;
@@ -67,16 +69,28 @@ class VersionCollection {
               )
             : collection)
         .snapshots()
-        .listen((e)  async {
-      final version = VersionModel.fromMap(e.docs.first.data());
-      dataStream.add(version);
-      _checkVersion(version);
+        .listen((e) {
+      final countries =
+          e.docs.map((e) => FabricanteModel.fromMap(e.data())).toList();
+      countries.sort((a, b) => a.nome.compareTo(b.nome));
+      dataStream.add(countries);
     });
   }
 
-  Future<void> _checkVersion(VersionModel version)  async {
-    if (version.number > VersionCollection.version) {
-      await showVersionDialog(version);
-    }
+  FabricanteModel getById(String id) =>
+      data.firstWhereOrNull((e) => e.id == id) ?? FabricanteModel.empty();
+
+  Future<FabricanteModel?> add(FabricanteModel model) async {
+    await collection.doc(model.id).set(model.toMap());
+    return model;
+  }
+
+  Future<FabricanteModel?> update(FabricanteModel model) async {
+    await collection.doc(model.id).update(model.toMap());
+    return model;
+  }
+
+  Future<void> delete(FabricanteModel model) async {
+    await collection.doc(model.id).delete();
   }
 }

@@ -1,8 +1,10 @@
 import 'package:aco_plus/app/modules/cliente/ui/clientes_page.dart';
 import 'package:aco_plus/app/modules/dashboard/ui/dashboard_page.dart';
+import 'package:aco_plus/app/modules/fabricante/ui/fabricantes_page.dart';
 import 'package:aco_plus/app/modules/kanban/ui/kanban_page.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordens_page.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedidos_page.dart';
+import 'package:aco_plus/app/modules/produto/ui/produtos_page.dart';
 import 'package:aco_plus/app/modules/relatorio/ui/relatorios_page.dart';
 import 'package:aco_plus/app/modules/step/ui/steps_page.dart';
 import 'package:aco_plus/app/modules/tag/ui/tags_page.dart';
@@ -17,6 +19,8 @@ enum AppModule {
   cliente,
   steps,
   tags,
+  fabricantes,
+  produtos,
 }
 
 extension AppModuleExt on AppModule {
@@ -38,6 +42,10 @@ extension AppModuleExt on AppModule {
         return const TagsPage();
       case AppModule.kanban:
         return const KanbanPage();
+      case AppModule.fabricantes:
+        return const FabricantesPage();
+      case AppModule.produtos:
+        return const ProdutosPage();
     }
   }
 
@@ -59,6 +67,10 @@ extension AppModuleExt on AppModule {
         return Icons.label_outlined;
       case AppModule.kanban:
         return Icons.view_agenda_outlined;
+      case AppModule.fabricantes:
+        return Icons.business_outlined;
+      case AppModule.produtos:
+        return Icons.inventory_2_outlined;
     }
   }
 
@@ -80,6 +92,10 @@ extension AppModuleExt on AppModule {
         return 'Kanban';
       case AppModule.tags:
         return 'Etiquetas';
+      case AppModule.fabricantes:
+        return 'Fabricantes';
+      case AppModule.produtos:
+        return 'Produtos';
     }
   }
 }

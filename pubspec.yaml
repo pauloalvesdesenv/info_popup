@@ -57,7 +57,10 @@ dependencies:
   go_router: ^14.2.0
   share_plus: ^9.0.0
   printing: ^5.13.1
-  info_popup: ^4.3.1
+  # info_popup: ^4.3.1
+  info_popup:
+    path: packages/info_popup
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter
