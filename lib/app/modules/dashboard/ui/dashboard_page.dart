@@ -331,7 +331,7 @@ class DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _ordemProducaoWidget() => StreamOut<List<OrdemModel>>(
-        stream: FirestoreClient.ordens.dataStream.listen,
+        stream: FirestoreClient.ordens.dataNaoConcluidasStream.listen,
         builder: (_, ordens) {
           ordens.removeWhere((element) => element.freezed.isFreezed);
           return Row(

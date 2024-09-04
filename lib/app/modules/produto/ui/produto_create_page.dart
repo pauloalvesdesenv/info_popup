@@ -94,6 +94,13 @@ class _ProdutoCreatePageState extends State<ProdutoCreatePage> {
           onChanged: (_) => produtoCtrl.formStream.update(),
         ),
         const H(16),
+        AppField(
+          label: 'Massa Final',
+          controller: form.massaFinal,
+          onChanged: (_) => produtoCtrl.formStream.update(),
+          suffixText: 'Kg',
+        ),
+        const H(16),
         if (form.isEdit)
           TextButton.icon(
               style: ButtonStyle(

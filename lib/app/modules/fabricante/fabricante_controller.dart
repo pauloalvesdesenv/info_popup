@@ -87,9 +87,8 @@ class FabricanteController {
           deleteMessage: 'Todos seus dados serão apagados do sistema',
           infoMessage:
               'Não é possível exlcuir o fabricante, pois ele está vinculado a um produto.',
-          conditional: false
-          // conditional: FirestoreClient.produtos.data
-          //     .any((e) => e.fabricante.id == fabricante.id),
+          conditional: FirestoreClient.produtos.data
+              .any((e) => e.fabricante.id == fabricante.id),
           );
 
   void onValid(FabricanteModel? fabricante) {

@@ -14,6 +14,10 @@ class TextController<T> {
     }
   }
 
+  TextController.number({double? value, this.object}) {
+    controller = MoneyMaskedTextController(initialValue: value ?? 0, precision: 2);
+  }
+
   TextController.ddMMyyyy({String? text, this.object}) {
     controller = MaskedTextController(text: text, mask: '00/00/0000');
   }

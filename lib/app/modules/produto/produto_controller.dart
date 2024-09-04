@@ -86,8 +86,8 @@ class ProdutoController {
           deleteTitle: 'Deseja excluir o produto?',
           deleteMessage: 'Todos seus dados serão apagados do sistema',
           infoMessage:
-              'Não é possível exlcuir o produto, pois ele está vinculado a um produto.',
-          conditional: false
+              'Não é possível excluir o produto, pois ele está vinculado a outras partes do sistema.',
+          conditional: true
           // conditional: FirestoreClient.produtos.data
           //     .any((e) => e.produto.id == produto.id),
           );

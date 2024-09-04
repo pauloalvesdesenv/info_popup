@@ -18,6 +18,7 @@ import 'package:aco_plus/app/modules/ordem/ordem_controller.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_page.dart';
 import 'package:aco_plus/app/modules/ordem/view_models/ordem_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class OrdensConcluidasPage extends StatefulWidget {
   const OrdensConcluidasPage({super.key});
@@ -72,6 +73,7 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
                   .where((e) => e.produto.id == utilsConcluidas.produto!.id)
                   .toList();
             }
+            ordens.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
             return RefreshIndicator(
               onRefresh: () async => FirestoreClient.ordens.fetch(),
@@ -160,14 +162,27 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
                 ),
               ),
               const W(8),
-              _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
-                  ordem.getPrcntgAguardando(), ordem.freezed.isFreezed),
-              const W(16),
-              _progressChartWidget(PedidoProdutoStatus.produzindo,
-                  ordem.getPrcntgProduzindo(), ordem.freezed.isFreezed),
-              const W(16),
-              _progressChartWidget(PedidoProdutoStatus.pronto,
-                  ordem.getPrcntgPronto(), ordem.freezed.isFreezed),
+              if (ordem.produtos.isNotEmpty)
+                Row(
+                  children: [
+                    _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
+                        ordem.getPrcntgAguardando(), ordem.freezed.isFreezed),
+                    const W(16),
+                    _progressChartWidget(PedidoProdutoStatus.produzindo,
+                        ordem.getPrcntgProduzindo(), ordem.freezed.isFreezed),
+                    const W(16),
+                    _progressChartWidget(PedidoProdutoStatus.pronto,
+                        ordem.getPrcntgPronto(), ordem.freezed.isFreezed),
+                  ],
+                ),
+              if (ordem.produtos.isEmpty)
+                const Row(
+                  children: [
+                    Text('Ordem Vazia'),
+                    W(8),
+                    Icon(Symbols.brightness_empty),
+                  ],
+                ),
               const W(16),
               Icon(
                 Icons.arrow_forward_ios,
