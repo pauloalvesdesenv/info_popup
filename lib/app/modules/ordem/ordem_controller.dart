@@ -178,6 +178,7 @@ class OrdemController {
       await FirestoreClient.pedidos
           .updateProdutoStatus(produto, produto.statusess.last.status);
     }
+    //TODO
     ordemEditada.produtos.removeWhere((e) => e.status.status.index == 0);
     await FirestoreClient.ordens.update(ordemEditada);
     await FirestoreClient.pedidos.fetch();

@@ -18,7 +18,6 @@ import 'package:aco_plus/app/core/components/checklist/check_item_model.dart';
 import 'package:aco_plus/app/core/components/comment/comment_model.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
 import 'package:flutter/foundation.dart';
-import 'package:googleapis/cloudsearch/v1.dart';
 
 class PedidoModel {
   final String id;

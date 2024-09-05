@@ -205,6 +205,8 @@ class PedidoController {
           .where((e) => _whereProductStatus(e, ordemViewModel.status))
           .toList();
     }
+
+    //TODO
     ordens.removeWhere((e) => e.produtos.isEmpty);
     if (ordemViewModel.dates != null) {
       ordens = ordens

@@ -56,6 +56,7 @@ class OrdemCreateModel {
     createdAt = ordem.createdAt;
     produto = FirestoreClient.produtos.data
         .firstWhere((e) => e.id == ordem.produto.id);
+        //TODO
     produtos = ordem.produtos
         .map((e) =>
             e.copyWith(isSelected: true, isAvailable: e.isAvailableToChanges))

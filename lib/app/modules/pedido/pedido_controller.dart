@@ -1,5 +1,4 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
-import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_create_by_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_history_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
@@ -21,7 +20,6 @@ import 'package:aco_plus/app/modules/pedido/ui/pedido_step_bottom.dart';
 import 'package:aco_plus/app/modules/pedido/view_models/pedido_view_model.dart';
 import 'package:aco_plus/app/modules/relatorio/relatorio_controller.dart';
 import 'package:aco_plus/app/modules/relatorio/view_models/relatorio_pedido_view_model.dart';
-import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -77,7 +75,10 @@ class PedidoController {
       String search, List<PedidoModel> pedidos) {
     pedidos = utilsArquiveds.steps.isEmpty
         ? pedidos
-        : pedidos.where((e) =>  utilsArquiveds.steps.map((e) => e.id).contains(e.step.id)).toList();
+        : pedidos
+            .where((e) =>
+                utilsArquiveds.steps.map((e) => e.id).contains(e.step.id))
+            .toList();
     if (search.length < 3) return pedidos;
     List<PedidoModel> filtered = [];
     for (final pedido in pedidos) {
@@ -109,7 +110,6 @@ class PedidoController {
         PedidoModel pedidoModel = form.toPedidoModel(pedido);
         await FirestoreClient.pedidos.add(pedidoModel);
         await FirestoreClient.pedidos.fetch();
-
       }
       if (isFromOrder) {
         Navigator.pop(_, form.isEdit ? pedido : null);
@@ -316,9 +316,13 @@ class PedidoController {
   Future<void> onGeneratePDF(PedidoModel pedido) async {
     final RelatorioPedidoViewModel relatorio = RelatorioPedidoViewModel();
     relatorio.cliente = FirestoreClient.clientes.getById(pedido.cliente.id);
-    relatorio.produtos = pedido.produtos.map((e) => e.produto).toList();
-    relatorio.status =
-        pedido.produtos.map((e) => e.status.status).toSet().toList();
+    relatorio.produtos =
+        pedido.produtos.map((e) => e.copyWith()).map((e) => e.produto).toList();
+    relatorio.status = pedido.produtos
+        .map((e) => e.copyWith())
+        .map((e) => e.status.status)
+        .toSet()
+        .toList();
 
     relatorio.tipo = RelatorioPedidoTipo.pedidos;
 
