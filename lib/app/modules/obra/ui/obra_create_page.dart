@@ -124,7 +124,8 @@ class _ObraCreatePageState extends State<ObraCreatePage> {
                         'Todos os dados da obra serão apagados do sistema',
                     infoMessage:
                         'Não é possível excluir obra, pois há pedidos vinculados a ela',
-                    conditional: FirestoreClient.pedidos.data
+                    conditional: FirestoreClient
+                        .pedidos.data
                         .any((e) => e.obra.id == widget.obra!.id))) return;
                 Navigator.pop(context, obraDeleteObj);
               },

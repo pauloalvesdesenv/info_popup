@@ -48,7 +48,7 @@ class ProdutoModel {
       id: map['id'] ?? '',
       nome: map['nome'] ?? '',
       descricao: map['descricao'] ?? '',
-      massaFinal: map['massaFinal'] ?? 0.0,
+      massaFinal: double.tryParse(map['massaFinal'].toString()) ?? 0.0,
       fabricante: map['fabricante'] != null
           ? FabricanteModel.fromMap(map['fabricante'])
           : FabricanteModel.empty(),

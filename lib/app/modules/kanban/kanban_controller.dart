@@ -45,8 +45,7 @@ class StepController {
   }
 
   Map<StepModel, List<PedidoModel>> mountKanban() {
-    final pedidos =
-        FirestoreClient.pedidos.data.where((e) => !e.isArchived).toList();
+    final pedidos = FirestoreClient.pedidos.pepidosUnarchiveds.toList();
     final kanban = <StepModel, List<PedidoModel>>{};
     for (StepModel step in FirestoreClient.steps.data.toList()) {
       final pedidosStep = pedidos.where((e) => e.step.id == step.id).toList();
@@ -64,13 +63,13 @@ class StepController {
 
   Map<String, List<PedidoModel>> _mountCalendar() {
     final calendar = <String, List<PedidoModel>>{};
-    final keys = FirestoreClient.pedidos.data
-        .where((e) => e.deliveryAt != null && !e.isArchived)
+    final keys = FirestoreClient.pedidos.pepidosUnarchiveds
+        .where((e) => e.deliveryAt != null)
         .map((e) => e.deliveryAt!)
         .toSet();
     for (DateTime key in keys) {
       calendar[DateFormat('dd/MM/yyyy').format(key)] = FirestoreClient
-          .pedidos.data
+          .pedidos.pepidosUnarchiveds
           .where((e) => e.deliveryAt == key)
           .toList();
     }
@@ -125,7 +124,7 @@ class StepController {
       action: PedidoHistoryAction.update,
     );
     pedido.addStep(step);
-    FirestoreClient.pedidos.dataStream.update();
+    FirestoreClient.pedidos.pedidosUnarchivedsStream.update();
     FirestoreClient.pedidos.update(pedido);
   }
 

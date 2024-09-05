@@ -27,7 +27,8 @@ class _GrapOrdemhTotalWidgetState extends State<ProdutoProduzidoWidget> {
   @override
   void initState() {
     data = produtoProduzidoCtrl.getSource();
-    pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
+    pedidoStream =
+        FirestoreClient.pedidos.pedidosUnarchivedsStream.listen.listen((e) {
       setState(() {
         data = produtoProduzidoCtrl.getSource();
       });
@@ -35,13 +36,11 @@ class _GrapOrdemhTotalWidgetState extends State<ProdutoProduzidoWidget> {
     super.initState();
   }
 
-
   @override
   void dispose() {
     pedidoStream.cancel();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {

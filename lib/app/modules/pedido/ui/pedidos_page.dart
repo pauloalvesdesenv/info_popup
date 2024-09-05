@@ -82,7 +82,7 @@ class _PedidosPageState extends State<PedidosPage> {
         backgroundColor: AppColors.primaryMain,
       ),
       body: StreamOut<List<PedidoModel>>(
-        stream: FirestoreClient.pedidos.dataStream.listen,
+        stream: FirestoreClient.pedidos.pedidosUnarchivedsStream.listen,
         builder: (_, pedidos) => StreamOut<PedidoUtils>(
           stream: pedidoCtrl.utilsStream.listen,
           builder: (_, utils) {
@@ -90,7 +90,7 @@ class _PedidosPageState extends State<PedidosPage> {
             pedidos = pedidoCtrl
                 .getPedidosFiltered(
                     utils.search.text,
-                    FirestoreClient.pedidos.data
+                    FirestoreClient.pedidos.pepidosUnarchiveds
                         .map((e) => e.copyWith())
                         .toList())
                 .toList();

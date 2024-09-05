@@ -32,7 +32,8 @@ class PedidoController {
   RelatorioPedidoViewModel get pedidoViewModel => pedidoViewModelStream.value;
 
   void onCreateRelatorioPedido() {
-    List<PedidoModel> pedidos = FirestoreClient.pedidos.data
+    List<PedidoModel> pedidos = FirestoreClient
+        .pedidos.data
         .map((e) =>
             e.copyWith(produtos: e.produtos.map((e) => e.copyWith()).toList()))
         .toList();

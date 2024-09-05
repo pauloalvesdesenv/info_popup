@@ -64,7 +64,7 @@ class _PedidoArchivedsPageState extends State<PedidosArchivedsPage> {
             pedidos = pedidoCtrl
                 .getPedidosArchivedsFiltered(
                     utils.search.text,
-                    FirestoreClient.pedidos.data
+                    FirestoreClient.pedidos.pedidosArchiveds
                         .map((e) => e.copyWith())
                         .toList())
                 .toList();

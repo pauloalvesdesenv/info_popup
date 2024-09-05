@@ -28,7 +28,8 @@ class _GrapOrdemhTotalWidgetState extends State<GraphOrdemTotalWidget> {
   void initState() {
     graphOrdemTotalCtrl.filterStream.add(GraphOrdemTotalModel());
     data = graphOrdemTotalCtrl.getCirucularChart(graphOrdemTotalCtrl.filter);
-    pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
+    pedidoStream =
+        FirestoreClient.pedidos.pedidosUnarchivedsStream.listen.listen((e) {
       setState(() {
         data =
             graphOrdemTotalCtrl.getCirucularChart(graphOrdemTotalCtrl.filter);

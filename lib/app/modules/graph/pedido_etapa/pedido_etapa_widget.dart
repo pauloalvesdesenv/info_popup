@@ -28,7 +28,8 @@ class _GrapOrdemhTotalWidgetState extends State<PedidoEtapaWidget> {
   void initState() {
     pedidoEtapaCtrl.filterStream.add(PedidoEtapaGraphModel());
     data = pedidoEtapaCtrl.getCartesianChart(pedidoEtapaCtrl.filter);
-    pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
+    pedidoStream =
+        FirestoreClient.pedidos.pedidosUnarchivedsStream.listen.listen((e) {
       setState(() {
         data = pedidoEtapaCtrl.getCartesianChart(pedidoEtapaCtrl.filter);
       });

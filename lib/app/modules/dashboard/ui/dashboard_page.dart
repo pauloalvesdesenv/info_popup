@@ -51,7 +51,7 @@ class DashboardPageState extends State<DashboardPage> {
 
   Widget body() {
     return StreamOut(
-      stream: FirestoreClient.pedidos.dataStream.listen,
+      stream: FirestoreClient.pedidos.pedidosUnarchivedsStream.listen,
       builder: (_, pedidos) => StreamOut(
         stream: FirestoreClient.ordens.dataStream.listen,
         builder: (_, __) => StreamOut(

@@ -26,7 +26,7 @@ class ClienteController {
       AppStream<ClienteUtils>.seed(ClienteUtils());
   ClienteUtils get utils => utilsStream.value;
 
-    void onInit() {
+  void onInit() {
     utilsStream.add(ClienteUtils());
     FirestoreClient.clientes.fetch();
   }
@@ -92,8 +92,8 @@ class ClienteController {
         deleteMessage: 'Todos seus dados serão apagados do sistema',
         infoMessage:
             'Não é possível exlcuir o cliente, pois ele está vinculado a um pedido.',
-        conditional:
-            FirestoreClient.pedidos.data.any((e) => e.cliente.id == cliente.id),
+        conditional: FirestoreClient.pedidos.data
+            .any((e) => e.cliente.id == cliente.id),
       );
 
   void onValid(ClienteModel? cliente) {
@@ -122,6 +122,5 @@ class ClienteController {
     if (form.nome.text.length < 2) {
       throw Exception('Nome deve conter no mínimo 3 caracteres');
     }
-
   }
 }

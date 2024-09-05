@@ -19,9 +19,13 @@ class PedidoCollection {
   AppStream<List<PedidoModel>> dataStream = AppStream<List<PedidoModel>>();
   List<PedidoModel> get data => dataStream.value;
 
+  AppStream<List<PedidoModel>> pedidosUnarchivedsStream =
+      AppStream<List<PedidoModel>>();
+  List<PedidoModel> get pepidosUnarchiveds => pedidosUnarchivedsStream.value;
+
   AppStream<List<PedidoModel>> pedidosArchivedsStream =
       AppStream<List<PedidoModel>>();
-  List<PedidoModel> get pedidosArchiveds => dataStream.value;
+  List<PedidoModel> get pedidosArchiveds => pedidosArchivedsStream.value;
 
   CollectionReference<Map<String, dynamic>> get collection =>
       FirebaseFirestore.instance.collection(name);
@@ -39,8 +43,8 @@ class PedidoCollection {
     final data = await FirebaseFirestore.instance.collection(name).get();
     final pedidos =
         data.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-
-    dataStream.add(pedidos.where((e) => !e.isArchived).toList());
+    dataStream.add(pedidos);
+    pedidosUnarchivedsStream.add(pedidos.where((e) => !e.isArchived).toList());
     pedidosArchivedsStream.add(pedidos.where((e) => e.isArchived).toList());
   }
 
@@ -80,7 +84,8 @@ class PedidoCollection {
         .snapshots()
         .listen((e) {
       final data = e.docs.map((e) => PedidoModel.fromMap(e.data())).toList();
-      dataStream.add(data.where((e) => !e.isArchived).toList());
+      dataStream.add(data);
+      pedidosUnarchivedsStream.add(data.where((e) => !e.isArchived).toList());
       pedidosArchivedsStream.add(data.where((e) => e.isArchived).toList());
     });
   }

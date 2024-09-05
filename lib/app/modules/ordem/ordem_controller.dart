@@ -86,7 +86,8 @@ class OrdemController {
 
   List<PedidoProdutoModel> _getPedidosProdutosSeparados(ProdutoModel produto) {
     List<PedidoProdutoModel> pedidos = [];
-    for (final pedido in FirestoreClient.pedidos.data
+    for (final pedido in FirestoreClient
+        .pedidos.data
         .where(
             (e) => FirestoreClient.steps.getById(e.step.id).isPermiteProducao)
         .toList()) {
@@ -357,6 +358,7 @@ class OrdemController {
 
     relatorioCtrl.ordemViewModelStream.add(relatorio);
 
-    await relatorioCtrl.onExportRelatorioOrdemUniquePDF(RelatorioOrdemModel.ordem(ordem));
+    await relatorioCtrl
+        .onExportRelatorioOrdemUniquePDF(RelatorioOrdemModel.ordem(ordem));
   }
 }

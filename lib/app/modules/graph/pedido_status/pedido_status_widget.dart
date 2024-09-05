@@ -24,19 +24,18 @@ class _GrapOrdemhTotalWidgetState extends State<PedidoStatusWidget> {
 
   late StreamSubscription<List<PedidoModel>> pedidoStream;
 
-
   @override
   void initState() {
     pedidoStatusCtrl.filterStream.add(PedidoStatusGraphModel());
     data = pedidoStatusCtrl.getCartesianChart(pedidoStatusCtrl.filter);
-    pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
+    pedidoStream =
+        FirestoreClient.pedidos.pedidosUnarchivedsStream.listen.listen((e) {
       setState(() {
         data = pedidoStatusCtrl.getCartesianChart(pedidoStatusCtrl.filter);
       });
     });
     super.initState();
   }
-
 
   @override
   void dispose() {

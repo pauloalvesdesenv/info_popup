@@ -26,7 +26,8 @@ class _GrapOrdemhTotalWidgetState extends State<ProdutoStatusWidget> {
   @override
   void initState() {
     data = produtoStatusCtrl.getSource();
-    pedidoStream = FirestoreClient.pedidos.dataStream.listen.listen((e) {
+    pedidoStream =
+        FirestoreClient.pedidos.pedidosUnarchivedsStream.listen.listen((e) {
       setState(() {
         data = produtoStatusCtrl.getSource();
       });
@@ -72,8 +73,7 @@ class _GrapOrdemhTotalWidgetState extends State<ProdutoStatusWidget> {
             overflowMode: LegendItemOverflowMode.wrap,
             position: LegendPosition.bottom,
           ),
-          primaryXAxis: const CategoryAxis(
-          ),
+          primaryXAxis: const CategoryAxis(),
           primaryYAxis: NumericAxis(
             axisLabelFormatter: (axisLabelRenderArgs) {
               return ChartAxisLabel(
