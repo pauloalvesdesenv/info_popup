@@ -36,11 +36,8 @@ class CommentsWidget extends StatelessWidget {
                 for (var user in mentions) {
                   if (user.deviceTokens.isNotEmpty) {
                     FCMProvider.postSend(
-                      FCMDataModel(
-                              title: titleNotification,
-                              description: text,
-                              token: user.deviceTokens.last)
-                          .toMap(),
+                      user.id,
+                      FCMDataModel(title: titleNotification, description: text, token: user.deviceTokens.last).toMap(),
                     );
                   }
                 }

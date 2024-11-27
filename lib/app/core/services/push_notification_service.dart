@@ -36,16 +36,13 @@ Future<void> initFirebaseMessaging() async {
     showFlutterNotification(message);
   });
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    _handleClickNotification(jsonEncode(message.data));
+    handleClickNotification(jsonEncode(message.data));
   });
 }
 
 Future<String?> getDeviceToken() async {
   if (kIsWeb) {
-    return await _menssaging.getToken(
-        vapidKey: kIsWeb
-            ? 'BMzSKaJYdozeg3ZFbdIKl7prhb03HQEU-VR9SbAqvAJNUDzQjRM6Tm463QGv5WkKdYea9gkVZS-WhEP4_U7Z8TY'
-            : null);
+    return await _menssaging.getToken(vapidKey: kIsWeb ? 'BMzSKaJYdozeg3ZFbdIKl7prhb03HQEU-VR9SbAqvAJNUDzQjRM6Tm463QGv5WkKdYea9gkVZS-WhEP4_U7Z8TY' : null);
   } else if (Platform.isAndroid) {
     return await _menssaging.getToken();
   } else {
@@ -70,16 +67,10 @@ Future<void> setupFlutterNotifications() async {
 
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
+  await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
 
   flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(
-        android: AndroidInitializationSettings('ic_notification'),
-        iOS: IOSInitializationSettings()),
-    onSelectNotification: selectNotification,
+    const InitializationSettings(android: AndroidInitializationSettings('ic_notification'), iOS: DarwinInitializationSettings()),
   );
 }
 
@@ -105,11 +96,11 @@ void showFlutterNotification(RemoteMessage message) {
                 ),
           iOS: ios == null
               ? null
-              : const IOSNotificationDetails(
+              : const DarwinNotificationDetails(
                   presentSound: true,
                   presentAlert: true,
                   presentBadge: true,
-                  attachments: <IOSNotificationAttachment>[],
+                  attachments: <DarwinNotificationAttachment>[],
                 ),
         ),
         payload: jsonEncode(message.data),
@@ -122,20 +113,19 @@ Future<void> onOpenNotification() async {
   try {
     final message = await _menssaging.getInitialMessage();
     if (message == null) return;
-    _handleClickNotification(jsonEncode(message.data));
+    handleClickNotification(jsonEncode(message.data));
   } catch (_) {}
 }
 
-Future selectNotificationIOS(
-    int id, String? title, String? body, String? payload) async {
+Future selectNotificationIOS(int id, String? title, String? body, String? payload) async {
   if (payload == null) return;
 }
 
 Future selectNotification(String? payload) async {
   if (payload == null) return;
-  _handleClickNotification(payload);
+  handleClickNotification(payload);
 }
 
-void _handleClickNotification(String payload) {
+void handleClickNotification(String payload) {
   final data = jsonDecode(payload);
 }

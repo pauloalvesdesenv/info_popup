@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/automatizacao/aut
 import 'package:aco_plus/app/core/client/firestore/collections/checklist/checklist_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/fabricante/fabricante_collection.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/notificacao/notificacao_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/ordem_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/pedido_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_collection.dart';
@@ -22,6 +23,7 @@ class FirestoreClient {
   static PedidoCollection pedidos = PedidoCollection();
   static OrdemCollection ordens = OrdemCollection();
   static AutomatizacaoCollection automatizacao = AutomatizacaoCollection();
+  static NotificacaoCollection notificacoes = NotificacaoCollection();
 
   static init() async {
     await version.start();
@@ -35,6 +37,7 @@ class FirestoreClient {
     await pedidos.start();
     await ordens.start();
     await automatizacao.start();
+    await notificacoes.start();
 
     await version.listen();
     await usuarios.listen();
@@ -47,5 +50,6 @@ class FirestoreClient {
     await pedidos.listen();
     await ordens.listen();
     await automatizacao.listen();
+    await notificacoes.listen();
   }
 }
