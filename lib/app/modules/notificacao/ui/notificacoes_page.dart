@@ -38,7 +38,6 @@ class _NotificacoesPageState extends State<NotificacoesPage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      drawer: const AppDrawer(),
       appBar: AppBar(
         title: Text('Notificacões', style: AppCss.largeBold.setColor(AppColors.white)),
         backgroundColor: AppColors.primaryMain,
