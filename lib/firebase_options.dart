@@ -30,10 +30,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -58,7 +55,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCU47wXoaBO8eabFmKUiXIhPe-Xo7sbhaw',
-    appId: '1:210867609065:android:91662436a9e9a893bc3f78',
+    appId: '1:210867609065:android:03f05879d26ed31cbc3f78',
     messagingSenderId: '210867609065',
     projectId: 'aco-plus-fa455',
     storageBucket: 'aco-plus-fa455.appspot.com',
@@ -72,4 +69,15 @@ class DefaultFirebaseOptions {
     storageBucket: 'aco-plus-fa455.appspot.com',
     iosBundleId: 'com.m2.acoplus.RunnerTests',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyATmh9R-oXmG_zfl5W3NPZ5SIaA3-WCI3k',
+    appId: '1:210867609065:web:d02e3f52f39ae35cbc3f78',
+    messagingSenderId: '210867609065',
+    projectId: 'aco-plus-fa455',
+    authDomain: 'aco-plus-fa455.firebaseapp.com',
+    storageBucket: 'aco-plus-fa455.appspot.com',
+    measurementId: 'G-YK4WTJYYHL',
+  );
+
 }
