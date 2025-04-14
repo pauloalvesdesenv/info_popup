@@ -27,6 +27,8 @@ class PedidoStatusController {
         .pedidos.data
         .map((e) =>
             e.copyWith(produtos: e.produtos.map((e) => e.copyWith()).toList()))
+        .toList()
+        .where((pedido) => pedido.status != PedidoStatus.pronto)
         .toList();
 
     List<GraphModel> source = [];

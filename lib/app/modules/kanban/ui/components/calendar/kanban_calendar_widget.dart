@@ -72,7 +72,7 @@ class _KanbanCalendarWidgetState extends State<KanbanCalendarWidget> {
                   focusedDay: DateTime.now(),
                   rowHeight: widget.utils.calendarFormat == CalendarFormat.month
                       ? 170
-                      : MediaQuery.of(context).size.height,
+                      : MediaQuery.of(context).size.height * 1.4,
                   daysOfWeekHeight: 30,
                   calendarFormat: widget.utils.calendarFormat,
                   headerStyle: const HeaderStyle(

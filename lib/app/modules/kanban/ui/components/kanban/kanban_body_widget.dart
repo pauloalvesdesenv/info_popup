@@ -30,8 +30,8 @@ class KanbanBodyWidget extends StatelessWidget {
             ],
           ),
           KanbanBlackLensWidget(utils),
-          KanbanPedidoSelectedWidget(utils),
           KanbanDaySelectedWidget(utils),
+          KanbanPedidoSelectedWidget(utils),
         ],
       ),
     );

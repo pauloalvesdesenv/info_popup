@@ -91,6 +91,8 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                       onSelect: (e) {
                         form.produto = e;
                         form.produtos.clear();
+                        form.materiaPrima = null;
+                        form.fabricante = null;
                         ordemCtrl.formStream.update();
                       },
                     ),

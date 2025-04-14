@@ -25,14 +25,9 @@ class NotificacoesPage extends StatefulWidget {
 class _NotificacoesPageState extends State<NotificacoesPage> {
   @override
   void initState() {
-    FirestoreClient.notificacoes.fetch();
-    super.initState();
-  }
+    FirestoreClient.notificacoes.fetch().then((_) => notificacaoCtrl.setViewed());
 
-  @override
-  void dispose() {
-    notificacaoCtrl.setViewed();
-    super.dispose();
+    super.initState();
   }
 
   @override
@@ -81,7 +76,9 @@ class _NotificacoesPageState extends State<NotificacoesPage> {
 
   Widget _itemNotificacaoWidget(NotificacaoModel notificacao) {
     return InkWell(
-      onTap: () => handleClickNotification(notificacao.payload),
+      onTap: () {
+        handleClickNotification(notificacao.payload);
+      },
       child: Container(
         color: notificacao.viewed ? Colors.grey[200] : Colors.transparent,
         child: ListTile(

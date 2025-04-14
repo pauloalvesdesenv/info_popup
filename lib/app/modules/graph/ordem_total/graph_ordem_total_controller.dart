@@ -27,6 +27,8 @@ class GrahpOrdemTotalController {
                 .map((p) => p.copyWith(
                     statusess: p.statusess.map((s) => s.copyWith()).toList()))
                 .toList()))
+        .toList()
+        .where((e) => e.status != PedidoProdutoStatus.pronto)
         .toList();
 
     List<GraphModel> source = [];
@@ -41,7 +43,7 @@ class GrahpOrdemTotalController {
         volFinal += vol;
         lengthFinal += pedidos.length;
       }
-      if (volFinal > 0) {
+      if (volFinal > 0 && status != PedidoProdutoStatus.pronto) {
         source.add(GraphModel(
             vol: volFinal,
             label: status.label,

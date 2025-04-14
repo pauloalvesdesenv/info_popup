@@ -18,7 +18,6 @@ class ProdutoStatusController {
     return [
       PedidoProdutoStatus.aguardandoProducao,
       PedidoProdutoStatus.produzindo,
-      PedidoProdutoStatus.pronto
     ]
         .map((status) => ColumnSeries<ProdutoStatusGraphModel, String>(
               dataSource: getSourceByStatus(status),
