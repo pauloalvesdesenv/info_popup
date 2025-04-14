@@ -87,39 +87,81 @@ class _UsuarioCreatePageState extends State<UsuarioCreatePage> {
             itemLabel: (e) => e?.label ?? 'Selecione',
             onSelect: (e) {
               form.role = e;
+              if (e == UsuarioRole.operador) {
+                form.permission.cliente = [];
+                form.permission.pedido = [];
+                form.permission.ordem = [
+                  UserPermissionType.read,
+                  UserPermissionType.update
+                ];
+              } else {
+                form.permission.cliente = UserPermissionType.values;
+                form.permission.pedido = UserPermissionType.values;
+                form.permission.ordem = UserPermissionType.values;
+              }
               usuarioCtrl.formStream.update();
             },
           ),
           const H(16),
-          AppDropDownList<UserPermissionType>(
-            label: 'Permissões de Cliente',
-            itens: UserPermissionType.values,
-            addeds: form.permission.cliente,
-            onChanged: () {
-              usuarioCtrl.formStream.update();
-            },
-            itemLabel: (e) => e.label,
-          ),
-          const H(16),
-          AppDropDownList<UserPermissionType>(
-            label: 'Permissões de Pedidos',
-            itens: UserPermissionType.values,
-            addeds: form.permission.pedido,
-            onChanged: () {
-              usuarioCtrl.formStream.update();
-            },
-            itemLabel: (e) => e.label,
-          ),
-          const H(16),
-          AppDropDownList<UserPermissionType>(
-            label: 'Permissões de Ordens',
-            itens: UserPermissionType.values,
-            addeds: form.permission.ordem,
-            onChanged: () {
-              usuarioCtrl.formStream.update();
-            },
-            itemLabel: (e) => e.label,
-          ),
+          if (form.role != UsuarioRole.operador) ...[
+            AppDropDownList<UserPermissionType>(
+              label: 'Permissões de Cliente',
+              itens: UserPermissionType.values,
+              addeds: form.permission.cliente,
+              onChanged: () {
+                usuarioCtrl.formStream.update();
+              },
+              itemLabel: (e) => e.label,
+            ),
+            const H(16),
+            AppDropDownList<UserPermissionType>(
+              label: 'Permissões de Pedidos',
+              itens: UserPermissionType.values,
+              addeds: form.permission.pedido,
+              onChanged: () {
+                usuarioCtrl.formStream.update();
+              },
+              itemLabel: (e) => e.label,
+            ),
+            const H(16),
+            AppDropDownList<UserPermissionType>(
+              label: 'Permissões de Ordens',
+              itens: UserPermissionType.values,
+              addeds: form.permission.ordem,
+              onChanged: () {
+                usuarioCtrl.formStream.update();
+              },
+              itemLabel: (e) => e.label,
+            ),
+          ],
+          if (form.role == UsuarioRole.operador) ...[
+            Container(
+              width: 500,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.amber[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Colors.amber[800],
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Operadores podem visualizar apenas ordens pendentes',
+                      style: TextStyle(
+                        color: Colors.amber[900],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
           const H(24),
           if (form.isEdit)
             TextButton.icon(

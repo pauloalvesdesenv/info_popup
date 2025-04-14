@@ -7,6 +7,7 @@ import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:info_popup/info_popup.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 enum KanbanViewMode {
   calendar,
@@ -15,11 +16,14 @@ enum KanbanViewMode {
 
 class KanbanUtils {
   KanbanViewMode view = KanbanViewMode.kanban;
+  CalendarFormat calendarFormat = CalendarFormat.month;
   Map<StepModel, List<PedidoModel>> kanban;
   Map<String, List<PedidoModel>> calendar;
+  Map<DateTime, List<PedidoModel>>? day;
   final ScrollController scroll = ScrollController();
   PedidoModel? pedido;
   bool get isPedidoSelected => pedido != null;
+  bool get isDaySelected => day != null;
   TextController search = TextController();
   ClienteModel? cliente;
   TextController clienteEC = TextController();

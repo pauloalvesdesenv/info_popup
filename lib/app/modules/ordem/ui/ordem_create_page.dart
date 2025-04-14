@@ -1,10 +1,11 @@
+import 'package:aco_plus/app/core/client/firestore/collections/fabricante/fabricante_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/materia_prima/models/materia_prima_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/usuario/enums/user_permission_type.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:aco_plus/app/core/components/app_checkbox.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
@@ -199,40 +200,72 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
           border: Border(
               top: BorderSide(
                   color: AppColors.black.withOpacity(0.04), width: 1))),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: InkWell(
-              onTap: () =>
-                  showOrderCreatePedidosSelecionadosBottom(widget.ordem),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'PESO TOTAL SELECIONADO PARA ESTA ORDEM: ${produtos.map((e) => e.qtde).fold(.0, (a, b) => a + b).toKg()}'
-                        .toUpperCase(),
-                    style: AppCss.mediumBold.setSize(20),
-                  ),
-                  if (produtos.isNotEmpty)
-                    Text(
-                      'Pedidos selecionados: ${produtos.length}',
-                      style: AppCss.minimumRegular
-                          .setSize(14)
-                          .copyWith(decoration: TextDecoration.underline),
-                    ),
-                ],
-              ),
-            ),
+          AppDropDown<FabricanteModel?>(
+            disable: form.produto == null,
+            label: 'Fabricante',
+            item: form.fabricante,
+            itens: FirestoreClient.fabricantes.data,
+            itemLabel: (e) => e!.nome,
+            onSelect: (e) {
+              form.fabricante = e;
+              ordemCtrl.formStream.update();
+            },
           ),
-          IconButton(
-              onPressed: () {
-                form.produtos.clear();
-                ordemCtrl.formStream.update();
-              },
-              icon: Icon(
-                Icons.delete_outline,
-                color: AppColors.white,
-              ))
+          const H(16),
+          AppDropDown<MateriaPrimaModel?>(
+            disable: form.produto == null,
+            label: 'Materia Prima',
+            item: form.materiaPrima,
+            itens: FirestoreClient.materiaPrimas.data
+                .where((e) =>
+                    e.fabricanteModel.id == form.fabricante?.id &&
+                    e.produto.id == form.produto?.id)
+                .toList(),
+            itemLabel: (e) => e!.corridaLote,
+            onSelect: (e) {
+              form.materiaPrima = e;
+              ordemCtrl.formStream.update();
+            },
+          ),
+          const H(16),
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () =>
+                      showOrderCreatePedidosSelecionadosBottom(widget.ordem),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PESO TOTAL SELECIONADO PARA ESTA ORDEM: ${produtos.map((e) => e.qtde).fold(.0, (a, b) => a + b).toKg()}'
+                            .toUpperCase(),
+                        style: AppCss.mediumBold.setSize(20),
+                      ),
+                      if (produtos.isNotEmpty)
+                        Text(
+                          'Pedidos selecionados: ${produtos.length}',
+                          style: AppCss.minimumRegular
+                              .setSize(14)
+                              .copyWith(decoration: TextDecoration.underline),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              IconButton(
+                  onPressed: () {
+                    form.produtos.clear();
+                    ordemCtrl.formStream.update();
+                  },
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: AppColors.white,
+                  ))
+            ],
+          ),
         ],
       ),
     );
@@ -302,7 +335,11 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                       ],
                     ),
                   ),
-                  AppCheckbox(value: check, onChanged: (_) {}),
+                  TextButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.add),
+                    label: const Text('Adicionar'),
+                  )
                 ],
               ),
             ),

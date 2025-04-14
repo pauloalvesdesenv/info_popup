@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:mime/mime.dart';
+import 'package:share_plus/share_plus.dart';
 
 Future<ArchiveModel?> showArchiveAddBottom(String path) async =>
     showModalBottomSheet(
@@ -24,6 +25,7 @@ Future<ArchiveModel?> showArchiveAddBottom(String path) async =>
       isScrollControlled: true,
       builder: (_) => ArchiveAddBottom(path),
     );
+
 
 class ArchiveAddBottom extends StatefulWidget {
   final String path;
@@ -35,6 +37,7 @@ class ArchiveAddBottom extends StatefulWidget {
 
 class _ArchiveAddBottomState extends State<ArchiveAddBottom> {
   ArchiveModel? archive;
+  FilePickerResult? result;
   final TextController _nameEC = TextController();
   final TextController _descEC = TextController();
   final FocusNode _focusNode = FocusNode();
@@ -209,7 +212,7 @@ class _ArchiveAddBottomState extends State<ArchiveAddBottom> {
   }
 
   Future<void> onAdd() async {
-    final result = await FilePicker.platform.pickFiles(
+    result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
     );
     if (result?.xFiles.isNotEmpty ?? false) {
@@ -234,7 +237,7 @@ class _ArchiveAddBottomState extends State<ArchiveAddBottom> {
     });
     final url = await FirebaseService.uploadFile(
       name: archive!.name!,
-      bytes: archive!.bytes!,
+      bytes: await result!.xFiles.first.readAsBytes(),
       mimeType: archive!.mime,
       path: widget.path,
     );

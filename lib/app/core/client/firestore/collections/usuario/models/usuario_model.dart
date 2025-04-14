@@ -15,6 +15,9 @@ class UsuarioModel {
   final List<StepModel> steps;
   final List<String> deviceTokens;
 
+  bool get isOperador => role == UsuarioRole.operador;
+  bool get isNotOperador => role != UsuarioRole.operador;
+
   static UsuarioModel get system => UsuarioModel(
         id: 'system',
         nome: 'Sistema',

@@ -1,14 +1,19 @@
 import 'package:aco_plus/app/core/client/firestore/collections/cliente/cliente_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/app_drop_down.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
+import 'package:aco_plus/app/core/extensions/string_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
+import 'package:aco_plus/app/modules/pedido/ui/pedidos_archiveds_page.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class KanbanFilterWidget extends StatefulWidget {
   final KanbanUtils utils;
@@ -49,7 +54,8 @@ class _KanbanFilterWidgetState extends State<KanbanFilterWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 width: double.maxFinite,
                 decoration: BoxDecoration(
                   color: AppColors.primaryMain,
@@ -96,6 +102,25 @@ class _KanbanFilterWidgetState extends State<KanbanFilterWidget> {
                         kanbanCtrl.utilsStream.update();
                       },
                     ),
+                    const Gap(8),
+                    Builder(builder: (context) {
+                      final pedidos = getPedidosArchiveds(utils);
+                      if (pedidos.isEmpty) return const SizedBox();
+                      return Align(
+                        alignment: Alignment.centerRight,
+                        child: InkWell(
+                          onTap: () => push(context, PedidosArchivedsPage()),
+                          child: Text(
+                            'Encontrados ${pedidos.length} pedidos arquivados.',
+                            style: AppCss.minimumBold
+                                .copyWith(
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: AppColors.primaryMain)
+                                .setColor(AppColors.primaryMain),
+                          ),
+                        ),
+                      );
+                    })
                   ],
                 ),
               )
@@ -104,5 +129,23 @@ class _KanbanFilterWidgetState extends State<KanbanFilterWidget> {
         ),
       ),
     );
+  }
+
+  List<PedidoModel> getPedidosArchiveds(KanbanUtils utils) {
+    final List<PedidoModel> pedidosFiltereds = [];
+
+    for (PedidoModel pedido in FirestoreClient.pedidos.pedidosArchiveds) {
+      if (utils.search.text.isNotEmpty &&
+          pedido.localizador.toCompare.contains(utils.search.text.toCompare)) {
+        pedidosFiltereds.add(pedido);
+        continue;
+      }
+      if (utils.cliente != null && utils.cliente!.id == pedido.cliente.id) {
+        pedidosFiltereds.add(pedido);
+        continue;
+      }
+    }
+
+    return pedidosFiltereds;
   }
 }

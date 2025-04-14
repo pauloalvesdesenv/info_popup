@@ -82,7 +82,7 @@ class NotificacaoModel {
       viewed: false,
       createdAt: DateTime.now(),
       userId: userId,
-      payload: jsonEncode(map)
+      payload: jsonEncode(map['data'])
     );
   }
 

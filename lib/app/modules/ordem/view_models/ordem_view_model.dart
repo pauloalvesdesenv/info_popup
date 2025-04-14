@@ -1,3 +1,5 @@
+import 'package:aco_plus/app/core/client/firestore/collections/fabricante/fabricante_model.dart';
+import 'package:aco_plus/app/core/client/firestore/collections/materia_prima/models/materia_prima_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
@@ -37,6 +39,8 @@ class OrdemCreateModel {
   bool isCreate = true;
   DateTime? createdAt;
   OrdemFreezedCreateModel freezed = OrdemFreezedCreateModel();
+  FabricanteModel? fabricante;
+  MateriaPrimaModel? materiaPrima;
   int? beltIndex;
 
   late bool isEdit;
@@ -56,13 +60,17 @@ class OrdemCreateModel {
     createdAt = ordem.createdAt;
     produto = FirestoreClient.produtos.data
         .firstWhere((e) => e.id == ordem.produto.id);
-        //TODO
     produtos = ordem.produtos
         .map((e) =>
             e.copyWith(isSelected: true, isAvailable: e.isAvailableToChanges))
         .toList();
     freezed = OrdemFreezedCreateModel.edit(ordem.freezed);
     beltIndex = ordem.beltIndex;
+    if (ordem.materiaPrima != null) {
+      fabricante = FirestoreClient.fabricantes
+          .getById(ordem.materiaPrima!.fabricanteModel.id);
+      materiaPrima = FirestoreClient.materiaPrimas.getById(ordem.materiaPrima!.id);
+    }
   }
 
   OrdemModel toOrdemModel() {
@@ -88,6 +96,7 @@ class OrdemCreateModel {
       beltIndex: isCreate
           ? FirestoreClient.ordens.ordensNaoCongeladas.length
           : beltIndex,
+      materiaPrima: materiaPrima
     );
   }
 }

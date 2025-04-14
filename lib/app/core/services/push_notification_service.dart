@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
+import 'package:aco_plus/app/core/utils/global_resource.dart';
+import 'package:aco_plus/app/modules/pedido/ui/pedido_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -42,7 +45,10 @@ Future<void> initFirebaseMessaging() async {
 
 Future<String?> getDeviceToken() async {
   if (kIsWeb) {
-    return await _menssaging.getToken(vapidKey: kIsWeb ? 'BMzSKaJYdozeg3ZFbdIKl7prhb03HQEU-VR9SbAqvAJNUDzQjRM6Tm463QGv5WkKdYea9gkVZS-WhEP4_U7Z8TY' : null);
+    return await _menssaging.getToken(
+        vapidKey: kIsWeb
+            ? 'BMzSKaJYdozeg3ZFbdIKl7prhb03HQEU-VR9SbAqvAJNUDzQjRM6Tm463QGv5WkKdYea9gkVZS-WhEP4_U7Z8TY'
+            : null);
   } else if (Platform.isAndroid) {
     return await _menssaging.getToken();
   } else {
@@ -67,10 +73,15 @@ Future<void> setupFlutterNotifications() async {
 
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
 
   flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(android: AndroidInitializationSettings('ic_notification'), iOS: DarwinInitializationSettings()),
+    const InitializationSettings(
+        android: AndroidInitializationSettings('ic_notification'),
+        iOS: DarwinInitializationSettings()),
   );
 }
 
@@ -117,7 +128,8 @@ Future<void> onOpenNotification() async {
   } catch (_) {}
 }
 
-Future selectNotificationIOS(int id, String? title, String? body, String? payload) async {
+Future selectNotificationIOS(
+    int id, String? title, String? body, String? payload) async {
   if (payload == null) return;
 }
 
@@ -127,5 +139,15 @@ Future selectNotification(String? payload) async {
 }
 
 void handleClickNotification(String payload) {
-  final data = jsonDecode(payload);
+  if (payload.isNotEmpty) {
+      final response = jsonDecode(payload);
+      switch (response['type']) {
+        case 'event':
+        final pedido = FirestoreClient.pedidos.getById(response['id']);
+        push(contextGlobal, PedidoPage(pedido: pedido, reason: PedidoInitReason.page));
+          break;
+        default:
+          break;
+      }
+  }
 }

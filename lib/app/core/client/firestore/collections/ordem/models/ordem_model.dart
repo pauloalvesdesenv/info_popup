@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
-
+import 'package:aco_plus/app/core/client/firestore/collections/materia_prima/models/materia_prima_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
@@ -13,6 +12,7 @@ class OrdemModel {
   final String id;
   final ProdutoModel produto;
   final DateTime createdAt;
+  final MateriaPrimaModel? materiaPrima;
   DateTime? endAt;
   List<PedidoProdutoModel> produtos;
   bool selected = true;
@@ -131,6 +131,7 @@ class OrdemModel {
     required this.produto,
     required this.produtos,
     required this.freezed,
+    this.materiaPrima,
     this.beltIndex,
     this.endAt,
   });
@@ -146,6 +147,7 @@ class OrdemModel {
           .toList(),
       'freezed': freezed.toMap(),
       'beltIndex': beltIndex,
+      'materiaPrima': materiaPrima?.toMap(),
     };
     return map;
   }
@@ -166,6 +168,9 @@ class OrdemModel {
           ? OrdemFreezedModel.fromMap(map['freezed'])
           : OrdemFreezedModel.static().copyWith(),
       beltIndex: map['beltIndex'],
+      materiaPrima: map['materiaPrima'] != null
+          ? MateriaPrimaModel.fromMap(map['materiaPrima'])
+          : null,
     );
   }
 

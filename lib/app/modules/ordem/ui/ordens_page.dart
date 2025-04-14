@@ -55,45 +55,50 @@ class _OrdensPageState extends State<OrdensPage> {
         ),
         title:
             Text('Ordens', style: AppCss.largeBold.setColor(AppColors.white)),
-        actions: [
-          Tooltip(
-            message: 'Ordens concluídas',
-            child: IconButton(
-                onPressed: () => push(context, const OrdensConcluidasPage()),
-                icon: Icon(
-                  Icons.domain_verification,
-                  color: AppColors.white,
-                )),
-          ),
-          Tooltip(
-            message: 'Filtro',
-            child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    ordemCtrl.utils.showFilter = !ordemCtrl.utils.showFilter;
-                    ordemCtrl.utilsStream.update();
-                  });
-                },
-                icon: Icon(
-                  Icons.sort,
-                  color: AppColors.white,
-                )),
-          ),
-          if (usuario.permission.ordem.contains(UserPermissionType.create))
-            Tooltip(
-              message: 'Nova ordem',
-              child: IconButton(
-                  onPressed: () => push(context, const OrdemCreatePage()),
-                  icon: Icon(
-                    Icons.add,
-                    color: AppColors.white,
-                  )),
-            )
-        ],
+        actions: usuario.isOperador
+            ? []
+            : [
+                Tooltip(
+                  message: 'Ordens concluídas',
+                  child: IconButton(
+                      onPressed: () =>
+                          push(context, const OrdensConcluidasPage()),
+                      icon: Icon(
+                        Icons.domain_verification,
+                        color: AppColors.white,
+                      )),
+                ),
+                Tooltip(
+                  message: 'Filtro',
+                  child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          ordemCtrl.utils.showFilter =
+                              !ordemCtrl.utils.showFilter;
+                          ordemCtrl.utilsStream.update();
+                        });
+                      },
+                      icon: Icon(
+                        Icons.sort,
+                        color: AppColors.white,
+                      )),
+                ),
+                if (usuario.permission.ordem
+                    .contains(UserPermissionType.create))
+                  Tooltip(
+                    message: 'Nova ordem',
+                    child: IconButton(
+                        onPressed: () => push(context, const OrdemCreatePage()),
+                        icon: Icon(
+                          Icons.add,
+                          color: AppColors.white,
+                        )),
+                  )
+              ],
         backgroundColor: AppColors.primaryMain,
       ),
       body: StreamOut<List<OrdemModel>>(
-        stream: FirestoreClient.ordens.dataNaoConcluidasStream.listen,
+        stream: FirestoreClient.ordens.naoConcluidasStream.listen,
         builder: (_, __) => StreamOut<OrdemUtils>(
           stream: ordemCtrl.utilsStream.listen,
           builder: (_, utils) {
@@ -106,6 +111,14 @@ class _OrdensPageState extends State<OrdensPage> {
             if (utils.produto != null) {
               ordens = ordens
                   .where((e) => e.produto.id == utils.produto!.id)
+                  .toList();
+            }
+            if (usuario.isOperador) {
+              ordens = ordens
+                  .where((e) => [
+                        PedidoProdutoStatus.aguardandoProducao,
+                        PedidoProdutoStatus.produzindo
+                      ].contains(e.status))
                   .toList();
             }
 
@@ -160,6 +173,21 @@ class _OrdensPageState extends State<OrdensPage> {
                       builder: (_) {
                         final ordensNaoConcluidas =
                             ordens.where((e) => !e.freezed.isFreezed).toList();
+                        if (ordensNaoConcluidas.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: EmptyData(),
+                          );
+                        }
+                        if (usuario.isOperador) {
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: ordensNaoConcluidas.length,
+                            itemBuilder: (_, i) =>
+                                _itemOrdemWidget(ordensNaoConcluidas[i]),
+                          );
+                        }
                         return ReorderableListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -176,11 +204,12 @@ class _OrdensPageState extends State<OrdensPage> {
                         );
                       },
                     ),
-                  if (ordens.isNotEmpty)
+                  if (usuario.isNotOperador)
                     Builder(
                       builder: (_) {
                         final ordensCongeladas =
-                            ordens.where((e) => e.freezed.isFreezed).toList();
+                            ordemCtrl.getOrdensFiltered(utils.search.text,
+                                FirestoreClient.ordens.ordensCongeladas);
                         ordensCongeladas.sort((a, b) =>
                             b.freezed.updatedAt.compareTo(a.freezed.updatedAt));
                         return ListView.builder(
@@ -272,22 +301,24 @@ class _OrdensPageState extends State<OrdensPage> {
                 ],
               ),
             ),
-            if (!ordem.freezed.isFreezed)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryMain.withOpacity(0.5),
-                  borderRadius:
-                      const BorderRadius.only(bottomRight: Radius.circular(8)),
-                ),
-                child: Text(
-                  ordem.beltIndex != null ? '${ordem.beltIndex! + 1}º' : '-',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[900]!,
-                      fontWeight: FontWeight.bold),
-                ),
-              )
+            if (usuario.isNotOperador)
+              if (!ordem.freezed.isFreezed)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryMain.withOpacity(0.5),
+                    borderRadius: const BorderRadius.only(
+                        bottomRight: Radius.circular(8)),
+                  ),
+                  child: Text(
+                    ordem.beltIndex != null ? '${ordem.beltIndex! + 1}º' : '-',
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[900]!,
+                        fontWeight: FontWeight.bold),
+                  ),
+                )
           ],
         ),
       ),

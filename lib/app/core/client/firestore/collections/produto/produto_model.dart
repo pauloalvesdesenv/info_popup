@@ -33,6 +33,8 @@ class ProdutoModel {
 
   String get label => '$nome - $descricao - $fabricante - $massaFinal';
 
+  String get labelMinified => '$nome - $descricao';
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

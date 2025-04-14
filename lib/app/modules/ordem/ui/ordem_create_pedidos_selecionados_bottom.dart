@@ -161,7 +161,11 @@ class _OrderCreatePedidosSelecionadosBottomState
                       ],
                     ),
                   ),
-                  AppCheckbox(value: check, onChanged: (_) {}),
+                  TextButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.remove),
+                    label: const Text('Remover'),
+                  )
                 ],
               ),
             ),

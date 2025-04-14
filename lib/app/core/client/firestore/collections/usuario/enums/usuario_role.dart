@@ -3,7 +3,8 @@ enum UsuarioRole {
   coordenador,
   planilhador,
   vendedor,
-  cliente
+  cliente,
+  operador
 }
 
 extension UsuarioRoleExtension on UsuarioRole {
@@ -19,6 +20,8 @@ extension UsuarioRoleExtension on UsuarioRole {
         return 'Vendedor';
       case UsuarioRole.cliente:
         return 'Cliente';
+      case UsuarioRole.operador:
+        return 'Operador';
     }
   }
 }

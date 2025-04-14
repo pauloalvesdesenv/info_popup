@@ -86,6 +86,11 @@ class StepController {
     utilsStream.update();
   }
 
+  void setDay(Map<DateTime, List<PedidoModel>>? day) {
+    utils.day = day;
+    utilsStream.update();
+  }
+
   void onAccept(StepModel step, PedidoModel pedido, int index,
       {bool auto = false}) async {
     if (!onWillAccept(pedido, step, auto: auto)) return;

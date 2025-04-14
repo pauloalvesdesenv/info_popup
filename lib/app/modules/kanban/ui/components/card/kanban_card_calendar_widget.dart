@@ -7,11 +7,14 @@ import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_step_
 import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_tags_widget.dart';
 import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_users_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class KanbanCardCalendarWidget extends StatefulWidget {
   final PedidoModel pedido;
+  final CalendarFormat calendarFormat;
   const KanbanCardCalendarWidget(
-    this.pedido, {
+    this.pedido,
+    this.calendarFormat, {
     super.key,
   });
 
@@ -28,7 +31,6 @@ class _KanbanCardCalendarWidgetState extends State<KanbanCardCalendarWidget> {
     return LayoutBuilder(
       builder: (context, contrains) {
         bool isSM = contrains.maxWidth < 100;
-        print(isSM.toString());
         return InkWell(
           onTap: () => kanbanCtrl.setPedido(widget.pedido),
           child: MouseRegion(
@@ -54,10 +56,11 @@ class _KanbanCardCalendarWidgetState extends State<KanbanCardCalendarWidget> {
                     if (widget.pedido.tags.isNotEmpty) ...[
                       KanbanCardTagsWidget(
                           pedido: widget.pedido,
-                          viewMode:
-                              stepViewMode == KanbanCardStepViewMode.expanded
-                                  ? WidgetViewMode.normal
-                                  : WidgetViewMode.minified),
+                          viewMode: stepViewMode ==
+                                      KanbanCardStepViewMode.expanded ||
+                                  widget.calendarFormat == CalendarFormat.week
+                              ? WidgetViewMode.normal
+                              : WidgetViewMode.minified),
                       const H(4),
                     ],
                     Row(
@@ -70,14 +73,17 @@ class _KanbanCardCalendarWidgetState extends State<KanbanCardCalendarWidget> {
                           if (widget.pedido.users.isNotEmpty)
                             KanbanCardUsersWidget(widget.pedido,
                                 viewMode: stepViewMode ==
-                                        KanbanCardStepViewMode.expanded
+                                            KanbanCardStepViewMode.expanded ||
+                                        widget.calendarFormat ==
+                                          CalendarFormat.week
                                     ? WidgetViewMode.normal
                                     : WidgetViewMode.minified)
                       ],
                     ),
                     const H(4),
                     KanbanCardStepWidget(widget.pedido.step,
-                        viewMode: stepViewMode),
+                        viewMode: stepViewMode,
+                        calendarFormat: widget.calendarFormat),
                   ],
                 ),
               ),

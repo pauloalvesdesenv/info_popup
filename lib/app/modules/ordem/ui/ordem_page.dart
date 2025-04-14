@@ -18,6 +18,7 @@ import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/ordem/ordem_controller.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordem_create_page.dart';
+import 'package:aco_plus/app/modules/usuario/usuario_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
@@ -43,18 +44,22 @@ class _OrdemPageState extends State<OrdemPage> {
       builder: (_, ordem) => AppScaffold(
           resizeAvoid: true,
           appBar: AppBar(
-            actions: [
-              IconButton(
-                  onPressed: () async => ordemCtrl.onGeneratePDF(ordem),
-                  icon: Icon(Icons.picture_as_pdf, color: AppColors.white)),
-              IconButton(
-                  onPressed: () async =>
-                      push(context, OrdemCreatePage(ordem: ordem)),
-                  icon: Icon(Icons.edit, color: AppColors.white)),
-              IconButton(
-                  onPressed: () async => ordemCtrl.onDelete(context, ordem),
-                  icon: Icon(Icons.delete, color: AppColors.white)),
-            ],
+            actions: usuario.isOperador
+                ? []
+                : [
+                    IconButton(
+                        onPressed: () async => ordemCtrl.onGeneratePDF(ordem),
+                        icon:
+                            Icon(Icons.picture_as_pdf, color: AppColors.white)),
+                    IconButton(
+                        onPressed: () async =>
+                            push(context, OrdemCreatePage(ordem: ordem)),
+                        icon: Icon(Icons.edit, color: AppColors.white)),
+                    IconButton(
+                        onPressed: () async =>
+                            ordemCtrl.onDelete(context, ordem),
+                        icon: Icon(Icons.delete, color: AppColors.white)),
+                  ],
             title: Text('Ordem ${ordem.localizator}',
                 style: AppCss.largeBold.setColor(AppColors.white)),
             backgroundColor: AppColors.primaryMain,
@@ -84,9 +89,10 @@ class _OrdemPageState extends State<OrdemPage> {
                 const Divisor(),
                 _statusWidget(ordem),
                 for (final produto in ordem.produtos) _produtoWidget(produto),
-                if (!ordem.freezed.isFreezed &&
-                    ordem.status != PedidoProdutoStatus.pronto)
-                  _freezedWidget(ordem)
+                if (usuario.isNotOperador)
+                  if (!ordem.freezed.isFreezed &&
+                      ordem.status != PedidoProdutoStatus.pronto)
+                    _freezedWidget(ordem)
               ],
             ),
           )
@@ -98,12 +104,22 @@ class _OrdemPageState extends State<OrdemPage> {
   Padding _descriptionWidget(OrdemModel ordem) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: RowItensLabel([
-        ItemLabel(
-            'Produto', '${ordem.produto.nome} - ${ordem.produto.descricao}'),
-        ItemLabel('Iniciada', ordem.createdAt.text()),
-        if (ordem.endAt != null) ItemLabel('Finalizada', ordem.endAt.text()),
-      ]),
+      child: Column(
+        children: [
+          RowItensLabel([
+            ItemLabel(
+                'Produto', '${ordem.produto.nome} - ${ordem.produto.descricao}'),
+            ItemLabel('Iniciada', ordem.createdAt.text()),
+            if (ordem.endAt != null) ItemLabel('Finalizada', ordem.endAt.text()),
+          ]),
+          const H(16),
+          RowItensLabel([
+            ItemLabel('Matéria Prima', ordem.materiaPrima != null ? '${ordem.materiaPrima?.fabricanteModel.nome} - ${ordem.materiaPrima?.produto.labelMinified.replaceAll(' - ', ' ')}'  : 'Não especificado'),
+            ItemLabel('Fabricante', ordem.materiaPrima?.fabricanteModel.nome ?? 'Não especificado'),
+          ]),
+        ],
+      ),
+
     );
   }
 
@@ -116,29 +132,31 @@ class _OrdemPageState extends State<OrdemPage> {
           Row(
             children: [
               Expanded(child: Text('Status', style: AppCss.largeBold)),
-              if (ordem.produtos.isNotEmpty)
-                InkWell(
-                  onTap: () =>
-                      ordemCtrl.showBottomChangeProdutosStatus(ordem.produtos),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                    decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(4)),
-                    child: IntrinsicWidth(
-                      child: Row(
-                        children: [
-                          Text('Mover todos para',
-                              style: AppCss.mediumRegular.setSize(12)),
-                          const W(2),
-                          Icon(Icons.keyboard_arrow_down,
-                              size: 16, color: AppColors.black.withOpacity(0.6))
-                        ],
+              if (usuario.isNotOperador)
+                if (ordem.produtos.isNotEmpty)
+                  InkWell(
+                    onTap: () => ordemCtrl
+                        .showBottomChangeProdutosStatus(ordem.produtos),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(4)),
+                      child: IntrinsicWidth(
+                        child: Row(
+                          children: [
+                            Text('Mover todos para',
+                                style: AppCss.mediumRegular.setSize(12)),
+                            const W(2),
+                            Icon(Icons.keyboard_arrow_down,
+                                size: 16,
+                                color: AppColors.black.withOpacity(0.6))
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                )
+                  )
             ],
           ),
           const H(8),
@@ -245,26 +263,77 @@ class _OrdemPageState extends State<OrdemPage> {
             ),
         ],
       ),
-      trailing: InkWell(
-        onTap: () => ordemCtrl.showBottomChangeProdutoStatus(produto),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-          decoration: BoxDecoration(
-              color: produto.statusView.status.color.withOpacity(0.4),
-              borderRadius: BorderRadius.circular(4)),
-          child: IntrinsicWidth(
-            child: Row(
-              children: [
-                Text(produto.statusView.status.label,
-                    style: AppCss.mediumRegular.setSize(12)),
-                const W(2),
-                Icon(Icons.keyboard_arrow_down,
-                    size: 16, color: AppColors.black.withOpacity(0.6))
-              ],
+      trailing: usuario.isOperador
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: (produto.status.status ==
+                          PedidoProdutoStatus.aguardandoProducao
+                      ? [PedidoProdutoStatus.aguardandoProducao]
+                      : [
+                          PedidoProdutoStatus.produzindo,
+                          PedidoProdutoStatus.pronto
+                        ])
+                  .map(
+                    (status) => Container(
+                      child: InkWell(
+                        onTap: status == produto.status.status
+                            ? null
+                            : () => ordemCtrl.onChangeProdutoStatus(
+                                produto, status),
+                        child: Tooltip(
+                          enableFeedback: status != produto.status.status,
+                          message: status == produto.status.status
+                              ? 'Este pedido atualmente está ${status.label}'
+                              : 'Clique para alterar para ${status.label}',
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: status.color.withValues(
+                                  alpha: status == produto.status.status
+                                      ? 1
+                                      : 0.1),
+                            ),
+                            child: Text(
+                              status.label,
+                              style: AppCss.minimumRegular.setSize(16).copyWith(
+                                    color: (status == PedidoProdutoStatus.pronto
+                                            ? Colors.white
+                                            : Colors.black)
+                                        .withValues(
+                                            alpha:
+                                                status == produto.status.status
+                                                    ? 1
+                                                    : 0.4),
+                                  ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            )
+          : InkWell(
+              onTap: () => ordemCtrl.showBottomChangeProdutoStatus(produto),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                decoration: BoxDecoration(
+                    color: produto.statusView.status.color.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(4)),
+                child: IntrinsicWidth(
+                  child: Row(
+                    children: [
+                      Text(produto.statusView.status.label,
+                          style: AppCss.mediumRegular.setSize(12)),
+                      const W(2),
+                      Icon(Icons.keyboard_arrow_down,
+                          size: 16, color: AppColors.black.withOpacity(0.6))
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 

@@ -1,6 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_produto_status_model.dart';
-import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -15,11 +14,13 @@ class OrdemCollection {
   AppStream<List<OrdemModel>> dataStream = AppStream<List<OrdemModel>>();
   List<OrdemModel> get data => dataStream.value;
 
-  AppStream<List<OrdemModel>> dataNaoConcluidasStream =
+  AppStream<List<OrdemModel>> naoConcluidasStream =
       AppStream<List<OrdemModel>>();
-  List<OrdemModel> get dataNaoConcluidas => dataNaoConcluidasStream.value;
+  List<OrdemModel> get naoConcluidas => naoConcluidasStream.value;
   List<OrdemModel> get ordensNaoCongeladas =>
-      dataNaoConcluidasStream.value.where((e) => !e.freezed.isFreezed).toList();
+      naoConcluidas.where((e) => !e.freezed.isFreezed).toList();
+  List<OrdemModel> get ordensCongeladas =>
+      data.where((e) => e.freezed.isFreezed).toList();
 
   AppStream<List<OrdemModel>> dataConcluidasStream =
       AppStream<List<OrdemModel>>();
@@ -61,7 +62,7 @@ class OrdemCollection {
       return a.beltIndex!.compareTo(b.beltIndex!);
     });
 
-    dataNaoConcluidasStream.add(ordensNaoConcluidas);
+    naoConcluidasStream.add(ordensNaoConcluidas);
 
     dataStream.add([...ordensConcluidas, ...ordensNaoConcluidas]);
   }
@@ -122,9 +123,9 @@ class OrdemCollection {
         return a.beltIndex!.compareTo(b.beltIndex!);
       });
 
-    dataNaoConcluidasStream.add(ordensNaoConcluidas);
+      naoConcluidasStream.add(ordensNaoConcluidas);
 
-    dataStream.add([...ordensConcluidas, ...ordensNaoConcluidas]);
+      dataStream.add([...ordensConcluidas, ...ordensNaoConcluidas]);
     });
   }
 

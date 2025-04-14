@@ -2,6 +2,7 @@ import 'package:aco_plus/app/modules/cliente/ui/clientes_page.dart';
 import 'package:aco_plus/app/modules/dashboard/ui/dashboard_page.dart';
 import 'package:aco_plus/app/modules/fabricante/ui/fabricantes_page.dart';
 import 'package:aco_plus/app/modules/kanban/ui/kanban_page.dart';
+import 'package:aco_plus/app/modules/materia_prima/ui/materias_primas_page.dart';
 import 'package:aco_plus/app/modules/ordem/ui/ordens_page.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedidos_page.dart';
 import 'package:aco_plus/app/modules/produto/ui/produtos_page.dart';
@@ -21,6 +22,7 @@ enum AppModule {
   tags,
   fabricantes,
   produtos,
+  materiaPrima,
 }
 
 extension AppModuleExt on AppModule {
@@ -46,6 +48,8 @@ extension AppModuleExt on AppModule {
         return const FabricantesPage();
       case AppModule.produtos:
         return const ProdutosPage();
+      case AppModule.materiaPrima:
+        return const MateriasPrimasPage();
     }
   }
 
@@ -71,6 +75,8 @@ extension AppModuleExt on AppModule {
         return Icons.business_outlined;
       case AppModule.produtos:
         return Icons.inventory_2_outlined;
+      case AppModule.materiaPrima:
+        return Icons.warehouse_outlined;
     }
   }
 
@@ -96,6 +102,8 @@ extension AppModuleExt on AppModule {
         return 'Fabricantes';
       case AppModule.produtos:
         return 'Produtos';
+      case AppModule.materiaPrima:
+        return 'Materia Prima';
     }
   }
 }

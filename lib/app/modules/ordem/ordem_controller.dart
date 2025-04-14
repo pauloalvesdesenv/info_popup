@@ -195,6 +195,12 @@ class OrdemController {
     if (form.produto == null) {
       throw Exception('Selecione o produto');
     }
+    if (form.fabricante == null) {
+      throw Exception('Selecione o fabricante');
+    }
+    if (form.materiaPrima == null) {
+      throw Exception('Selecione a materia prima');
+    }
   }
 
   Future<void> onDelete(_, OrdemModel ordem) async {
@@ -295,6 +301,11 @@ class OrdemController {
     final produtoStatus = produto.statusess.last.status;
     final status = await showOrdemProdutoStatusBottom(produtoStatus);
     if (status == null || produtoStatus == status) return;
+    await onChangeProdutoStatus(produto, status);
+    onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
+  }
+
+  Future<void> onSelectProdutoStatus(PedidoProdutoModel produto, PedidoProdutoStatus status) async {
     await onChangeProdutoStatus(produto, status);
     onReorder(FirestoreClient.ordens.ordensNaoCongeladas);
   }

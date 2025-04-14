@@ -1,12 +1,14 @@
 class FCMDataModel {
   final String title;
   final String description;
-  final String token;
+  final String? token;
+  final Map<String, dynamic>? data;
 
   FCMDataModel({
     required this.title,
     required this.description,
     required this.token,
+    this.data,
   });
 
   Map<String, dynamic> toMap() => {
@@ -21,6 +23,7 @@ class FCMDataModel {
               "aps": {"category": "NEW_MESSAGE_CATEGORY"}
             }
           }
-        }
+        },
+        "data": data,
       };
 }

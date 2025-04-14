@@ -69,9 +69,27 @@ class PedidoProdutosWidget extends StatelessWidget {
           trailing:
               pedido.isAguardandoEntradaProducao() ? const SizedBox() : null,
           childrenPadding: const EdgeInsets.all(16),
-          subtitle: Text(
-            '${produto.qtde}Kg',
-            style: AppCss.minimumRegular,
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${produto.qtde}Kg',
+                style: AppCss.minimumRegular,
+              ),
+              Builder(builder: (context) {
+                final ordem = pedidoCtrl.getOrdemByProduto(produto);
+
+                return ordem?.materiaPrima != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          '${ordem?.materiaPrima?.fabricanteModel.nome} - ${ordem?.materiaPrima?.corridaLote}',
+                          style: AppCss.minimumBold,
+                        ),
+                      )
+                    : const SizedBox();
+              })
+            ],
           ),
           children: [
             for (final status

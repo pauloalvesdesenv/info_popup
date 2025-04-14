@@ -1,10 +1,12 @@
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/components/h.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
+import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/kanban/ui/components/card/kanban_card_calendar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:separated_column/separated_column.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class KanbanCalendarBuilderWidget extends StatefulWidget {
   const KanbanCalendarBuilderWidget({
@@ -12,12 +14,13 @@ class KanbanCalendarBuilderWidget extends StatefulWidget {
     required this.day,
     required this.pedidos,
     required this.backgroundColor,
+    required this.calendarFormat,
   });
 
   final DateTime day;
   final List<PedidoModel> pedidos;
   final Color backgroundColor;
-
+  final CalendarFormat calendarFormat;
   @override
   State<KanbanCalendarBuilderWidget> createState() =>
       _KanbanCalendarBuilderWidgetState();
@@ -45,22 +48,40 @@ class _KanbanCalendarBuilderWidgetState
               ? const NeverScrollableScrollPhysics()
               : null,
           children: [
-            Center(
-              child: Text(
-                DateFormat('d').format(widget.day),
-                style: AppCss.minimumRegular.copyWith(
-                    color: Colors.grey[900],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 11,
-                    height: 1),
-              ),
+            Stack(
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    DateFormat('d').format(widget.day),
+                    style: AppCss.minimumRegular.copyWith(
+                        color: Colors.grey[900],
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                        height: 1),
+                  ),
+                ),
+                if (widget.pedidos.isNotEmpty)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      onTap: () => kanbanCtrl.setDay({widget.day: widget.pedidos}),
+                      child: Icon(
+                        Icons.fullscreen,
+                        size: 16,
+                        color: Colors.grey[900],
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const H(8),
             if (widget.pedidos.isNotEmpty)
               SeparatedColumn(
                   separatorBuilder: (_, __) => const H(8),
                   children: widget.pedidos
-                      .map((e) => KanbanCardCalendarWidget(e))
+                      .map((e) =>
+                          KanbanCardCalendarWidget(e, widget.calendarFormat))
                       .toList()),
           ],
         ),

@@ -34,12 +34,14 @@ class CommentsWidget extends StatelessWidget {
             CommentAddWidget(
               onSave: (text, mentions) {
                 for (var user in mentions) {
-                  if (user.deviceTokens.isNotEmpty) {
-                    FCMProvider.postSend(
-                      user.id,
-                      FCMDataModel(title: titleNotification, description: text, token: user.deviceTokens.last).toMap(),
-                    );
-                  }
+                  FCMProvider.postSend(
+                    user.id,
+                    FCMDataModel(
+                        title: titleNotification,
+                        description: text,
+                        token: user.deviceTokens.lastOrNull,
+                        data: {'type': 'event', 'id': pedidoCtrl.pedido.id}).toMap(),
+                  );
                 }
                 items.add(
                   CommentModel(

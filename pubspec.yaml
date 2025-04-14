@@ -61,6 +61,7 @@ dependencies:
   printing: ^5.13.1
   info_popup:
     path: packages/info_popup
+  gap: ^3.0.1
 
   # f pub run flutter_launcher_icons && dart run flutter_native_splash:create
 
