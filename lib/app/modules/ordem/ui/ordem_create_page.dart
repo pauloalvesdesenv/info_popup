@@ -1,4 +1,3 @@
-import 'package:aco_plus/app/core/client/firestore/collections/fabricante/fabricante_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/materia_prima/models/materia_prima_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/ordem/models/ordem_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
@@ -92,7 +91,23 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                         form.produto = e;
                         form.produtos.clear();
                         form.materiaPrima = null;
-                        form.fabricante = null;
+                        ordemCtrl.formStream.update();
+                      },
+                    ),
+                    const H(16),
+                    AppDropDown<MateriaPrimaModel?>(
+                      disable: form.produto == null,
+                      label: 'Materia Prima',
+                      item: form.materiaPrima,
+                      itens: [
+                        MateriaPrimaModel.empty(),
+                        ...FirestoreClient.materiaPrimas.data
+                            .where((e) => e.produto.id == form.produto?.id)
+                      ],
+                      itemLabel: (e) =>
+                          '${e!.fabricanteModel.nome} - ${e.corridaLote}',
+                      onSelect: (e) {
+                        form.materiaPrima = e;
                         ordemCtrl.formStream.update();
                       },
                     ),
@@ -204,34 +219,6 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                   color: AppColors.black.withOpacity(0.04), width: 1))),
       child: Column(
         children: [
-          AppDropDown<FabricanteModel?>(
-            disable: form.produto == null,
-            label: 'Fabricante',
-            item: form.fabricante,
-            itens: FirestoreClient.fabricantes.data,
-            itemLabel: (e) => e!.nome,
-            onSelect: (e) {
-              form.fabricante = e;
-              ordemCtrl.formStream.update();
-            },
-          ),
-          const H(16),
-          AppDropDown<MateriaPrimaModel?>(
-            disable: form.produto == null,
-            label: 'Materia Prima',
-            item: form.materiaPrima,
-            itens: FirestoreClient.materiaPrimas.data
-                .where((e) =>
-                    e.fabricanteModel.id == form.fabricante?.id &&
-                    e.produto.id == form.produto?.id)
-                .toList(),
-            itemLabel: (e) => e!.corridaLote,
-            onSelect: (e) {
-              form.materiaPrima = e;
-              ordemCtrl.formStream.update();
-            },
-          ),
-          const H(16),
           Row(
             children: [
               Expanded(

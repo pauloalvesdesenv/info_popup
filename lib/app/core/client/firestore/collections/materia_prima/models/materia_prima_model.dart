@@ -24,7 +24,7 @@ class MateriaPrimaModel {
         id: 'register_unavailable',
         fabricanteModel: FabricanteModel.empty(),
         produto: ProdutoModel.empty(),
-        corridaLote: '',
+        corridaLote: 'Não especificado',
         anexos: [],
         status: MateriaPrimaStatus.disponivel,
       );

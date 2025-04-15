@@ -32,8 +32,7 @@ class PedidoController {
   RelatorioPedidoViewModel get pedidoViewModel => pedidoViewModelStream.value;
 
   void onCreateRelatorioPedido() {
-    List<PedidoModel> pedidos = FirestoreClient
-        .pedidos.data
+    List<PedidoModel> pedidos = FirestoreClient.pedidos.data
         .map((e) =>
             e.copyWith(produtos: e.produtos.map((e) => e.copyWith()).toList()))
         .toList();
@@ -203,11 +202,10 @@ class PedidoController {
         .toList();
     for (final ordem in ordens) {
       ordem.produtos = ordem.produtos
-          .where((e) => _whereProductStatus(e, ordemViewModel.status))
+          .where((e) => !e.pedido.localizador.contains('NOTFOUND') && _whereProductStatus(e, ordemViewModel.status))
           .toList();
     }
 
-    //TODO
     ordens.removeWhere((e) => e.produtos.isEmpty);
     if (ordemViewModel.dates != null) {
       ordens = ordens
@@ -270,7 +268,9 @@ class PedidoController {
     for (var ordem in ordemViewModel.relatorio!.ordens) {
       for (var produto in ordem.produtos) {
         if (produtos.map((e) => e.id).contains(produto.produto.id) == false) {
+          if (produto.produto.nome != 'Produto não encontrado') {
           produtos.add(produto.produto);
+          }
         }
       }
     }

@@ -11,6 +11,7 @@ import 'package:aco_plus/app/core/utils/app_css.dart';
 import 'package:aco_plus/app/core/utils/global_resource.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/kanban/kanban_view_model.dart';
+import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/pedidos_archiveds_page.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -109,7 +110,15 @@ class _KanbanFilterWidgetState extends State<KanbanFilterWidget> {
                       return Align(
                         alignment: Alignment.centerRight,
                         child: InkWell(
-                          onTap: () => push(context, PedidosArchivedsPage()),
+                          onTap: () async {
+                            push(context, PedidosArchivedsPage());
+                            await Future.delayed(
+                                const Duration(milliseconds: 100));
+                            pedidoCtrl.utilsArquiveds.search.text =
+                                utils.search.text;
+                            pedidoCtrl.utilsArquiveds.showFilter = true;
+                            pedidoCtrl.utilsArquivedsStream.update();
+                          },
                           child: Text(
                             'Encontrados ${pedidos.length} pedidos arquivados.',
                             style: AppCss.minimumBold

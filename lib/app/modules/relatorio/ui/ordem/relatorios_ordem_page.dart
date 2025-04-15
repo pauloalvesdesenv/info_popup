@@ -205,7 +205,8 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
                         child: IconButton(
                           onPressed: () {
                             model.dates = null;
-                            relatorioCtrl.onExportRelatorioPedidoPDF(relatorioCtrl.pedidoViewModel);
+                            relatorioCtrl.onExportRelatorioPedidoPDF(
+                                relatorioCtrl.pedidoViewModel);
                             relatorioCtrl.ordemViewModelStream.update();
                           },
                           style: ButtonStyle(
@@ -242,7 +243,20 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: Text(ordem.localizator, style: AppCss.mediumBold)),
+              Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(ordem.localizator, style: AppCss.mediumBold),
+                  if (ordem.materiaPrima != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                          '${ordem.materiaPrima!.fabricanteModel.nome} - ${ordem.materiaPrima!.corridaLote}',
+                          style: AppCss.minimumRegular),
+                    ),
+                ],
+              )),
               Text(
                   DateFormat("'Criado 'dd/MM/yyyy' às 'HH:mm")
                       .format(ordem.createdAt),
@@ -288,7 +302,7 @@ class _RelatoriosOrdemPageState extends State<RelatoriosOrdemPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Text('$label:',
+              child: Text(label,
                   style: labelStyle ??
                       AppCss.minimumRegular
                           .copyWith(fontWeight: FontWeight.w500)),

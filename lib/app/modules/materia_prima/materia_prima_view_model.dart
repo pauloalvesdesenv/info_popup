@@ -2,6 +2,7 @@ import 'package:aco_plus/app/core/client/firestore/collections/fabricante/fabric
 import 'package:aco_plus/app/core/client/firestore/collections/materia_prima/enums/materia_prima_status.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/materia_prima/models/materia_prima_model.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
+import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/components/archive/archive_model.dart';
 import 'package:aco_plus/app/core/models/text_controller.dart';
 import 'package:aco_plus/app/core/services/hash_service.dart';
@@ -26,8 +27,8 @@ class MateriaPrimaCreateModel {
   MateriaPrimaCreateModel.edit(MateriaPrimaModel materiaPrima)
       : id = materiaPrima.id,
         isEdit = true {
-    fabricanteModel = materiaPrima.fabricanteModel;
-    produtoModel = materiaPrima.produto;
+    fabricanteModel = FirestoreClient.fabricantes.getById(materiaPrima.fabricanteModel.id);
+    produtoModel = FirestoreClient.produtos.getById(materiaPrima.produto.id);
     corridaLote.text = materiaPrima.corridaLote;
     anexos = materiaPrima.anexos;
   }

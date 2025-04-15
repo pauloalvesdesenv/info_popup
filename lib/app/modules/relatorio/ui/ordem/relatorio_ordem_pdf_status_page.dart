@@ -61,6 +61,11 @@ class RelatorioOrdemPdfStatusPage {
           ),
           _itemInfo('Bitola', '${ordem.produto.descricaoReplaced}mm'),
           PdfDivisor.build(),
+          if (ordem.materiaPrima != null) ...[
+            _itemInfo('Materia Prima',
+                '${ordem.materiaPrima!.fabricanteModel.nome} - ${ordem.materiaPrima!.corridaLote}'),
+            PdfDivisor.build(),
+          ],
           for (final produto in ordem.produtos)
             pw.Column(
               children: [
