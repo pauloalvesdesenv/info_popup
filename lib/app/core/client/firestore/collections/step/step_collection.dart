@@ -1,4 +1,3 @@
-
 import 'package:aco_plus/app/core/client/firestore/collections/step/models/step_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -54,26 +53,27 @@ class StepCollection {
     _isListen = true;
     (field != null
             ? collection.where(
-                field,
-                isEqualTo: isEqualTo,
-                isNotEqualTo: isNotEqualTo,
-                isLessThan: isLessThan,
-                isLessThanOrEqualTo: isLessThanOrEqualTo,
-                isGreaterThan: isGreaterThan,
-                isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
-                arrayContains: arrayContains,
-                arrayContainsAny: arrayContainsAny,
-                whereIn: whereIn,
-                whereNotIn: whereNotIn,
-                isNull: isNull,
-              )
+              field,
+              isEqualTo: isEqualTo,
+              isNotEqualTo: isNotEqualTo,
+              isLessThan: isLessThan,
+              isLessThanOrEqualTo: isLessThanOrEqualTo,
+              isGreaterThan: isGreaterThan,
+              isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
+              arrayContains: arrayContains,
+              arrayContainsAny: arrayContainsAny,
+              whereIn: whereIn,
+              whereNotIn: whereNotIn,
+              isNull: isNull,
+            )
             : collection)
         .snapshots()
         .listen((e) {
-      final countries = e.docs.map((e) => StepModel.fromMap(e.data())).toList();
-      countries.sort((a, b) => a.index.compareTo(b.index));
-      dataStream.add(countries);
-    });
+          final countries =
+              e.docs.map((e) => StepModel.fromMap(e.data())).toList();
+          countries.sort((a, b) => a.index.compareTo(b.index));
+          dataStream.add(countries);
+        });
   }
 
   StepModel getById(String id) {
@@ -89,7 +89,7 @@ class StepCollection {
 
   Future<StepModel?> update(StepModel model) async {
     await collection.doc(model.id).update(model.toMap());
-      return model;
+    return model;
   }
 
   Future<void> delete(StepModel model) async {

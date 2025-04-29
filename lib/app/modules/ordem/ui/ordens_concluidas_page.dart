@@ -38,89 +38,100 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
   Widget build(BuildContext context) {
     return AppScaffold(
       appBar: AppBar(
-        title: Text('Ordens Concluídas',
-            style: AppCss.largeBold.setColor(AppColors.white)),
+        title: Text(
+          'Ordens Concluídas',
+          style: AppCss.largeBold.setColor(AppColors.white),
+        ),
         actions: [
           Tooltip(
             message: 'Filtro',
             child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    ordemCtrl.utilsConcluidas.showFilter =
-                        !ordemCtrl.utilsConcluidas.showFilter;
-                    ordemCtrl.utilsConcluidasStream.update();
-                  });
-                },
-                icon: Icon(
-                  Icons.sort,
-                  color: AppColors.white,
-                )),
+              onPressed: () {
+                setState(() {
+                  ordemCtrl.utilsConcluidas.showFilter =
+                      !ordemCtrl.utilsConcluidas.showFilter;
+                  ordemCtrl.utilsConcluidasStream.update();
+                });
+              },
+              icon: Icon(Icons.sort, color: AppColors.white),
+            ),
           ),
         ],
         backgroundColor: AppColors.primaryMain,
       ),
       body: StreamOut<List<OrdemModel>>(
         stream: FirestoreClient.ordens.dataConcluidasStream.listen,
-        builder: (_, __) => StreamOut<OrdemConcluidasUtils>(
-          stream: ordemCtrl.utilsConcluidasStream.listen,
-          builder: (_, utilsConcluidas) {
-            List<OrdemModel> ordens = ordemCtrl
-                .getOrdensFiltered(utilsConcluidas.search.text,
-                    __.where((e) => e.produtos.isNotEmpty).toList())
-                .toList();
-            if (utilsConcluidas.produto != null) {
-              ordens = ordens
-                  .where((e) => e.produto.id == utilsConcluidas.produto!.id)
-                  .toList();
-            }
-            ordens.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-            return RefreshIndicator(
-              onRefresh: () async => FirestoreClient.ordens.fetch(),
-              child: ListView(
-                children: [
-                  if (utilsConcluidas.showFilter)
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          AppField(
-                            label: 'Pesquisar',
-                            controller: utilsConcluidas.search,
-                            suffixIcon: Icons.search,
-                            onChanged: (_) =>
-                                ordemCtrl.utilsConcluidasStream.update(),
-                          ),
-                          const H(16),
-                          AppDropDown<ProdutoModel?>(
-                            label: 'Bitola',
-                            item: utilsConcluidas.produto,
-                            itens: FirestoreClient.produtos.data.toList(),
-                            itemLabel: (e) => e != null
-                                ? e.descricao
-                                : 'Selecione um produto',
-                            onSelect: (e) {
-                              utilsConcluidas.produto = e;
-                              ordemCtrl.utilsConcluidasStream.update();
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ordens.isEmpty
-                      ? const EmptyData()
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          cacheExtent: 200,
-                          itemCount: ordens.length,
-                          itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
+        builder:
+            (_, __) => StreamOut<OrdemConcluidasUtils>(
+              stream: ordemCtrl.utilsConcluidasStream.listen,
+              builder: (_, utilsConcluidas) {
+                List<OrdemModel> ordens =
+                    ordemCtrl
+                        .getOrdensFiltered(
+                          utilsConcluidas.search.text,
+                          __.where((e) => e.produtos.isNotEmpty).toList(),
                         )
-                ],
-              ),
-            );
-          },
-        ),
+                        .toList();
+                if (utilsConcluidas.produto != null) {
+                  ordens =
+                      ordens
+                          .where(
+                            (e) => e.produto.id == utilsConcluidas.produto!.id,
+                          )
+                          .toList();
+                }
+                ordens.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+                return RefreshIndicator(
+                  onRefresh: () async => FirestoreClient.ordens.fetch(),
+                  child: ListView(
+                    children: [
+                      if (utilsConcluidas.showFilter)
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              AppField(
+                                label: 'Pesquisar',
+                                controller: utilsConcluidas.search,
+                                suffixIcon: Icons.search,
+                                onChanged:
+                                    (_) =>
+                                        ordemCtrl.utilsConcluidasStream
+                                            .update(),
+                              ),
+                              const H(16),
+                              AppDropDown<ProdutoModel?>(
+                                label: 'Bitola',
+                                item: utilsConcluidas.produto,
+                                itens: FirestoreClient.produtos.data.toList(),
+                                itemLabel:
+                                    (e) =>
+                                        e != null
+                                            ? e.descricao
+                                            : 'Selecione um produto',
+                                onSelect: (e) {
+                                  utilsConcluidas.produto = e;
+                                  ordemCtrl.utilsConcluidasStream.update();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ordens.isEmpty
+                          ? const EmptyData()
+                          : ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            cacheExtent: 200,
+                            itemCount: ordens.length,
+                            itemBuilder: (_, i) => _itemOrdemWidget(ordens[i]),
+                          ),
+                    ],
+                  ),
+                );
+              },
+            ),
       ),
     );
   }
@@ -142,10 +153,7 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      ordem.localizator,
-                      style: AppCss.mediumBold,
-                    ),
+                    Text(ordem.localizator, style: AppCss.mediumBold),
                     Text(
                       '${ordem.produto.nome} ${ordem.produto.descricao} - ${ordem.produtos.fold(0.0, (previousValue, element) => previousValue + element.qtde).toKg()}',
                       style: AppCss.minimumRegular
@@ -165,14 +173,23 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
               if (ordem.produtos.isNotEmpty)
                 Row(
                   children: [
-                    _progressChartWidget(PedidoProdutoStatus.aguardandoProducao,
-                        ordem.getPrcntgAguardando(), ordem.freezed.isFreezed),
+                    _progressChartWidget(
+                      PedidoProdutoStatus.aguardandoProducao,
+                      ordem.getPrcntgAguardando(),
+                      ordem.freezed.isFreezed,
+                    ),
                     const W(16),
-                    _progressChartWidget(PedidoProdutoStatus.produzindo,
-                        ordem.getPrcntgProduzindo(), ordem.freezed.isFreezed),
+                    _progressChartWidget(
+                      PedidoProdutoStatus.produzindo,
+                      ordem.getPrcntgProduzindo(),
+                      ordem.freezed.isFreezed,
+                    ),
                     const W(16),
-                    _progressChartWidget(PedidoProdutoStatus.pronto,
-                        ordem.getPrcntgPronto(), ordem.freezed.isFreezed),
+                    _progressChartWidget(
+                      PedidoProdutoStatus.pronto,
+                      ordem.getPrcntgPronto(),
+                      ordem.freezed.isFreezed,
+                    ),
                   ],
                 ),
               if (ordem.produtos.isEmpty)
@@ -197,22 +214,26 @@ class _OrdensConcluidasPageState extends State<OrdensConcluidasPage> {
   }
 
   Widget _progressChartWidget(
-      PedidoProdutoStatus status, double porcentagem, bool isFreezed) {
+    PedidoProdutoStatus status,
+    double porcentagem,
+    bool isFreezed,
+  ) {
     return Stack(
       alignment: Alignment.center,
       children: [
         CircularProgressIndicator(
           value: porcentagem,
-          backgroundColor:
-              (isFreezed ? Colors.grey[600]! : status.color).withOpacity(0.2),
+          backgroundColor: (isFreezed ? Colors.grey[600]! : status.color)
+              .withValues(alpha: 0.2),
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation(
-              isFreezed ? Colors.grey[600]! : status.color),
+            isFreezed ? Colors.grey[600]! : status.color,
+          ),
         ),
         Text(
           '${(porcentagem * 100).percent}%',
           style: AppCss.minimumBold.setSize(10),
-        )
+        ),
       ],
     );
   }

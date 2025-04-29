@@ -1,4 +1,3 @@
-
 import 'package:aco_plus/app/core/client/firestore/collections/produto/produto_model.dart';
 import 'package:aco_plus/app/core/models/app_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -53,39 +52,39 @@ class ProdutoCollection {
     _isListen = true;
     (field != null
             ? collection.where(
-                field,
-                isEqualTo: isEqualTo,
-                isNotEqualTo: isNotEqualTo,
-                isLessThan: isLessThan,
-                isLessThanOrEqualTo: isLessThanOrEqualTo,
-                isGreaterThan: isGreaterThan,
-                isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
-                arrayContains: arrayContains,
-                arrayContainsAny: arrayContainsAny,
-                whereIn: whereIn,
-                whereNotIn: whereNotIn,
-                isNull: isNull,
-              )
+              field,
+              isEqualTo: isEqualTo,
+              isNotEqualTo: isNotEqualTo,
+              isLessThan: isLessThan,
+              isLessThanOrEqualTo: isLessThanOrEqualTo,
+              isGreaterThan: isGreaterThan,
+              isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
+              arrayContains: arrayContains,
+              arrayContainsAny: arrayContainsAny,
+              whereIn: whereIn,
+              whereNotIn: whereNotIn,
+              isNull: isNull,
+            )
             : collection)
         .snapshots()
         .listen((e) {
-      final countries =
-          e.docs.map((e) => ProdutoModel.fromMap(e.data())).toList();
-      countries.sort((a, b) => a.number.compareTo(b.number));
-      dataStream.add(countries);
-    });
+          final countries =
+              e.docs.map((e) => ProdutoModel.fromMap(e.data())).toList();
+          countries.sort((a, b) => a.number.compareTo(b.number));
+          dataStream.add(countries);
+        });
   }
 
   ProdutoModel getById(String id) => data.singleWhere((e) => e.id == id);
 
   Future<ProdutoModel?> add(ProdutoModel model) async {
     await collection.doc(model.id).set(model.toMap());
-      return model;
+    return model;
   }
 
   Future<ProdutoModel?> update(ProdutoModel model) async {
     await collection.doc(model.id).update(model.toMap());
-      return model;
+    return model;
   }
 
   Future<void> delete(ProdutoModel model) async {

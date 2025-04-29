@@ -13,12 +13,12 @@ class HighLightTheme {
           '\n\nThe backgroundColor can not be transparent. \n'
           'Description: The backgroundColor can not be transparent. '
           'Please use another color.  \n \n'
-          'For example: Colors.black.withOpacity(.5) \n',
+          'For example: Colors.black.withValues(alpha: .5) \n',
         );
 
   /// Default [HighLightTheme].
   factory HighLightTheme.defaultTheme() => HighLightTheme(
-        backgroundColor: Colors.black.withOpacity(.5),
+        backgroundColor: Colors.black.withValues(alpha: .5),
       );
 
   /// The [radius] of the highlighter.

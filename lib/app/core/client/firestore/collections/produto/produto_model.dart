@@ -11,11 +11,12 @@ class ProdutoModel {
   final FabricanteModel fabricante;
 
   factory ProdutoModel.empty() => ProdutoModel(
-      id: HashService.get,
-      nome: 'Produto não encontrado',
-      descricao: 'Este produto não foi encontrado no sistema',
-      fabricante: FabricanteModel.empty(),
-      massaFinal: 0.0);
+    id: HashService.get,
+    nome: 'Produto não encontrado',
+    descricao: 'Este produto não foi encontrado no sistema',
+    fabricante: FabricanteModel.empty(),
+    massaFinal: 0.0,
+  );
 
   String get descricaoReplaced =>
       descricao.replaceAll('mm', '').replaceAll('.0', '');
@@ -51,9 +52,10 @@ class ProdutoModel {
       nome: map['nome'] ?? '',
       descricao: map['descricao'] ?? '',
       massaFinal: double.tryParse(map['massaFinal'].toString()) ?? 0.0,
-      fabricante: map['fabricante'] != null
-          ? FabricanteModel.fromMap(map['fabricante'])
-          : FabricanteModel.empty(),
+      fabricante:
+          map['fabricante'] != null
+              ? FabricanteModel.fromMap(map['fabricante'])
+              : FabricanteModel.empty(),
     );
   }
 

@@ -19,14 +19,15 @@ class PedidoEtapaController {
 
   // PEDIDOS QUE ENTRARAM QUE COMEÇARAM A PRODUÇÃO HOJE
   // PEDIDOS QUE FORAM FINALIZADOS HOJE
-  List<GraphModel> getCartesianChart(
-    PedidoEtapaGraphModel filter,
-  ) {
-    List<PedidoModel> pedidos = FirestoreClient
-        .pedidos.data
-        .map((e) =>
-            e.copyWith(produtos: e.produtos.map((e) => e.copyWith()).toList()))
-        .toList();
+  List<GraphModel> getCartesianChart(PedidoEtapaGraphModel filter) {
+    List<PedidoModel> pedidos =
+        FirestoreClient.pedidos.data
+            .map(
+              (e) => e.copyWith(
+                produtos: e.produtos.map((e) => e.copyWith()).toList(),
+              ),
+            )
+            .toList();
 
     List<GraphModel> source = [];
 
@@ -39,11 +40,14 @@ class PedidoEtapaController {
         lengthFinal++;
       }
       if (volFinal > 0) {
-        source.add(GraphModel(
+        source.add(
+          GraphModel(
             vol: volFinal,
             label: step.name,
             length: lengthFinal,
-            color: step.color));
+            color: step.color,
+          ),
+        );
       }
     }
 

@@ -5,14 +5,12 @@ import 'package:aco_plus/app/core/extensions/date_ext.dart';
 import 'package:aco_plus/app/core/extensions/double_ext.dart';
 import 'package:aco_plus/app/core/utils/app_colors.dart';
 import 'package:aco_plus/app/core/utils/app_css.dart';
-import 'package:aco_plus/app/core/utils/global_resource.dart';
-import 'package:aco_plus/app/modules/pedido/ui/pedido_page.dart';
 import 'package:flutter/material.dart';
 
 class PedidoItemWidget extends StatelessWidget {
   final PedidoModel pedido;
   final Function(PedidoModel) onTap;
-    const PedidoItemWidget({
+  const PedidoItemWidget({
     super.key,
     required this.pedido,
     required this.onTap,
@@ -27,11 +25,7 @@ class PedidoItemWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.neutralLight,
-                ),
-              ),
+              border: Border(bottom: BorderSide(color: AppColors.neutralLight)),
             ),
             child: Row(
               children: [
@@ -39,17 +33,14 @@ class PedidoItemWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        pedido.localizador,
-                        style: AppCss.mediumBold,
-                      ),
-                      Text(
-                        '${pedido.cliente.nome} - ${pedido.obra.descricao}',
-                      ),
+                      Text(pedido.localizador, style: AppCss.mediumBold),
+                      Text('${pedido.cliente.nome} - ${pedido.obra.descricao}'),
                       Text(
                         pedido.produtos
-                            .map((e) =>
-                                '${'${e.produto.descricao} - ${e.qtde}'}Kg')
+                            .map(
+                              (e) =>
+                                  '${'${e.produto.descricao} - ${e.qtde}'}Kg',
+                            )
                             .join(', '),
                         style: AppCss.minimumRegular
                             .setSize(11)
@@ -68,21 +59,29 @@ class PedidoItemWidget extends StatelessWidget {
                 ),
                 const W(8),
                 ColorFiltered(
-                  colorFilter: pedido.isAguardandoEntradaProducao()
-                      ? ColorFilter.mode(Colors.grey[200]!, BlendMode.srcIn)
-                      : const ColorFilter.mode(
-                          Colors.transparent, BlendMode.color),
+                  colorFilter:
+                      pedido.isAguardandoEntradaProducao()
+                          ? ColorFilter.mode(Colors.grey[200]!, BlendMode.srcIn)
+                          : const ColorFilter.mode(
+                            Colors.transparent,
+                            BlendMode.color,
+                          ),
                   child: Row(
                     children: [
                       _progressChartWidget(
-                          PedidoProdutoStatus.aguardandoProducao,
-                          pedido.getPrcntgAguardandoProducao()),
-                      const W(16),
-                      _progressChartWidget(PedidoProdutoStatus.produzindo,
-                          pedido.getPrcntgProduzindo()),
+                        PedidoProdutoStatus.aguardandoProducao,
+                        pedido.getPrcntgAguardandoProducao(),
+                      ),
                       const W(16),
                       _progressChartWidget(
-                          PedidoProdutoStatus.pronto, pedido.getPrcntgPronto()),
+                        PedidoProdutoStatus.produzindo,
+                        pedido.getPrcntgProduzindo(),
+                      ),
+                      const W(16),
+                      _progressChartWidget(
+                        PedidoProdutoStatus.pronto,
+                        pedido.getPrcntgPronto(),
+                      ),
                     ],
                   ),
                 ),
@@ -103,12 +102,13 @@ class PedidoItemWidget extends StatelessWidget {
                 margin: const EdgeInsets.all(0.5),
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: pedido.step.color.withOpacity(0.15),
+                  color: pedido.step.color.withValues(alpha: 0.15),
                 ),
                 child: Text(
                   pedido.steps.last.step.name,
-                  style:
-                      AppCss.minimumBold.setSize(9).setColor(Colors.grey[800]!),
+                  style: AppCss.minimumBold
+                      .setSize(9)
+                      .setColor(Colors.grey[800]!),
                 ),
               ),
             ),
@@ -123,14 +123,14 @@ class PedidoItemWidget extends StatelessWidget {
       children: [
         CircularProgressIndicator(
           value: porcentagem,
-          backgroundColor: status.color.withOpacity(0.2),
+          backgroundColor: status.color.withValues(alpha: 0.2),
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation(status.color),
         ),
         Text(
           '${(porcentagem * 100).percent}%',
           style: AppCss.minimumBold.setSize(10),
-        )
+        ),
       ],
     );
   }

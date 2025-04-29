@@ -42,32 +42,34 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-        resizeAvoid: true,
-        appBar: AppBar(
-          leading: IconButton(
-              onPressed: () => pop(context),
-              icon: Icon(
-                Icons.arrow_back,
-                color: AppColors.white,
-              )),
-          title: Text('${ordemCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Ordem',
-              style: AppCss.largeBold.setColor(AppColors.white)),
-          actions: [
-            if ((widget.ordem != null &&
-                    usuario.permission.ordem
-                        .contains(UserPermissionType.update)) ||
-                (widget.ordem == null &&
-                    usuario.permission.ordem
-                        .contains(UserPermissionType.create)))
-              IconLoadingButton(() async {
-                await ordemCtrl.onConfirm(context, widget.ordem);
-              })
-          ],
-          backgroundColor: AppColors.primaryMain,
+      resizeAvoid: true,
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => pop(context),
+          icon: Icon(Icons.arrow_back, color: AppColors.white),
         ),
-        body: StreamOut(
-            stream: ordemCtrl.formStream.listen,
-            builder: (_, form) => body(form)));
+        title: Text(
+          '${ordemCtrl.form.isEdit ? 'Editar' : 'Adicionar'} Ordem',
+          style: AppCss.largeBold.setColor(AppColors.white),
+        ),
+        actions: [
+          if ((widget.ordem != null &&
+                  usuario.permission.ordem.contains(
+                    UserPermissionType.update,
+                  )) ||
+              (widget.ordem == null &&
+                  usuario.permission.ordem.contains(UserPermissionType.create)))
+            IconLoadingButton(() async {
+              await ordemCtrl.onConfirm(context, widget.ordem);
+            }),
+        ],
+        backgroundColor: AppColors.primaryMain,
+      ),
+      body: StreamOut(
+        stream: ordemCtrl.formStream.listen,
+        builder: (_, form) => body(form),
+      ),
+    );
   }
 
   Widget body(OrdemCreateModel form) {
@@ -101,11 +103,13 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                       item: form.materiaPrima,
                       itens: [
                         MateriaPrimaModel.empty(),
-                        ...FirestoreClient.materiaPrimas.data
-                            .where((e) => e.produto.id == form.produto?.id)
+                        ...FirestoreClient.materiaPrimas.data.where(
+                          (e) => e.produto.id == form.produto?.id,
+                        ),
                       ],
-                      itemLabel: (e) =>
-                          '${e!.fabricanteModel.nome} - ${e.corridaLote}',
+                      itemLabel:
+                          (e) =>
+                              '${e!.fabricanteModel.nome} - ${e.corridaLote}',
                       onSelect: (e) {
                         form.materiaPrima = e;
                         ordemCtrl.formStream.update();
@@ -116,9 +120,10 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                       onTap: () {
                         setState(() {
                           form.localizador.controller.selection = TextSelection(
-                              baseOffset: 0,
-                              extentOffset: form
-                                  .localizador.controller.value.text.length);
+                            baseOffset: 0,
+                            extentOffset:
+                                form.localizador.controller.value.text.length,
+                          );
                         });
                       },
                       label: 'Filtrar por localizador',
@@ -157,74 +162,92 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
               if (form.produto != null)
                 Builder(
                   builder: (_) {
-                    List<PedidoProdutoModel> produtos =
-                        ordemCtrl.getPedidosPorProduto(form.produto!,
-                            ordem: widget.ordem);
-                    produtos = produtos
-                        .where((produto) => !form.produtos
-                            .map((e) => e.id)
-                            .contains(produto.id))
-                        .toList();
+                    List<PedidoProdutoModel> produtos = ordemCtrl
+                        .getPedidosPorProduto(
+                          form.produto!,
+                          ordem: widget.ordem,
+                        );
+                    produtos =
+                        produtos
+                            .where(
+                              (produto) =>
+                                  !form.produtos
+                                      .map((e) => e.id)
+                                      .contains(produto.id),
+                            )
+                            .toList();
 
                     return Column(
                       children: [
                         for (PedidoProdutoModel produto in produtos)
                           _itemProduto(
-                              isEnable: produto.isAvailable,
-                              produto: produto,
-                              check: form.produtos
-                                  .map((e) => e.id)
-                                  .contains(produto.id),
-                              onTap: () {
-                                form.produtos
-                                        .map((e) => e.id)
-                                        .contains(produto.id)
-                                    ? form.produtos
-                                        .removeWhere((e) => e.id == produto.id)
-                                    : form.produtos.add(produto);
-                                ordemCtrl.formStream.update();
-                              })
+                            isEnable: produto.isAvailable,
+                            produto: produto,
+                            check: form.produtos
+                                .map((e) => e.id)
+                                .contains(produto.id),
+                            onTap: () {
+                              form.produtos
+                                      .map((e) => e.id)
+                                      .contains(produto.id)
+                                  ? form.produtos.removeWhere(
+                                    (e) => e.id == produto.id,
+                                  )
+                                  : form.produtos.add(produto);
+                              ordemCtrl.formStream.update();
+                            },
+                          ),
                       ],
                     );
                   },
-                )
+                ),
             ],
           ),
         ),
-        _bottom(form)
+        _bottom(form),
       ],
     );
   }
 
   Container _bottom(OrdemCreateModel form) {
-    List<PedidoProdutoModel> produtos = form.produto != null
-        ? ordemCtrl.getPedidosPorProduto(form.produto!, ordem: widget.ordem)
-        : <PedidoProdutoModel>[];
-    produtos = produtos
-        .where((produto) => form.produtos.map((e) => e.id).contains(produto.id))
-        .toList();
+    List<PedidoProdutoModel> produtos =
+        form.produto != null
+            ? ordemCtrl.getPedidosPorProduto(form.produto!, ordem: widget.ordem)
+            : <PedidoProdutoModel>[];
+    produtos =
+        produtos
+            .where(
+              (produto) => form.produtos.map((e) => e.id).contains(produto.id),
+            )
+            .toList();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: AppColors.white,
-          border: Border(
-              top: BorderSide(
-                  color: AppColors.black.withOpacity(0.04), width: 1))),
+        color: AppColors.white,
+        border: Border(
+          top: BorderSide(
+            color: AppColors.black.withValues(alpha: 0.04),
+            width: 1,
+          ),
+        ),
+      ),
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: () =>
-                      showOrderCreatePedidosSelecionadosBottom(widget.ordem),
+                  onTap:
+                      () => showOrderCreatePedidosSelecionadosBottom(
+                        widget.ordem,
+                      ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -245,14 +268,12 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                 ),
               ),
               IconButton(
-                  onPressed: () {
-                    form.produtos.clear();
-                    ordemCtrl.formStream.update();
-                  },
-                  icon: Icon(
-                    Icons.delete_outline,
-                    color: AppColors.white,
-                  ))
+                onPressed: () {
+                  form.produtos.clear();
+                  ordemCtrl.formStream.update();
+                },
+                icon: Icon(Icons.delete_outline, color: AppColors.white),
+              ),
             ],
           ),
         ],
@@ -260,13 +281,14 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
     );
   }
 
-  Widget _itemProduto(
-      {required PedidoProdutoModel produto,
-      required bool check,
-      required void Function() onTap,
-      required bool isEnable}) {
+  Widget _itemProduto({
+    required PedidoProdutoModel produto,
+    required bool check,
+    required void Function() onTap,
+    required bool isEnable,
+  }) {
     return Container(
-      color: !isEnable ? AppColors.black.withOpacity(0.04) : null,
+      color: !isEnable ? AppColors.black.withValues(alpha: 0.04) : null,
       child: IgnorePointer(
         ignoring: !isEnable,
         child: InkWell(
@@ -275,7 +297,9 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                    color: AppColors.black.withOpacity(0.04), width: 1),
+                  color: AppColors.black.withValues(alpha: 0.04),
+                  width: 1,
+                ),
                 borderRadius: BorderRadius.circular(4),
               ),
               padding: const EdgeInsets.all(16),
@@ -303,16 +327,22 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                             const W(8),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
-                                  color: produto.pedido.tipo.backgroundColor,
-                                  borderRadius: BorderRadius.circular(4)),
-                              child: Text(produto.pedido.tipo.label,
-                                  style: AppCss.minimumBold
-                                      .setColor(
-                                          produto.pedido.tipo.foregroundColor)
-                                      .setSize(11)),
-                            )
+                                color: produto.pedido.tipo.backgroundColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                produto.pedido.tipo.label,
+                                style: AppCss.minimumBold
+                                    .setColor(
+                                      produto.pedido.tipo.foregroundColor,
+                                    )
+                                    .setSize(11),
+                              ),
+                            ),
                           ],
                         ),
                         Text(
@@ -328,7 +358,7 @@ class _OrdemCreatePageState extends State<OrdemCreatePage> {
                     onPressed: () {},
                     icon: const Icon(Icons.add),
                     label: const Text('Adicionar'),
-                  )
+                  ),
                 ],
               ),
             ),

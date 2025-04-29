@@ -16,13 +16,11 @@ class ProdutoCreateModel {
   FabricanteModel? fabricante;
   late bool isEdit;
 
-  ProdutoCreateModel()
-      : id = HashService.get,
-        isEdit = false;
+  ProdutoCreateModel() : id = HashService.get, isEdit = false;
 
   ProdutoCreateModel.edit(ProdutoModel produto)
-      : id = produto.id,
-        isEdit = true {
+    : id = produto.id,
+      isEdit = true {
     nome.text = produto.nome;
     descricao.text = produto.descricao;
     fabricante = produto.fabricante;
@@ -30,10 +28,10 @@ class ProdutoCreateModel {
   }
 
   ProdutoModel toProdutoModel() => ProdutoModel(
-        id: id,
-        nome: nome.text,
-        descricao: descricao.text,
-        fabricante: fabricante!,
-        massaFinal: massaFinal.doubleValue
-      );
+    id: id,
+    nome: nome.text,
+    descricao: descricao.text,
+    fabricante: fabricante!,
+    massaFinal: massaFinal.doubleValue,
+  );
 }

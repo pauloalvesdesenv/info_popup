@@ -33,14 +33,17 @@ class StepModel {
     isShipping: false,
     shipping: null,
     isArchivedAvailable: false,
-    isPermiteProducao: false
+    isPermiteProducao: false,
   );
 
-  List<StepModel> get fromSteps => fromStepsIds
-      .map((e) => FirestoreClient.steps
-          .getById(e)
-          .copyWith(fromStepsIds: [], toStepsIds: []))
-      .toList();
+  List<StepModel> get fromSteps =>
+      fromStepsIds
+          .map(
+            (e) => FirestoreClient.steps
+                .getById(e)
+                .copyWith(fromStepsIds: [], toStepsIds: []),
+          )
+          .toList();
 
   bool get isEnable => moveRoles.contains(usuario.role);
 
@@ -72,7 +75,7 @@ class StepModel {
     bool? isShipping,
     StepShippingModel? shipping,
     bool? isArchivedAvailable,
-    bool? isPermiteProducao
+    bool? isPermiteProducao,
   }) {
     return StepModel(
       id: id ?? this.id,
@@ -117,8 +120,10 @@ class StepModel {
     };
   }
 
-  factory StepModel.fromMap(Map<String, dynamic> map,
-      {bool isHistory = false}) {
+  factory StepModel.fromMap(
+    Map<String, dynamic> map, {
+    bool isHistory = false,
+  }) {
     if (isHistory) {
       return StepModel(
         id: map['id'] ?? '',
@@ -130,11 +135,12 @@ class StepModel {
         createdAt: DateTime.now(),
         isDefault: false,
         isShipping: map['isShipping'] ?? false,
-        shipping: map['shipping'] != null
-            ? StepShippingModel.fromMap(map['shipping'])
-            : null,
-            isArchivedAvailable: false,
-            isPermiteProducao: false,
+        shipping:
+            map['shipping'] != null
+                ? StepShippingModel.fromMap(map['shipping'])
+                : null,
+        isArchivedAvailable: false,
+        isPermiteProducao: false,
       );
     }
     return StepModel(
@@ -142,17 +148,20 @@ class StepModel {
       name: map['name'] ?? '',
       index: map['index'] ?? 0,
       color: Color(map['color']),
-      fromStepsIds: map['fromStepsIds'] != null
-          ? List<String>.from(map['fromStepsIds'])
-          : <String>[],
+      fromStepsIds:
+          map['fromStepsIds'] != null
+              ? List<String>.from(map['fromStepsIds'])
+              : <String>[],
       moveRoles: List<UsuarioRole>.from(
-          map['moveRoles']?.map((x) => UsuarioRole.values[x])),
+        map['moveRoles']?.map((x) => UsuarioRole.values[x]),
+      ),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
       isDefault: map['isDefault'] ?? false,
       isShipping: map['isShipping'] ?? false,
-      shipping: map['shipping'] != null
-          ? StepShippingModel.fromMap(map['shipping'])
-          : null,
+      shipping:
+          map['shipping'] != null
+              ? StepShippingModel.fromMap(map['shipping'])
+              : null,
       isArchivedAvailable: map['isArchivedAvailable'] ?? false,
       isPermiteProducao: map['isPermiteProducao'] ?? false,
     );

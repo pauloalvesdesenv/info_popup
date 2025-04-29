@@ -1,6 +1,5 @@
 import 'package:aco_plus/app/core/client/firestore/collections/notificacao/notificacao_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
-import 'package:aco_plus/app/core/components/app_drawer.dart';
 import 'package:aco_plus/app/core/components/app_field.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
@@ -25,7 +24,9 @@ class NotificacoesPage extends StatefulWidget {
 class _NotificacoesPageState extends State<NotificacoesPage> {
   @override
   void initState() {
-    FirestoreClient.notificacoes.fetch().then((_) => notificacaoCtrl.setViewed());
+    FirestoreClient.notificacoes.fetch().then(
+      (_) => notificacaoCtrl.setViewed(),
+    );
 
     super.initState();
   }
@@ -34,42 +35,55 @@ class _NotificacoesPageState extends State<NotificacoesPage> {
   Widget build(BuildContext context) {
     return AppScaffold(
       appBar: AppBar(
-        title: Text('Notificacões', style: AppCss.largeBold.setColor(AppColors.white)),
+        title: Text(
+          'Notificacões',
+          style: AppCss.largeBold.setColor(AppColors.white),
+        ),
         backgroundColor: AppColors.primaryMain,
       ),
       body: StreamOut<List<NotificacaoModel>>(
         stream: FirestoreClient.notificacoes.dataStream.listen,
-        builder: (_, __) => StreamOut<NotificacaoUtils>(
-          stream: notificacaoCtrl.utilsStream.listen,
-          builder: (_, utils) {
-            final notificacoes = notificacaoCtrl.getNotificacaoesFiltered(utils.search.text, __).toList();
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: AppField(
-                    hint: 'Pesquisar',
-                    controller: utils.search,
-                    suffixIcon: Icons.search,
-                    onChanged: (_) => notificacaoCtrl.utilsStream.update(),
-                  ),
-                ),
-                Expanded(
-                  child: notificacoes.isEmpty
-                      ? const EmptyData()
-                      : RefreshIndicator(
-                          onRefresh: () async => FirestoreClient.notificacoes.fetch(),
-                          child: ListView.separated(
-                            itemCount: notificacoes.length,
-                            separatorBuilder: (_, i) => const Divisor(),
-                            itemBuilder: (_, i) => _itemNotificacaoWidget(notificacoes[i]),
-                          ),
-                        ),
-                ),
-              ],
-            );
-          },
-        ),
+        builder:
+            (_, __) => StreamOut<NotificacaoUtils>(
+              stream: notificacaoCtrl.utilsStream.listen,
+              builder: (_, utils) {
+                final notificacoes =
+                    notificacaoCtrl
+                        .getNotificacaoesFiltered(utils.search.text, __)
+                        .toList();
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: AppField(
+                        hint: 'Pesquisar',
+                        controller: utils.search,
+                        suffixIcon: Icons.search,
+                        onChanged: (_) => notificacaoCtrl.utilsStream.update(),
+                      ),
+                    ),
+                    Expanded(
+                      child:
+                          notificacoes.isEmpty
+                              ? const EmptyData()
+                              : RefreshIndicator(
+                                onRefresh:
+                                    () async =>
+                                        FirestoreClient.notificacoes.fetch(),
+                                child: ListView.separated(
+                                  itemCount: notificacoes.length,
+                                  separatorBuilder: (_, i) => const Divisor(),
+                                  itemBuilder:
+                                      (_, i) => _itemNotificacaoWidget(
+                                        notificacoes[i],
+                                      ),
+                                ),
+                              ),
+                    ),
+                  ],
+                );
+              },
+            ),
       ),
     );
   }
@@ -83,17 +97,19 @@ class _NotificacoesPageState extends State<NotificacoesPage> {
         color: notificacao.viewed ? Colors.grey[200] : Colors.transparent,
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-          title: Text(
-            notificacao.title,
-            style: AppCss.mediumBold,
-          ),
+          title: Text(notificacao.title, style: AppCss.mediumBold),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               H(2),
               Text(notificacao.description),
               H(2),
-              Text('Enviada em: ${notificacao.createdAt.textHour()}', style: AppCss.minimumRegular.copyWith(color: AppColors.neutralMedium)),
+              Text(
+                'Enviada em: ${notificacao.createdAt.textHour()}',
+                style: AppCss.minimumRegular.copyWith(
+                  color: AppColors.neutralMedium,
+                ),
+              ),
             ],
           ),
         ),

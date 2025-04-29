@@ -10,7 +10,7 @@ class EnderecoModel {
   String bairro = '';
   String localidade = '';
   String estado = '';
-String numero = '';
+  String numero = '';
   String complemento = '';
   double lat = 0.0;
   double lon = 0.0;
@@ -28,9 +28,10 @@ String numero = '';
 
   EnderecoModel.empty();
 
-  String get name => localidade.isEmpty
-      ? 'Endereço Indisponível'
-      : '$logradouro, $numero - $bairro. $localidade-${estado.toUpperCase()}';
+  String get name =>
+      localidade.isEmpty
+          ? 'Endereço Indisponível'
+          : '$logradouro, $numero - $bairro. $localidade-${estado.toUpperCase()}';
 
   EnderecoModel.fromViacep(ViacepEndereco viacep) {
     cep = viacep.cep;
@@ -71,7 +72,8 @@ String numero = '';
 
   String toJson() => json.encode(toMap());
 
-  factory EnderecoModel.fromJson(String source) => EnderecoModel.fromMap(json.decode(source));
+  factory EnderecoModel.fromJson(String source) =>
+      EnderecoModel.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -115,14 +117,14 @@ class EnderecoCreateModel {
   }
 
   EnderecoModel toEndereco() => EnderecoModel(
-        cep: cep.text,
-        logradouro: logradouro.text,
-        bairro: bairro.text,
-        localidade: localidade.text,
-        estado: estado.text,
-        numero: numero.text,
-        complemento: complemento.text,
-        lat: lat.doubleValue,
-        lon: lon.doubleValue,
-      );
+    cep: cep.text,
+    logradouro: logradouro.text,
+    bairro: bairro.text,
+    localidade: localidade.text,
+    estado: estado.text,
+    numero: numero.text,
+    complemento: complemento.text,
+    lat: lat.doubleValue,
+    lon: lon.doubleValue,
+  );
 }

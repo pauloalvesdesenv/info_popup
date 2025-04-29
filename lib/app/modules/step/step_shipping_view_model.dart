@@ -11,7 +11,5 @@ class StepShippingCreateModel {
   }
 
   StepShippingModel toStepShippingModel() =>
-      StepShippingModel(
-        description: description.text,
-      );
+      StepShippingModel(description: description.text);
 }

@@ -13,7 +13,7 @@ class OrdemUtils {
   final TextController search = TextController();
   List<PedidoProdutoStatus> status = [
     PedidoProdutoStatus.aguardandoProducao,
-    PedidoProdutoStatus.produzindo
+    PedidoProdutoStatus.produzindo,
   ];
   ProdutoModel? produto;
 }
@@ -23,7 +23,7 @@ class OrdemConcluidasUtils {
   final TextController search = TextController();
   List<PedidoProdutoStatus> status = [
     PedidoProdutoStatus.aguardandoProducao,
-    PedidoProdutoStatus.produzindo
+    PedidoProdutoStatus.produzindo,
   ];
   ProdutoModel? produto;
 }
@@ -44,58 +44,64 @@ class OrdemCreateModel {
   late bool isEdit;
 
   OrdemCreateModel()
-      : id = '${[
-              ...FirestoreClient.ordens.dataStream.value,
-              ...FirestoreClient.ordens.dataConcluidasStream.value
-            ].length + 1}_${HashService.get}',
-        isEdit = false,
-        isCreate = true;
+    : id =
+          '${[...FirestoreClient.ordens.dataStream.value, ...FirestoreClient.ordens.dataConcluidasStream.value].length + 1}_${HashService.get}',
+      isEdit = false,
+      isCreate = true;
 
-  OrdemCreateModel.edit(OrdemModel ordem)
-      : id = ordem.id,
-        isEdit = true {
+  OrdemCreateModel.edit(OrdemModel ordem) : id = ordem.id, isEdit = true {
     isCreate = false;
     createdAt = ordem.createdAt;
-    produto = FirestoreClient.produtos.data
-        .firstWhere((e) => e.id == ordem.produto.id);
-    produtos = ordem.produtos
-        .map((e) =>
-            e.copyWith(isSelected: true, isAvailable: e.isAvailableToChanges))
-        .toList();
+    produto = FirestoreClient.produtos.data.firstWhere(
+      (e) => e.id == ordem.produto.id,
+    );
+    produtos =
+        ordem.produtos
+            .map(
+              (e) => e.copyWith(
+                isSelected: true,
+                isAvailable: e.isAvailableToChanges,
+              ),
+            )
+            .toList();
     freezed = OrdemFreezedCreateModel.edit(ordem.freezed);
     beltIndex = ordem.beltIndex;
     if (ordem.materiaPrima != null) {
-      materiaPrima =
-          FirestoreClient.materiaPrimas.getById(ordem.materiaPrima!.id);
+      materiaPrima = FirestoreClient.materiaPrimas.getById(
+        ordem.materiaPrima!.id,
+      );
     }
   }
 
   OrdemModel toOrdemModel() {
     return OrdemModel(
-        id: id,
-        createdAt: createdAt ?? DateTime.now(),
-        produto: produto!,
-        produtos: produtos
-            .map(
-              (e) => e.copyWith(
-                statusess: [
-                  ...e.statusess,
-                  if (e.statusess.last.status !=
-                      PedidoProdutoStatus.aguardandoProducao)
-                    if (e.isSelected && e.isAvailableToChanges)
-                      PedidoProdutoStatusModel.create(
-                          PedidoProdutoStatus.aguardandoProducao)
-                ],
-              ),
-            )
-            .toList(),
-        freezed:
-            isCreate ? OrdemFreezedModel.static() : freezed.toOrdemFreeze(),
-        beltIndex: isCreate
-            ? FirestoreClient.ordens.ordensNaoCongeladas.length
-            : beltIndex,
-        materiaPrima:
-            materiaPrima?.id == 'register_unavailable' ? null : materiaPrima);
+      id: id,
+      createdAt: createdAt ?? DateTime.now(),
+      produto: produto!,
+      produtos:
+          produtos
+              .map(
+                (e) => e.copyWith(
+                  statusess: [
+                    ...e.statusess,
+                    if (e.statusess.last.status !=
+                        PedidoProdutoStatus.aguardandoProducao)
+                      if (e.isSelected && e.isAvailableToChanges)
+                        PedidoProdutoStatusModel.create(
+                          PedidoProdutoStatus.aguardandoProducao,
+                        ),
+                  ],
+                ),
+              )
+              .toList(),
+      freezed: isCreate ? OrdemFreezedModel.static() : freezed.toOrdemFreeze(),
+      beltIndex:
+          isCreate
+              ? FirestoreClient.ordens.ordensNaoCongeladas.length
+              : beltIndex,
+      materiaPrima:
+          materiaPrima?.id == 'register_unavailable' ? null : materiaPrima,
+    );
   }
 }
 
@@ -116,6 +122,9 @@ class OrdemFreezedCreateModel {
 
   OrdemFreezedModel toOrdemFreeze() {
     return OrdemFreezedModel(
-        isFreezed: isFreezed, reason: reason, updatedAt: updatedAt);
+      isFreezed: isFreezed,
+      reason: reason,
+      updatedAt: updatedAt,
+    );
   }
 }

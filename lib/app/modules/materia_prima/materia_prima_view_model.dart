@@ -20,25 +20,25 @@ class MateriaPrimaCreateModel {
 
   late bool isEdit;
 
-  MateriaPrimaCreateModel()
-      : id = HashService.get,
-        isEdit = false;
+  MateriaPrimaCreateModel() : id = HashService.get, isEdit = false;
 
   MateriaPrimaCreateModel.edit(MateriaPrimaModel materiaPrima)
-      : id = materiaPrima.id,
-        isEdit = true {
-    fabricanteModel = FirestoreClient.fabricantes.getById(materiaPrima.fabricanteModel.id);
+    : id = materiaPrima.id,
+      isEdit = true {
+    fabricanteModel = FirestoreClient.fabricantes.getById(
+      materiaPrima.fabricanteModel.id,
+    );
     produtoModel = FirestoreClient.produtos.getById(materiaPrima.produto.id);
     corridaLote.text = materiaPrima.corridaLote;
     anexos = materiaPrima.anexos;
   }
 
   MateriaPrimaModel toMateriaPrimaModel() => MateriaPrimaModel(
-        id: id,
-        fabricanteModel: fabricanteModel!,
-        produto: produtoModel!,
-        corridaLote: corridaLote.text,
-        anexos: anexos,
-        status: MateriaPrimaStatus.disponivel,
-      );
+    id: id,
+    fabricanteModel: fabricanteModel!,
+    produto: produtoModel!,
+    corridaLote: corridaLote.text,
+    anexos: anexos,
+    status: MateriaPrimaStatus.disponivel,
+  );
 }

@@ -9,10 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-enum KanbanViewMode {
-  calendar,
-  kanban,
-}
+enum KanbanViewMode { calendar, kanban }
 
 class KanbanUtils {
   KanbanViewMode view = KanbanViewMode.kanban;

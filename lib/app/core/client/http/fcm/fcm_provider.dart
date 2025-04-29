@@ -1,4 +1,3 @@
-import 'package:aco_plus/app/core/client/firestore/collections/notificacao/notificacao_collection.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/notificacao/notificacao_model.dart';
 import 'package:aco_plus/app/core/client/firestore/firestore_client.dart';
 import 'package:aco_plus/app/core/services/push_notification_service.dart';
@@ -19,17 +18,20 @@ class FCMProvider {
   static Future<void> postSend(String userId, Map<String, dynamic> body) async {
     try {
       if (body['message']['token'] != null) {
-
-      await Dio().post(
+        await Dio().post(
           'https://fcm.googleapis.com/v1/projects/aco-plus-fa455/messages:send',
-          options: Options(headers: {
-            'Authorization': 'Bearer ${await _getAccessToken()}',
-            'Content-Type': 'application/json'
-          }),
-          data: body);
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer ${await _getAccessToken()}',
+              'Content-Type': 'application/json',
+            },
+          ),
+          data: body,
+        );
       }
-      await FirestoreClient.notificacoes
-          .add(NotificacaoModel.fromFCMMap(userId, body));
+      await FirestoreClient.notificacoes.add(
+        NotificacaoModel.fromFCMMap(userId, body),
+      );
     } catch (_) {
       return;
     }
@@ -51,13 +53,13 @@ class FCMProvider {
           "https://www.googleapis.com/oauth2/v1/certs",
       "client_x509_cert_url":
           "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ojuxq%40aco-plus-fa455.iam.gserviceaccount.com",
-      "universe_domain": "googleapis.com"
+      "universe_domain": "googleapis.com",
     };
 
     List<String> scopes = [
       "https://www.googleapis.com/auth/userinfo.email",
       "https://www.googleapis.com/auth/firebase.database",
-      "https://www.googleapis.com/auth/firebase.messaging"
+      "https://www.googleapis.com/auth/firebase.messaging",
     ];
 
     http.Client client = await auth.clientViaServiceAccount(
@@ -66,11 +68,12 @@ class FCMProvider {
     );
 
     // Obtain the access token
-    auth.AccessCredentials credentials =
-        await auth.obtainAccessCredentialsViaServiceAccount(
-            auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
-            scopes,
-            client);
+    auth.AccessCredentials credentials = await auth
+        .obtainAccessCredentialsViaServiceAccount(
+          auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
+          scopes,
+          client,
+        );
 
     // Close the HTTP client
     client.close();

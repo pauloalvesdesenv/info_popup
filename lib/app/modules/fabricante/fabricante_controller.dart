@@ -35,13 +35,17 @@ class FabricanteController {
   FabricanteCreateModel get form => formStream.value;
 
   void init(FabricanteModel? fabricante) {
-    formStream.add(fabricante != null
-        ? FabricanteCreateModel.edit(fabricante)
-        : FabricanteCreateModel());
+    formStream.add(
+      fabricante != null
+          ? FabricanteCreateModel.edit(fabricante)
+          : FabricanteCreateModel(),
+    );
   }
 
   List<FabricanteModel> getFabricanteesFiltered(
-      String search, List<FabricanteModel> fabricantes) {
+    String search,
+    List<FabricanteModel> fabricantes,
+  ) {
     if (search.length < 3) return fabricantes;
     List<FabricanteModel> filtered = [];
     for (final fabricante in fabricantes) {
@@ -52,7 +56,7 @@ class FabricanteController {
     return filtered;
   }
 
-  Future<void> onConfirm(_, FabricanteModel? fabricante) async {
+  Future<void> onConfirm(value, FabricanteModel? fabricante) async {
     try {
       onValid(fabricante);
       if (form.isEdit) {
@@ -61,43 +65,51 @@ class FabricanteController {
       } else {
         await FirestoreClient.fabricantes.add(form.toFabricanteModel());
       }
-      pop(_);
+      pop(value);
       NotificationService.showPositive(
-          'Fabricante ${form.isEdit ? 'Editado' : 'Adicionado'}',
-          'Operação realizada com sucesso',
-          position: NotificationPosition.bottom);
+        'Fabricante ${form.isEdit ? 'Editado' : 'Adicionado'}',
+        'Operação realizada com sucesso',
+        position: NotificationPosition.bottom,
+      );
     } catch (e) {
-      NotificationService.showNegative('Erro', e.toString(),
-          position: NotificationPosition.bottom);
+      NotificationService.showNegative(
+        'Erro',
+        e.toString(),
+        position: NotificationPosition.bottom,
+      );
     }
   }
 
-  Future<void> onDelete(_, FabricanteModel fabricante) async {
+  Future<void> onDelete(value, FabricanteModel fabricante) async {
     if (await _isDeleteUnavailable(fabricante)) return;
     await FirestoreClient.fabricantes.delete(fabricante);
-    pop(_);
+    pop(value);
     NotificationService.showPositive(
-        'Fabricante Excluido', 'Operação realizada com sucesso',
-        position: NotificationPosition.bottom);
+      'Fabricante Excluido',
+      'Operação realizada com sucesso',
+      position: NotificationPosition.bottom,
+    );
   }
 
   Future<bool> _isDeleteUnavailable(FabricanteModel fabricante) async =>
       !await onDeleteProcess(
-          deleteTitle: 'Deseja excluir o fabricante?',
-          deleteMessage: 'Todos seus dados serão apagados do sistema',
-          infoMessage:
-              'Não é possível exlcuir o fabricante, pois ele está vinculado a um produto.',
-          conditional: FirestoreClient.produtos.data
-              .any((e) => e.fabricante.id == fabricante.id),
-          );
+        deleteTitle: 'Deseja excluir o fabricante?',
+        deleteMessage: 'Todos seus dados serão apagados do sistema',
+        infoMessage:
+            'Não é possível exlcuir o fabricante, pois ele está vinculado a um produto.',
+        conditional: FirestoreClient.produtos.data.any(
+          (e) => e.fabricante.id == fabricante.id,
+        ),
+      );
 
   void onValid(FabricanteModel? fabricante) {
     if (form.nome.text.length < 2) {
       throw Exception('Nome deve conter no mínimo 3 caracteres');
     }
     if (form.isEdit) {
-      if (FirestoreClient.fabricantes.data
-          .any((e) => e.nome == form.nome.text)) {
+      if (FirestoreClient.fabricantes.data.any(
+        (e) => e.nome == form.nome.text,
+      )) {
         throw Exception('Já existe um fabricante com esse nome');
       }
     }

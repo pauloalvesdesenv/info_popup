@@ -86,47 +86,52 @@ class OrdemCollection {
     _isListen = true;
     (field != null
             ? collection.where(
-                field,
-                isEqualTo: isEqualTo,
-                isNotEqualTo: isNotEqualTo,
-                isLessThan: isLessThan,
-                isLessThanOrEqualTo: isLessThanOrEqualTo,
-                isGreaterThan: isGreaterThan,
-                isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
-                arrayContains: arrayContains,
-                arrayContainsAny: arrayContainsAny,
-                whereIn: whereIn,
-                whereNotIn: whereNotIn,
-                isNull: isNull,
-              )
+              field,
+              isEqualTo: isEqualTo,
+              isNotEqualTo: isNotEqualTo,
+              isLessThan: isLessThan,
+              isLessThanOrEqualTo: isLessThanOrEqualTo,
+              isGreaterThan: isGreaterThan,
+              isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
+              arrayContains: arrayContains,
+              arrayContainsAny: arrayContainsAny,
+              whereIn: whereIn,
+              whereNotIn: whereNotIn,
+              isNull: isNull,
+            )
             : collection)
         .snapshots()
         .listen((e) {
-      final ordens = e.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
+          final ordens =
+              e.docs.map((e) => OrdemModel.fromMap(e.data())).toList();
 
-      final ordensConcluidas =
-          ordens.where((e) => e.status == PedidoProdutoStatus.pronto).toList();
-      dataConcluidasStream.add(ordensConcluidas);
+          final ordensConcluidas =
+              ordens
+                  .where((e) => e.status == PedidoProdutoStatus.pronto)
+                  .toList();
+          dataConcluidasStream.add(ordensConcluidas);
 
-      final ordensNaoConcluidas =
-          ordens.where((e) => e.status != PedidoProdutoStatus.pronto).toList();
-      ordensNaoConcluidas.sort((a, b) {
-        if (a.freezed.isFreezed && !b.freezed.isFreezed) {
-          return 1;
-        } else if (!a.freezed.isFreezed && b.freezed.isFreezed) {
-          return -1;
-        }
+          final ordensNaoConcluidas =
+              ordens
+                  .where((e) => e.status != PedidoProdutoStatus.pronto)
+                  .toList();
+          ordensNaoConcluidas.sort((a, b) {
+            if (a.freezed.isFreezed && !b.freezed.isFreezed) {
+              return 1;
+            } else if (!a.freezed.isFreezed && b.freezed.isFreezed) {
+              return -1;
+            }
 
-        if (a.beltIndex == null || b.beltIndex == null) {
-          return 0;
-        }
-        return a.beltIndex!.compareTo(b.beltIndex!);
-      });
+            if (a.beltIndex == null || b.beltIndex == null) {
+              return 0;
+            }
+            return a.beltIndex!.compareTo(b.beltIndex!);
+          });
 
-      naoConcluidasStream.add(ordensNaoConcluidas);
+          naoConcluidasStream.add(ordensNaoConcluidas);
 
-      dataStream.add([...ordensConcluidas, ...ordensNaoConcluidas]);
-    });
+          dataStream.add([...ordensConcluidas, ...ordensNaoConcluidas]);
+        });
   }
 
   OrdemModel getById(String id) => data.firstWhere((e) => e.id == id);

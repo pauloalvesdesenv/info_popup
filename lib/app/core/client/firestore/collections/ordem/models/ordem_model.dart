@@ -27,47 +27,65 @@ class OrdemModel {
     return pedidosIds.map((e) => FirestoreClient.pedidos.getById(e)).toList();
   }
 
-  double get qtdeTotal => produtos.isEmpty
-      ? 0
-      : produtos.fold(
-          0, (previousValue, element) => previousValue + element.qtde);
+  double get qtdeTotal =>
+      produtos.isEmpty
+          ? 0
+          : produtos.fold(
+            0,
+            (previousValue, element) => previousValue + element.qtde,
+          );
 
   double quantideTotal() {
     return produtos.isEmpty
         ? 0
         : produtos.fold(
-            0, (previousValue, element) => previousValue + element.qtde);
+          0,
+          (previousValue, element) => previousValue + element.qtde,
+        );
   }
 
   double qtdeAguardando() {
-    var where = produtos
-        .where((e) =>
-            e.statusView.status == PedidoProdutoStatus.aguardandoProducao)
-        .toList();
+    var where =
+        produtos
+            .where(
+              (e) =>
+                  e.statusView.status == PedidoProdutoStatus.aguardandoProducao,
+            )
+            .toList();
     return where.isEmpty
         ? 0
         : where.fold(
-            0, (previousValue, element) => previousValue + element.qtde);
+          0,
+          (previousValue, element) => previousValue + element.qtde,
+        );
   }
 
   double qtdeProduzindo() {
-    var where = produtos
-        .where((e) => e.statusess.last.status == PedidoProdutoStatus.produzindo)
-        .toList();
+    var where =
+        produtos
+            .where(
+              (e) => e.statusess.last.status == PedidoProdutoStatus.produzindo,
+            )
+            .toList();
     return where.isEmpty
         ? 0
         : where.fold(
-            0, (previousValue, element) => previousValue + element.qtde);
+          0,
+          (previousValue, element) => previousValue + element.qtde,
+        );
   }
 
   double qtdePronto() {
-    var where = produtos
-        .where((e) => e.statusess.last.status == PedidoProdutoStatus.pronto)
-        .toList();
+    var where =
+        produtos
+            .where((e) => e.statusess.last.status == PedidoProdutoStatus.pronto)
+            .toList();
     return where.isEmpty
         ? 0
         : where.fold(
-            0, (previousValue, element) => previousValue + element.qtde);
+          0,
+          (previousValue, element) => previousValue + element.qtde,
+        );
   }
 
   IconData get icon {
@@ -142,9 +160,10 @@ class OrdemModel {
       'createdAt': createdAt.millisecondsSinceEpoch,
       'endAt': endAt?.millisecondsSinceEpoch,
       'produto': produto.toMap(),
-      'idPedidosProdutos': produtos
-          .map((x) => {'pedidoId': x.pedidoId, 'produtoId': x.id})
-          .toList(),
+      'idPedidosProdutos':
+          produtos
+              .map((x) => {'pedidoId': x.pedidoId, 'produtoId': x.id})
+              .toList(),
       'freezed': freezed.toMap(),
       'beltIndex': beltIndex,
       'materiaPrima': materiaPrima?.toMap(),
@@ -157,20 +176,27 @@ class OrdemModel {
       id: map['id'] ?? '',
       produto: ProdutoModel.fromMap(map['produto']),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      endAt: map['endAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['endAt'])
-          : null,
+      endAt:
+          map['endAt'] != null
+              ? DateTime.fromMillisecondsSinceEpoch(map['endAt'])
+              : null,
       produtos: List<PedidoProdutoModel>.from(
-        map['idPedidosProdutos']?.map((x) => FirestoreClient.pedidos
-            .getProdutoByPedidoId(x['pedidoId'], x['produtoId'])),
+        map['idPedidosProdutos']?.map(
+          (x) => FirestoreClient.pedidos.getProdutoByPedidoId(
+            x['pedidoId'],
+            x['produtoId'],
+          ),
+        ),
       ),
-      freezed: map['freezed'] != null
-          ? OrdemFreezedModel.fromMap(map['freezed'])
-          : OrdemFreezedModel.static().copyWith(),
+      freezed:
+          map['freezed'] != null
+              ? OrdemFreezedModel.fromMap(map['freezed'])
+              : OrdemFreezedModel.static().copyWith(),
       beltIndex: map['beltIndex'],
-      materiaPrima: map['materiaPrima'] != null
-          ? MateriaPrimaModel.fromMap(map['materiaPrima'])
-          : null,
+      materiaPrima:
+          map['materiaPrima'] != null
+              ? MateriaPrimaModel.fromMap(map['materiaPrima'])
+              : null,
     );
   }
 
@@ -204,7 +230,10 @@ class OrdemFreezedModel {
   final DateTime updatedAt;
 
   static static() => OrdemFreezedModel(
-      isFreezed: false, reason: TextController(), updatedAt: DateTime.now());
+    isFreezed: false,
+    reason: TextController(),
+    updatedAt: DateTime.now(),
+  );
 
   OrdemFreezedModel({
     required this.isFreezed,
@@ -236,9 +265,10 @@ class OrdemFreezedModel {
     return OrdemFreezedModel(
       isFreezed: map['isFreezed'] ?? false,
       reason: TextController(text: map['reason']),
-      updatedAt: map['updatedAt'] != null
-          ? DateTime.parse(map['updatedAt'])
-          : DateTime.now(),
+      updatedAt:
+          map['updatedAt'] != null
+              ? DateTime.parse(map['updatedAt'])
+              : DateTime.now(),
     );
   }
 

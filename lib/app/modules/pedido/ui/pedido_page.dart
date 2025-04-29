@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/enums/pedido_tipo.dart';
 import 'package:aco_plus/app/core/client/firestore/collections/pedido/models/pedido_model.dart';
 import 'package:aco_plus/app/core/components/app_scaffold.dart';
 import 'package:aco_plus/app/core/components/divisor.dart';
 import 'package:aco_plus/app/core/components/stream_out.dart';
 import 'package:aco_plus/app/core/components/w.dart';
-import 'package:aco_plus/app/modules/kanban/kanban_controller.dart';
 import 'package:aco_plus/app/modules/pedido/pedido_controller.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_anexos_widget.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_armacao_widget.dart';
@@ -24,7 +21,6 @@ import 'package:aco_plus/app/modules/pedido/ui/components/pedido_timeline_widget
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_top_bar.dart';
 import 'package:aco_plus/app/modules/pedido/ui/components/pedido_users_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 enum PedidoInitReason { page, kanban }
 
@@ -33,8 +29,12 @@ class PedidoPage extends StatefulWidget {
   final PedidoInitReason reason;
   final Function()? onDelete;
 
-  const PedidoPage(
-      {required this.pedido, required this.reason, this.onDelete, super.key});
+  const PedidoPage({
+    required this.pedido,
+    required this.reason,
+    this.onDelete,
+    super.key,
+  });
 
   @override
   State<PedidoPage> createState() => _PedidoPageState();
@@ -63,8 +63,11 @@ class _PedidoPageState extends State<PedidoPage>
     super.build(context);
     return StreamOut(
       stream: pedidoCtrl.pedidoStream.listen,
-      builder: (_, pedido) =>
-          isKanban ? _kanbanReasonWidget(pedido) : _pedidoReasonWidget(pedido),
+      builder:
+          (_, pedido) =>
+              isKanban
+                  ? _kanbanReasonWidget(pedido)
+                  : _pedidoReasonWidget(pedido),
     );
   }
 
@@ -81,10 +84,7 @@ class _PedidoPageState extends State<PedidoPage>
   }
 
   Widget _kanbanReasonWidget(PedidoModel pedido) {
-    return Material(
-      surfaceTintColor: Colors.transparent,
-      child: body(pedido),
-    );
+    return Material(surfaceTintColor: Colors.transparent, child: body(pedido));
   }
 
   Widget body(PedidoModel pedido) {
@@ -123,7 +123,7 @@ class _PedidoPageState extends State<PedidoPage>
               const Divisor(),
               if (pedido.tipo == PedidoTipo.cda) ...[
                 PedidoArmacaoWidget(pedido),
-                const Divisor()
+                const Divisor(),
               ],
             ],
           ),
@@ -131,7 +131,7 @@ class _PedidoPageState extends State<PedidoPage>
           PedidoEntregaWidget(pedido),
           const Divisor(),
         ],
-        
+
         if (pedido.instrucoesEntrega.isNotEmpty ||
             pedido.instrucoesFinanceiras.isNotEmpty) ...[
           PedidoFinancWidget(pedido),

@@ -35,13 +35,17 @@ class MateriaPrimaController {
   MateriaPrimaCreateModel get form => formStream.value;
 
   void init(MateriaPrimaModel? materiaPrima) {
-    formStream.add(materiaPrima != null
-        ? MateriaPrimaCreateModel.edit(materiaPrima)
-        : MateriaPrimaCreateModel());
+    formStream.add(
+      materiaPrima != null
+          ? MateriaPrimaCreateModel.edit(materiaPrima)
+          : MateriaPrimaCreateModel(),
+    );
   }
 
   List<MateriaPrimaModel> getMateriaPrimaesFiltered(
-      String search, List<MateriaPrimaModel> materiaPrimas) {
+    String search,
+    List<MateriaPrimaModel> materiaPrimas,
+  ) {
     if (search.length < 3) return materiaPrimas;
     List<MateriaPrimaModel> filtered = [];
     for (final materiaPrima in materiaPrimas) {
@@ -52,7 +56,7 @@ class MateriaPrimaController {
     return filtered;
   }
 
-  Future<void> onConfirm(_, MateriaPrimaModel? materiaPrima) async {
+  Future<void> onConfirm(value, MateriaPrimaModel? materiaPrima) async {
     try {
       onValid(materiaPrima);
       if (form.isEdit) {
@@ -61,36 +65,42 @@ class MateriaPrimaController {
       } else {
         await FirestoreClient.materiaPrimas.add(form.toMateriaPrimaModel());
       }
-      pop(_);
+      pop(value);
       NotificationService.showPositive(
-          'Matéria Prima ${form.isEdit ? 'Editada' : 'Adicionada'}',
-          'Operação realizada com sucesso',
-          position: NotificationPosition.bottom);
+        'Matéria Prima ${form.isEdit ? 'Editada' : 'Adicionada'}',
+        'Operação realizada com sucesso',
+        position: NotificationPosition.bottom,
+      );
     } catch (e) {
-      NotificationService.showNegative('Erro', e.toString(),
-          position: NotificationPosition.bottom);
+      NotificationService.showNegative(
+        'Erro',
+        e.toString(),
+        position: NotificationPosition.bottom,
+      );
     }
   }
 
-  Future<void> onDelete(_, MateriaPrimaModel materiaPrima) async {
+  Future<void> onDelete(value, MateriaPrimaModel materiaPrima) async {
     if (await _isDeleteUnavailable(materiaPrima)) return;
     await FirestoreClient.materiaPrimas.delete(materiaPrima);
-    pop(_);
+    pop(value);
     NotificationService.showPositive(
-        'Matéria Prima Excluída', 'Operação realizada com sucesso',
-        position: NotificationPosition.bottom);
+      'Matéria Prima Excluída',
+      'Operação realizada com sucesso',
+      position: NotificationPosition.bottom,
+    );
   }
 
   Future<bool> _isDeleteUnavailable(MateriaPrimaModel materiaPrima) async =>
       !await onDeleteProcess(
-          deleteTitle: 'Deseja excluir a Matéria Prima?',
-          deleteMessage: 'Todos seus dados serão apagados do sistema',
-          infoMessage:
-              'Não é possível exlcuir a Matéria Prima, pois ela está vinculada a uma Ordem.',
-              conditional: true,
-          // conditional: FirestoreClient.produtos.data
-          //     .any((e) => e.materiaPrima.id == materiaPrima.id),
-          );
+        deleteTitle: 'Deseja excluir a Matéria Prima?',
+        deleteMessage: 'Todos seus dados serão apagados do sistema',
+        infoMessage:
+            'Não é possível exlcuir a Matéria Prima, pois ela está vinculada a uma Ordem.',
+        conditional: true,
+        // conditional: FirestoreClient.produtos.data
+        //     .any((e) => e.materiaPrima.id == materiaPrima.id),
+      );
 
   void onValid(MateriaPrimaModel? materiaPrima) {
     if (form.fabricanteModel == null) {
@@ -102,6 +112,5 @@ class MateriaPrimaController {
     if (form.corridaLote.text.length < 2) {
       throw Exception('Corrida deve conter no mínimo 3 caracteres');
     }
-
   }
 }

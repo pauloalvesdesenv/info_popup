@@ -10,25 +10,25 @@ class StreamOut<T> extends StatelessWidget {
   final Widget loading;
 
   const StreamOut({
-    Key? key,
+    super.key,
     required this.stream,
     required this.builder,
     this.preFunction,
     this.condition = true,
     this.request,
     this.loading = const LoadingStreamOut(),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     if (condition && preFunction != null) preFunction!.call();
     return StreamBuilder<T>(
       stream: stream,
-      builder: (_, snapshot) {
+      builder: (value, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.hasData) {
           if (snapshot.data != null) {
-            return builder(_, snapshot.requireData);
+            return builder(value, snapshot.requireData);
           } else {
             return loading;
           }
@@ -49,24 +49,24 @@ class StreamOutNull<T> extends StatelessWidget {
   final Widget loading;
 
   const StreamOutNull({
-    Key? key,
+    super.key,
     required this.stream,
     required this.child,
     this.preFunction,
     this.condition = true,
     this.request,
     this.loading = const SizedBox(),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     if (condition && preFunction != null) preFunction!.call();
     return StreamBuilder<T?>(
       stream: stream,
-      builder: (BuildContext _, AsyncSnapshot<T?> snapshot) {
+      builder: (BuildContext value, AsyncSnapshot<T?> snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.hasData) {
-          return child(_, snapshot.data);
+          return child(value, snapshot.data);
         } else {
           return loading;
         }
@@ -87,7 +87,7 @@ class StreamOutResponse<ApiResponse, T> extends StatelessWidget {
   final double columnLength;
 
   const StreamOutResponse({
-    Key? key,
+    super.key,
     required this.stream,
     required this.child,
     this.preFunction,
@@ -97,14 +97,14 @@ class StreamOutResponse<ApiResponse, T> extends StatelessWidget {
     this.loading,
     this.emptyLoading,
     this.columnLength = 1,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     if (condition && preFunction != null) preFunction!.call();
     return StreamBuilder<ApiResponse>(
       stream: stream,
-      builder: (_, snapshot) {
+      builder: (value, snapshot) {
         if (snapshot.connectionState != ConnectionState.active) {
           return emptyLoading ?? loading ?? Container();
         }
@@ -112,7 +112,7 @@ class StreamOutResponse<ApiResponse, T> extends StatelessWidget {
             snapshot.hasData) {
           dynamic response = snapshot.requireData;
           if (response.hasData) {
-            return child(_, response.data);
+            return child(value, response.data);
           } else if (response.hasLoading) {
             return loading ?? const SizedBox();
           } else {
