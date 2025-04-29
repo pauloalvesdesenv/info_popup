@@ -1,1 +1,0 @@
-enum WidgetViewMode { minified, normal }
