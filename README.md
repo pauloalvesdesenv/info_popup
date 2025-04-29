@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Introduction
 
 The `info_popup` package allows you to easily show a **simple**, **customizable** popup on your wrapped widget. The **highlight feature**, which can be activated at will, helps draw the user's attention to the desired location. 
@@ -165,3 +166,21 @@ The info_popup package provides a simple and effective way to show a customizabl
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/SalihCanBinboga/info_popup/blob/master/LICENSE "LICENSE") file for details.
+=======
+# Goals
+
+A new Flutter project.
+
+## Getting Started
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
+>>>>>>> refs/remotes/origin/main
